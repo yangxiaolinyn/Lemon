@@ -115,94 +115,6 @@
       RETURN
       END SUBROUTINE Emitter_A_Photon2
 
-
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Set_initial_parameter_values( Phot, Emitter )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      IMPLICIT NONE
-      !REAL(mcp), INTENT(IN) :: T_e
-      TYPE(Photon_Emitter), INTENT(INOUT) :: Emitter
-      TYPE(Photon), INTENT(INOUT) :: Phot 
-      REAL(mcp) :: E_low, E_up
-
-
-      Emitter%ln_nu1 = 8.D0
-      Emitter%ln_nu2 = 15.D0
-      Emitter%T_e = 100.D0 * mec2
-
-      phot%ln_nu1 = 8.D0
-      phot%ln_nu2 = 15.D0
-      phot%T_e = 100.D0 * mec2
-      phot%R_out = one
-
-      E_low = 1.D-5
-      E_up = 1.D1 
-      phot%n_e = 1.D20
-      Emitter%n_e = phot%n_e 
-      phot%logE_low = DLOG10(E_low)
-      phot%logE_up = DLOG10(E_up)
-      phot%effect_number = 0
-
-      RETURN
-      END SUBROUTINE Set_initial_parameter_values
-
-
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Emitter_A_Photon( Emitter )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      IMPLICIT NONE 
-      TYPE(Photon_Emitter), INTENT(INOUT) :: Emitter 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      Emitter%r = ranmar()**(one/three) 
-      Emitter%mucos = one - two * ranmar()
-      Emitter%musin = dsqrt( one - Emitter%mucos**2 )
-      Emitter%phi = twopi * ranmar()
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      Emitter%x = Emitter%r * Emitter%musin * dcos( Emitter%phi )
-      Emitter%y = Emitter%r * Emitter%musin * dsin( Emitter%phi )
-      Emitter%z = Emitter%r * Emitter%mucos
-      Emitter%Vector_of_position(1) = Emitter%x
-      Emitter%Vector_of_position(2) = Emitter%y
-      Emitter%Vector_of_position(3) = Emitter%z 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      CALL Emitter%j_nu_theta_emissity_sampling( )  
-      Emitter%Vector_of_Momentum(1:3) = Emitter%Phot4k_CtrCF(2:4) / Emitter%Phot4k_CtrCF(1)  
-
-      RETURN
-      END SUBROUTINE Emitter_A_Photon
-
-
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Transmit_Data_And_Parameters_From_Emitter2Photon( Emitter, Phot )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      IMPLICIT NONE
-      TYPE(Photon_Emitter), INTENT(IN) :: Emitter
-      TYPE(Photon), INTENT(INOUT) :: Phot 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      
-      phot%r_ini      = Emitter%r
-      phot%theta_ini  = Emitter%theta
-      phot%mucos_ini  = Emitter%mucos
-      phot%musin_ini  = Emitter%musin
-      phot%phi_ini    = Emitter%phi 
-      phot%x_ini  = Emitter%x
-      phot%y_ini  = Emitter%y
-      phot%z_ini  = Emitter%z
-      phot%Vector_of_Momentum_ini = Emitter%Vector_of_Momentum
-      phot%Vector_of_position_ini = Emitter%Vector_of_position
-      phot%Phot4k_CtrCF_ini = Emitter%Phot4k_CtrCF 
-      phot%Phot4k_CovCF_ini = Emitter%Phot4k_CovCF 
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      phot%E_ini = DABS( Emitter%Phot4k_CovCF(1) )  
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      phot%w_ini = Emitter%w_ini_em 
-      phot%Optical_Depth_absorption = Emitter%Optical_Depth_absorption
-      phot%j_Enu_theta = Emitter%j_Enu_theta
-  
-      RETURN
-      END SUBROUTINE Transmit_Data_And_Parameters_From_Emitter2Photon
- 
   
   
 
@@ -259,7 +171,7 @@
     Num_Photons = 0 
     phot%v_L_v_i = zero 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    CALL Set_initial_parameter_values( phot, Emitter ) 
+    CALL phot%Set_initial_parameter_values( ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     if( myid == np-1 ) then
         !CALL Emitter_A_Photon2( Emitter, phot )  
@@ -271,8 +183,8 @@
     !****************************************************
         Num_Photons = Num_Photons + 1 
         !write(unit = *, fmt = *)'ggg==', Num_Photons 
-        CALL Emitter_A_Photon( Emitter ) 
-        CALL Transmit_Data_And_Parameters_From_Emitter2Photon( Emitter, Phot )  
+        CALL phot%Emitter_A_Photon( ) 
+        !CALL Transmit_Data_And_Parameters_From_Emitter2Photon( Emitter, Phot )  
         CALL phot%Calc_Phot_Informations_At_Observor_2zones( ) 
 
 112     continue

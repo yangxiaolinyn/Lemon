@@ -17,7 +17,7 @@
           real(mcp) :: R_out
           real(mcp) :: w_ini_em
           real(mcp) :: mag_B = 1.D0
-          real(mcp) :: n_e! = 1.D15
+          real(mcp) :: n_e 
           real(mcp) :: Big_Theta_e = 100.D0 
           real(mcp) :: j_Enu_theta
           real(mcp) :: weights_y(1: N_wt) = zero
@@ -161,6 +161,7 @@
       this%j_Enu_theta = this%j_theta_nu_emissity( nu, zero, one )
       this%E_ini = this%Phot4k_CtrCF(1) 
       this%w_ini_em = this%j_Enu_theta * nu
+      this%w_ini = this%j_Enu_theta * nu
 
       this%Optical_Depth_absorption = this%j_Enu_theta / &
           ( two * planck_h * (this%E_ini*1.D6*erg_of_one_ev / planck_h )**3 / Cv**2 / &
@@ -168,6 +169,7 @@
 
       this%Phot4k_CovCF = this%Phot4k_CtrCF
       this%Phot4k_CovCF(1) = - this%Phot4k_CovCF(1)
+      this%E_ini = DABS( this%Phot4k_CtrCF(1) )  
       end subroutine j_nu_theta_emissity_sampling_Sub
  
 !*******************************************************************************************************

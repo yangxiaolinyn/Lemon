@@ -1,11 +1,12 @@
       module ScatDistance
       !use ScatterPhoton
-      use Basic_Variables_And_Methods
+      !use Basic_Variables_And_Methods
       use CrossSection 
+      use PhotonEmitter
       implicit none 
       integer, parameter :: N_sigma = 1000 
 
-      type, public, extends(Basic_Variables_And_Methods_Of_Particle) :: Photon_With_ScatDistance
+      type, public, extends(Photon_Emitter) :: Photon_With_ScatDistance
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 !* The BL coordinates of the photon at p, which determines the BL coordinates  *
 !* by YNOGK functions: r(p), mucos(p), phi(p), t(p), sigma(p)                  *
@@ -71,39 +72,20 @@
           procedure, public :: sigma_fn
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          procedure, public :: Set_Cross_Section   => Set_Cross_Section_sub  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!   Subroutines for non-Kerr space-time
+          procedure, public :: Set_Cross_Section   => Set_Cross_Section_sub   
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
           procedure, public :: Set_Cross_Section_3Te => Set_Cross_Section_3Te_sub
           procedure, public :: n_e_p => n_e_p_fn
-          procedure, public :: get_Tau2_At_out_zone => get_Tau2_At_out_zone_fn 
-          !procedure, public :: RandomNum2p_case2   =>   RandomNum2p_case2_fn
-          !procedure, public :: Integrals   =>    Integrals_fn
-          !procedure, public :: RandomNum2p_case3   =>   RandomNum2p_case3_fn
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          !procedure, public :: RandNum2p_case1_Finit_Space   =>  &
-          !                      RandNum2p_case1_Finit_Space_fn
-          !procedure, public :: RandNum2p_case2_Finit_Space   =>  &
-          !                      RandNum2p_case2_Finit_Space_fn
-          !procedure, public :: RandNum2p_case3_Finit_Space   =>  &
-          !                      RandNum2p_case3_Finit_Space_fn
+          procedure, public :: get_Tau2_At_out_zone => get_Tau2_At_out_zone_fn  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       end type Photon_With_ScatDistance
  
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      private ::  Set_Cross_Section_sub  
+      private :: Set_Cross_Section_sub  
       private :: Set_Cross_Section_3Te_sub 
       private :: n_e_p_fn
-      private :: get_Tau2_At_out_zone_fn
-      !private :: RandomNum2p_case3_fn
-      !private :: RandomNum2p_case2_fn
-      !private :: Integrals_fn
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !private :: RandNum2p_case1_Finit_Space_fn
-      !private :: RandNum2p_case2_Finit_Space_fn
-      !private :: RandNum2p_case3_Finit_Space_fn
+      private :: get_Tau2_At_out_zone_fn 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
       contains  
