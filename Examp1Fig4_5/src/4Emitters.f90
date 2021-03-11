@@ -28,15 +28,7 @@
           procedure, public :: j_nu_theta_emissity_sampling  =>  j_nu_theta_emissity_sampling_Sub
           procedure, public :: j_theta_nu_emissity   =>   j_theta_nu_emissity_fn
           procedure, public :: j_theta_E_nu_emissity   =>   j_theta_E_nu_emissity_fn
-          procedure, public :: get_Phot4k    =>  get_Phot4k_Sub
-          !procedure, public :: get_Phot4k_LNRF  =>  get_Phot4k_LNRF_Sub
-          !procedure, public :: Set_Phot4k_LNRF  =>  Set_Phot4k_LNRF_Sub
-          !procedure, public :: get_Phot4k_BL    =>  get_Phot4k_BL_Sub
-          !procedure, public :: get_Phot_Covariant4k_BL    =>  get_Phot_Covariant4k_BL_Sub
-          !procedure, public :: Set_Phot4k_BL    =>  Set_Phot4k_BL_Sub
-          !procedure, public :: get_Phot4k_CovBL =>  get_Phot4k_CovBL_Sub 
-          !procedure, public :: Get_Phot4k_inCF_From_4k_inBL => Get_Phot4k_inCF_From_4k_inBL_Sub
-          !procedure, public :: temp1
+          procedure, public :: get_Phot4k    =>  get_Phot4k_Sub 
 
       end type Photon_Emitter
 
@@ -44,13 +36,7 @@
       private :: j_nu_theta_emissity_sampling_Sub
       private :: j_theta_nu_emissity_fn
       private :: get_Phot4k_Sub
-      private :: j_theta_E_nu_emissity_fn
-      !private :: get_Phot4k_BL_Sub
-      !private :: Set_Phot4k_BL_Sub
-      !private :: get_Phot4k_LNRF_Sub
-      !private :: get_Phot_Covariant4k_BL_Sub
-      !private :: Get_Phot4k_inCF_From_4k_inBL_Sub
-      !private :: get_Phot4k_CovBL_Sub
+      private :: j_theta_E_nu_emissity_fn 
 
       contains
 
