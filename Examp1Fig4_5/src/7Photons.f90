@@ -55,6 +55,7 @@
       this%ln_nu1 = 8.D0
       this%ln_nu2 = 15.D0
       this%T_e = 100.D0 * mec2
+      !this%Theta_e = 100.D0 * mec2
       this%R_out = one
 
       E_low = 1.D-5

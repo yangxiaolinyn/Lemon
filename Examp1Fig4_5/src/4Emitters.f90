@@ -10,7 +10,7 @@
           real(mcp), parameter :: c4 = 2.D0**(11.D0/12.D0)
           real(mcp), parameter :: prob1 = c1 / ( c1 + c2 + c3 )
           real(mcp), parameter :: prob2 = ( c1 + c2 ) / ( c1 + c2 + c3 )
-          integer, parameter :: N_wt = 3000
+          !integer, parameter :: N_wt = 3000
 
       type, public, extends(Basic_Variables_And_Methods_Of_Particle) :: Photon_Emitter
           real(mcp) :: R_in
@@ -20,8 +20,9 @@
           real(mcp) :: n_e 
           real(mcp) :: Big_Theta_e = 100.D0 
           real(mcp) :: j_Enu_theta
-          real(mcp) :: weights_y(1: N_wt) = zero
+          !real(mcp) :: weights_y(1: N_wt) = zero
           real(mcp) :: Optical_Depth_absorption
+          real(mcp), private :: Theta_e
 
       contains 
           procedure, public :: get_Phot4k_CtrCF_CovCF    =>  get_Phot4k_CtrCF_CovCF_Sub
@@ -164,8 +165,8 @@
       this%w_ini = this%j_Enu_theta * nu
 
       this%Optical_Depth_absorption = this%j_Enu_theta / &
-          ( two * planck_h * (this%E_ini*1.D6*erg_of_one_ev / planck_h )**3 / Cv**2 / &
-                       ( dexp(this%E_ini/51.1D0) - one ) ) 
+          ( two * planck_h * ( this%E_ini * 1.D6 * erg_of_one_ev / planck_h )**3 / Cv**2 / &
+                       ( dexp( this%E_ini / this%T_e ) - one ) ) 
 
       this%Phot4k_CovCF = this%Phot4k_CtrCF
       this%Phot4k_CovCF(1) = - this%Phot4k_CovCF(1)
