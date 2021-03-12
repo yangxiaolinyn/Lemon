@@ -23,6 +23,13 @@
           !real(mcp) :: weights_y(1: N_wt) = zero
           real(mcp) :: Optical_Depth_absorption
           real(mcp), private :: Theta_e
+          real(mcp) :: n_obs(1: 3)
+          real(mcp) :: sin_theta_obs
+          real(mcp) :: cos_theta_obs
+          real(mcp) :: sin_phi_obs
+          real(mcp) :: cos_phi_obs
+          real(mcp) :: theta_obs
+          real(mcp) :: phi_obs
 
       contains 
           procedure, public :: get_Phot4k_CtrCF_CovCF    =>  get_Phot4k_CtrCF_CovCF_Sub
@@ -146,8 +153,8 @@
       nu0 = two / nine * electron_Charge * this%mag_B / &
                  ( twopi * electron_mass * Cv) * Big_Theta**2 
 
-      costheta = zero
-      sintheta = one
+      !costheta = zero
+      !sintheta = one
   
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       ln_nu = this%ln_nu1 + ranmar() * ( this%ln_nu2 - this%ln_nu1 )  
@@ -155,22 +162,21 @@
       phi = ranmar() * twopi
 
       this%Phot4k_CtrCF(1) = nu * h_ev * 1.D-6
-      this%Phot4k_CtrCF(2) = this%Phot4k_CtrCF(1) * sintheta * DCOS(phi)
-      this%Phot4k_CtrCF(3) = this%Phot4k_CtrCF(1) * sintheta * DSIN(phi)
-      this%Phot4k_CtrCF(4) = this%Phot4k_CtrCF(1) * costheta
+      this%Phot4k_CtrCF(2) = this%Phot4k_CtrCF(1) * this%sin_theta_obs * DCOS(phi)
+      this%Phot4k_CtrCF(3) = this%Phot4k_CtrCF(1) * this%sin_theta_obs * DSIN(phi)
+      this%Phot4k_CtrCF(4) = this%Phot4k_CtrCF(1) * this%cos_theta_obs
 
-      this%j_Enu_theta = this%j_theta_nu_emissity( nu, zero, one )
+      this%j_Enu_theta = this%j_theta_nu_emissity( nu, this%cos_theta_obs, this%sin_theta_obs )
       this%E_ini = this%Phot4k_CtrCF(1) 
       this%w_ini_em = this%j_Enu_theta * nu
-      this%w_ini = this%j_Enu_theta * nu
+      this%w_ini = this%w_ini_em
 
       this%Optical_Depth_absorption = this%j_Enu_theta / &
           ( two * planck_h * ( this%E_ini * 1.D6 * erg_of_one_ev / planck_h )**3 / Cv**2 / &
                        ( dexp( this%E_ini / this%T_e ) - one ) ) 
 
       this%Phot4k_CovCF = this%Phot4k_CtrCF
-      this%Phot4k_CovCF(1) = - this%Phot4k_CovCF(1)
-      this%E_ini = DABS( this%Phot4k_CtrCF(1) )  
+      this%Phot4k_CovCF(1) = - this%Phot4k_CovCF(1)   
       end subroutine j_nu_theta_emissity_sampling_Sub
  
 !*******************************************************************************************************

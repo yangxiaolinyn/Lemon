@@ -1,22 +1,17 @@
-    program main 
-    !use Statistial_Method_Of_Infinity_zone 
+    program main  
     use Statistial_Method_Of_Finity_zone
-    implicit none
-    real(mcp) :: a_spin
-    integer :: methods_cases
-    integer(kind = 8) :: Total_Phot_Num 
-    TYPE(Photon_Emitter) :: Emitter 
-    TYPE(Photon) :: Phot 
+    implicit none  
+    integer(kind = 8) :: Total_Phot_Num     
+    type(Photon) :: phot 
+    real(mcp) :: the_obs, phi_obs
  
-    call InitRandom()
-    methods_cases = 1
-    if( methods_cases == 1 )then
-        Total_Phot_Num = 1D10
-        call mimick_of_photon_with_finity_zone( Total_Phot_Num )
-    else
-        !Total_Phot_Num = 2D8
-        !call mimick_of_photon_with_infinity_zone(a_spin, Total_Phot_Num)
-    endif
+    the_obs = 90.D0
+    phi_obs = zero
+
+    CALL phot%Set_initial_parameter_values( the_obs, phi_obs ) 
+
+    Total_Phot_Num = 1D10
+    call mimick_of_photon_with_finity_zone( Total_Phot_Num, phot )  
 
     END PROGRAM main
 

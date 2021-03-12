@@ -1,11 +1,7 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       MODULE SemiAnalyMethod
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !USE constants
-      USE Photons
-      !USE RandUtils
-      !USE PhotonEmitter
-      !USE Photons 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      USE Photons 
       IMPLICIT NONE 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -64,11 +60,11 @@
       TYPE(Photon), INTENT(INOUT) :: Phot 
       REAL(mcp) :: j_nu, D, L, R_sphere, r_xy, r_max, dr, dtheta, theta_xy
       REAL(mcp) :: dnu, nu_low, nu_up, v_Lv(0: 500), Length_0
-      REAL(mcp) :: alpha, nu, costheta, sintheta, alpha_nu 
+      REAL(mcp) :: alpha, nu, costhetaB, sinthetaB, alpha_nu 
       integer(kind=8) :: i, j, k, Nr, Nt, Nn
 
       v_Lv = zero
-      R_sphere = one
+      R_sphere = phot%R_out
       Nr = 300
       Nt = 300
       Nn = 500
@@ -85,17 +81,18 @@
               Do k = 0, Nn
                   nu = 10**( k * dnu + phot%ln_nu1 )
                   theta_xy = dtheta * j
-                  costheta = r_xy * dsin( theta_xy ) / dsqrt( r_xy**2 + D**2 )
-                  sintheta = dsqrt( one - costheta**2 ) 
+                  costhetaB = ( phot%cos_theta_obs + r_xy * dsin( theta_xy ) * &
+                                phot%sin_theta_obs ) / dsqrt( r_xy**2 + D**2 )
+                  sinthetaB = dsqrt( one - costhetaB**2 ) 
                   Length_0 = two * dsqrt( R_sphere**2 - ( L*r_xy )**2 / ( D**2 + r_xy**2 ) ) 
-                  alpha_nu = phot%j_theta_nu_emissity( nu, costheta, sintheta ) / &
+                  alpha_nu = phot%j_theta_nu_emissity( nu, costhetaB, sinthetaB ) / &
                              ( two*planck_h*nu**3/Cv**2 / ( dexp( h_ev*nu*1.D-6/phot%T_e ) - one ) ) 
                   if( Length_0 * alpha_nu <= 1.D-10 )then
                       v_Lv( k ) = v_Lv( k ) + nu * phot%j_theta_nu_emissity &
-                              ( nu, costheta, sintheta ) * Length_0  
+                              ( nu, costhetaB, sinthetaB ) * Length_0  
                   else
                       v_Lv( k ) = v_Lv( k ) + nu * phot%j_theta_nu_emissity &
-                              ( nu, costheta, sintheta ) / alpha_nu * &
+                              ( nu, costhetaB, sinthetaB ) / alpha_nu * &
                               ( one - dexp( - Length_0 * alpha_nu ) )  
                   endif 
                   !write(*, *)'sss====', phot%n_e * phot%sigma_fn( phot%T_e, nu*h_ev*1.D-6 ),alpha_nu, &

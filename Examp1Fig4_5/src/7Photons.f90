@@ -42,11 +42,11 @@
  
       contains    
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Set_initial_parameter_values_Sub( this )
+      SUBROUTINE Set_initial_parameter_values_Sub( this, theobs, phiobs )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       IMPLICIT NONE
       class(Photon) :: this
-      !REAL(mcp), INTENT(IN) :: T_e
+      REAL(mcp), INTENT(IN) :: theobs, phiobs
       !TYPE(Photon_Emitter), INTENT(INOUT) :: Emitter
       !TYPE(Photon), INTENT(INOUT) :: Phot 
       REAL(mcp) :: E_low, E_up
@@ -54,8 +54,7 @@
 
       this%ln_nu1 = 8.D0
       this%ln_nu2 = 15.D0
-      this%T_e = 100.D0 * mec2
-      !this%Theta_e = 100.D0 * mec2
+      this%T_e = 100.D0 * mec2 
       this%R_out = one
 
       E_low = 1.D-5
@@ -64,6 +63,15 @@
       this%logE_low = DLOG10(E_low)
       this%logE_up = DLOG10(E_up)
       this%effect_number = 0
+
+      this%theta_obs = theobs
+      this%sin_theta_obs = dsin( theobs * dtor )
+      this%cos_theta_obs = dcos( theobs * dtor )
+      this%sin_phi_obs = dsin( phiobs * dtor )
+      this%cos_phi_obs = dcos( phiobs * dtor )
+      this%n_obs(1) = this%sin_theta_obs * this%cos_phi_obs
+      this%n_obs(2) = this%sin_theta_obs * this%sin_phi_obs
+      this%n_obs(3) = this%cos_theta_obs
 
       RETURN
       END SUBROUTINE Set_initial_parameter_values_Sub
@@ -123,11 +131,7 @@
      
       return
       end subroutine Calc_Phot_Informations_At_Observor_2zones_Sub
-!*******************************************************************************************************
 !******************************************************************************************************* 
-!*******************************************************************************************************
-!*******************************************************************************************************
-!*******************************************************************************************************
  
       end module Photons
 
