@@ -2,6 +2,7 @@
     MODULE Statistial_Method_Of_Finity_zone
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     USE RandUtils
+    !USE Photons 
     USE SemiAnalyMethod 
     USE MPI
     IMPLICIT NONE 
@@ -9,11 +10,14 @@
 
     CONTAINS 
 !**************************************************************************************
-    SUBROUTINE mimick_of_photon_with_finity_zone( Total_Phot_Num, phot )
+    SUBROUTINE mimick_of_photon_with_finity_zone( Total_Phot_Num, the_obs, &
+                phi_obs, y1, y2, Te, Rout, SemiAnalyResults )
 !************************************************************************************** 
     implicit none  
-    integer(kind = 8), intent(in) :: Total_Phot_Num   
-    type(Photon), intent(inout) :: phot 
+    integer(kind = 8), intent(in) :: Total_Phot_Num
+    real(mcp), intent(in) :: the_obs, phi_obs, y1, y2, Te, Rout
+    type(Photon) :: phot 
+    character*80, intent(in) :: SemiAnalyResults 
     integer(kind = 8) :: Num_Photons
     integer :: send_num, recv_num, send_tag, RECV_SOURCE, status(MPI_STATUS_SIZE)  
     real(mcp) :: v_L_v_Sent(0:500), v_L_v_Recv(0:500) 
@@ -45,11 +49,11 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Num_Photons = 0 
     phot%v_L_v_i = zero 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    !CALL phot%Set_initial_parameter_values( ) 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+    CALL phot%Set_initial_parameter_values( the_obs, phi_obs, y1, y2, Te, Rout ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     if( myid == np-1 ) then
-        !CALL Semi_Analytical_Calculations2( phot )
+        CALL Semi_Analytical_Calculations2( phot, SemiAnalyResults )
     endif 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
