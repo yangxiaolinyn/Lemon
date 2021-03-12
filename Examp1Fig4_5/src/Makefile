@@ -73,7 +73,8 @@ OBJS =  $(OUT_DIR)/ConstantsUnit.o \
         $(OUT_DIR)/5CrossSection.o \
         $(OUT_DIR)/4Emitters.o \
         $(OUT_DIR)/7Photons.o \
-        $(OUT_DIR)/8SubFunc_Finity_zone_method.o \
+        $(OUT_DIR)/8SemiAnalyticalResults.o \
+        $(OUT_DIR)/9SubFunc_Finity_zone_method.o \
         $(OUT_DIR)/main.o     
 #        8SubroutinesFunctions_two_zones.o \
 #        BesselKn.o \
