@@ -1,35 +1,26 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      MODULE Statistial_Method_Of_Finity_zone
+    MODULE Statistial_Method_Of_Finity_zone
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !USE constants
-      USE RandUtils
-      USE SemiAnalyMethod
-      !USE PhotonEmitter
-      !USE Photons
-      USE MPI
-      IMPLICIT NONE 
+    !USE constants
+    USE RandUtils
+    USE SemiAnalyMethod
+    !USE PhotonEmitter
+    !USE Photons
+    USE MPI
+    IMPLICIT NONE 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      CONTAINS 
+    CONTAINS 
 !**************************************************************************************
     SUBROUTINE mimick_of_photon_with_finity_zone( Total_Phot_Num )
 !************************************************************************************** 
     implicit none 
-    real(mcp) :: T_e, E, dt, t = 0.D0, p_length, E_low, E_up, Tb = 2.D-3
-    real(mcp), parameter :: n_e1 = 1.6D17 
+    !real(mcp) :: T_e, E, Tb = 2.D-3 
     integer(kind = 8) :: Num_Photons
-    integer(kind = 8), intent(in) :: Total_Phot_Num  
-    !real(mcp) :: R_out, R_in, rea, img, E_max = 1.D15*h_ev*1.D-6 
-    !type(Photon_Emitter) :: Emitter
+    integer(kind = 8), intent(in) :: Total_Phot_Num   
     type(Photon) :: phot 
-    integer :: send_num, recv_num, send_tag, RECV_SOURCE, status(MPI_STATUS_SIZE) 
-    !integer :: effect_Photon_Number_Sent 
-    !integer :: effect_Photon_Number_Recv, cases
-    !real(mcp), dimension(0:400, 0:400) :: disk_image_Sent, disk_image_Recv
-    !real(mcp), dimension(1:500, 1:1000) :: ET_array_Recv, ET_array_Sent
+    integer :: send_num, recv_num, send_tag, RECV_SOURCE, status(MPI_STATUS_SIZE)  
     real(mcp) :: v_L_v_Sent(0:500), v_L_v_Recv(0:500) 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     integer i,j,del,reals
 !--------------MPI---------------------------------------------------------------
@@ -53,8 +44,7 @@
         mydutyphot = Total_Phot_Num / np
     endif 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!| Set Initial conditions for the Photon                     !
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+!| Set Initial conditions for the Photon                     !  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Num_Photons = 0 
     phot%v_L_v_i = zero 
@@ -62,7 +52,7 @@
     CALL phot%Set_initial_parameter_values( ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     if( myid == np-1 ) then
-        !CALL Emitter_A_Photon2( Emitter, phot )  
+        !Semi_Analytical_Calculations2( phot )  
     endif 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -94,6 +84,7 @@
           write(*,*)'MPI_Processor ', myid, ' has send v_L_v_Sent to Master Processor!'
   
       else  
+
           if (np-2 >= 0) then
               do RECV_SOURCE = 0, np-2 
                   recv_num = 500
