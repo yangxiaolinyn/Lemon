@@ -167,7 +167,7 @@
                                    this%Vector_of_Momentum_ini(1: 3) 
 
       this%j_Enu_theta = this%j_theta_nu_emissity( nu, this%cos_theta_obs, this%sin_theta_obs )
-      this%E_ini = this%Phot4k_CtrCF(1) 
+      this%E_ini = this%Phot4k_CtrCF_ini(1) 
       this%w_ini_em = this%j_Enu_theta * nu
       this%w_ini = this%w_ini_em
 

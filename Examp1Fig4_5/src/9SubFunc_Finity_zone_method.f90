@@ -11,13 +11,13 @@
     CONTAINS 
 !**************************************************************************************
     SUBROUTINE mimick_of_photon_with_finity_zone( Total_Phot_Num, the_obs, &
-                phi_obs, y1, y2, Te, Rout, SemiAnalyResults )
+                phi_obs, y1, y2, Te, Rout, SemiAnalyResults, MCResults )
 !************************************************************************************** 
     implicit none  
     integer(kind = 8), intent(in) :: Total_Phot_Num
     real(mcp), intent(in) :: the_obs, phi_obs, y1, y2, Te, Rout
     type(Photon) :: phot 
-    character*80, intent(in) :: SemiAnalyResults 
+    character*80, intent(in) :: SemiAnalyResults, MCResults 
     integer(kind = 8) :: Num_Photons
     integer :: send_num, recv_num, send_tag, RECV_SOURCE, status(MPI_STATUS_SIZE)  
     real(mcp) :: v_L_v_Sent(0:500), v_L_v_Recv(0:500) 
@@ -52,9 +52,11 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     CALL phot%Set_initial_parameter_values( the_obs, phi_obs, y1, y2, Te, Rout ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    CALL MPI_BARRIER( MPI_COMM_WORLD, ierr )
     if( myid == np-1 ) then
-        CALL Semi_Analytical_Calculations2( phot, SemiAnalyResults )
+        CALL Semi_Analytical_Calculations1( phot, SemiAnalyResults )
     endif 
+    CALL MPI_BARRIER( MPI_COMM_WORLD, ierr )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     !****************************************************
@@ -98,7 +100,7 @@
           endif 
           write(*,*)'There are', phot%effect_number, 'of total', Total_Phot_Num, 'photons',&
                         'arrive at the plate of observer!!' 
-          open(unit=17, file='./spectrum/vLv_MC_2.txt', status="replace")  
+          open(unit=17, file = MCResults, status="replace")  
           do j = 0, 499
               write(unit = 17, fmt = *)phot%v_L_v_i(j)
           enddo 

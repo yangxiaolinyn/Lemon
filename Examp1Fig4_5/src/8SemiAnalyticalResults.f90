@@ -11,6 +11,79 @@
 
       CONTAINS  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      SUBROUTINE Semi_Analytical_Calculations1( Phot, SemiAnalyResults )
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      IMPLICIT NONE
+      !TYPE(Photon_Emitter), INTENT(INOUT) :: Emitter
+      TYPE(Photon), INTENT(INOUT) :: Phot 
+      character*80, intent(in) :: SemiAnalyResults 
+      REAL(mcp) :: j_nu, D, L, R_sphere, r_xy, r_max, dx, dy, dtheta, theta_xy, x, y
+      REAL(mcp) :: dnu, nu_low, nu_up, v_Lv(0: 500), Length_0, R02
+      REAL(mcp) :: alpha, nu, costhetaB, sinthetaB, alpha_nu 
+      integer :: i, j, k, Nx, Ny, Nn, istat
+
+      !open(unit=16, file = SemiAnalyResults, status="replace") 
+      open(unit=16, file = SemiAnalyResults, status = "old", &
+                           action = "read", iostat = istat)
+    if(istat /= 0)then
+      open(unit=19, file = SemiAnalyResults, status = "replace", &
+                                   action = "write", iostat = istat)
+      v_Lv = zero
+      R_sphere = phot%R_out
+      Nx = 500
+      Ny = 500
+      Nn = 500
+      D = one
+      L = 1.D31 
+      r_max = D * R_sphere / dsqrt( L**2 - R_sphere**2 )
+      dx = r_max * two / Nx
+      dy = r_max * two / Ny 
+      dnu = ( phot%ln_nu2 - phot%ln_nu1 ) / Nn
+      DO i = 0, Nx
+          x = dx * i - r_max
+          write(*, *)'sss====', i, r_xy
+          DO j = 0, Ny
+              y = dy * j - r_max
+              r_xy = dsqrt( x**2 + y**2 )
+              R02 = ( L*r_xy )**2 / ( D**2 + r_xy**2 )
+              if( R_sphere**2 >= R02 )then
+                Do k = 0, Nn
+                  nu = 10**( k * dnu + phot%ln_nu1 ) 
+                  costhetaB = ( phot%cos_theta_obs + y * &
+                                phot%sin_theta_obs ) / dsqrt( r_xy**2 + D**2 )
+                  sinthetaB = dsqrt( one - costhetaB**2 ) 
+                  Length_0 = two * dsqrt( R_sphere**2 - R02 ) 
+                  alpha_nu = phot%j_theta_nu_emissity( nu, costhetaB, sinthetaB ) / &
+                              ( two*planck_h*nu**3/Cv**2 / ( dexp( h_ev*nu*1.D-6/phot%T_e ) - one ) ) 
+                  if( Length_0 * alpha_nu <= 1.D-10 )then
+                      v_Lv( k ) = v_Lv( k ) + nu * phot%j_theta_nu_emissity &
+                              ( nu, costhetaB, sinthetaB ) * Length_0  
+                  else
+                      v_Lv( k ) = v_Lv( k ) + nu * phot%j_theta_nu_emissity &
+                              ( nu, costhetaB, sinthetaB ) / alpha_nu * &
+                              ( one - dexp( - Length_0 * alpha_nu ) )  
+                  endif
+                  !write(*, *)'sss====', phot%n_e * phot%sigma_fn( phot%T_e, nu*h_ev*1.D-6 ),alpha_nu, &
+                  !       alpha_nu - phot%n_e * phot%sigma_fn( phot%T_e, nu*h_ev*1.D-6 )
+                  !       phot%j_theta_nu_emissity( one, nu, costheta, sintheta )
+                enddo
+              else
+              endif
+          ENDDO
+      ENDDO
+      do k = 0,Nn
+          write(unit = 19, fmt = *)v_Lv( k )
+      enddo
+      close(unit=19) 
+      stop
+    else
+    endif
+      close(unit=16)  
+      RETURN
+      END SUBROUTINE Semi_Analytical_Calculations1
+
+
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       SUBROUTINE Semi_Analytical_Calculations2( Phot, SemiAnalyResults )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       IMPLICIT NONE
@@ -34,7 +107,7 @@
       Nt = 300
       Nn = 500
       D = one
-      L = 1.D10 
+      L = 1.D100 
       r_max = D * R_sphere / dsqrt( L**2 - R_sphere**2 )
       dr = r_max / Nr
       dtheta = twopi / Nt 
@@ -53,8 +126,8 @@
                   alpha_nu = phot%j_theta_nu_emissity( nu, costhetaB, sinthetaB ) / &
                               ( two*planck_h*nu**3/Cv**2 / ( dexp( h_ev*nu*1.D-6/phot%T_e ) - one ) ) 
                   if( Length_0 * alpha_nu <= 1.D-10 )then
-                      !v_Lv( k ) = v_Lv( k ) + nu * phot%j_theta_nu_emissity &
-                      !        ( nu, costhetaB, sinthetaB ) * Length_0  
+                      v_Lv( k ) = v_Lv( k ) + nu * phot%j_theta_nu_emissity &
+                              ( nu, costhetaB, sinthetaB ) * Length_0  
                   else
                       v_Lv( k ) = v_Lv( k ) + nu * phot%j_theta_nu_emissity &
                               ( nu, costhetaB, sinthetaB ) / alpha_nu * &
@@ -70,6 +143,7 @@
           write(unit = 19, fmt = *)v_Lv( k )
       enddo
       close(unit=19) 
+      stop
     else
     endif
       close(unit=16)  
