@@ -49,7 +49,7 @@
     !CALL phot%Set_initial_parameter_values( ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     if( myid == np-1 ) then
-        !Semi_Analytical_Calculations2( phot )  
+        !CALL Semi_Analytical_Calculations2( phot )
     endif 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

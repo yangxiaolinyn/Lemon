@@ -29,7 +29,7 @@
           Lv_MC_total = Lv_MC_total + Lv_MC(i)
       endfor
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      Openr,lunAo10,'./vLv_Integral2.txt',/Get_Lun
+      Openr,lunAo10,'./vLv_Integral3.txt',/Get_Lun
       Point_lun,lunAo10,0
       Lv_Int2=fltarr(ns)
       ReadF,lunAo10,Lv_Int2
@@ -65,7 +65,7 @@
       l=16 & xxss=l*(ratio) & yyss=l
       ;xoff=(LL-xxss)/2.,yoff=(3*LL/2.-yyss)/2.,
       !p.font = 0
-      device,filename='vLv_02.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
+      device,filename='vLv_04.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
       /color,xoff=(2-xxss)/2.0,yoff=(2-yyss)/2.,$
       set_font='Times-Roman';, /tt_font
 

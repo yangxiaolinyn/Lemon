@@ -142,7 +142,7 @@
       implicit none
       class(Photon_Emitter) :: this
       !real(mcp), intent(in) :: T_e
-      real(mcp) :: nu, costheta, sintheta, phi
+      real(mcp) :: nu, phi
       real(mcp) :: nu0, nus, Big_Theta
       real(mcp) :: r1, r2, y1, a1, b1 
       real(mcp) :: del_ln_nu, nu1, nu2, del_nu
@@ -152,19 +152,19 @@
       Big_Theta = this%T_e / mec2
       nu0 = two / nine * electron_Charge * this%mag_B / &
                  ( twopi * electron_mass * Cv) * Big_Theta**2 
-
-      !costheta = zero
-      !sintheta = one
+ 
   
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       ln_nu = this%ln_nu1 + ranmar() * ( this%ln_nu2 - this%ln_nu1 )  
       nu = 10.D0**( ln_nu ) 
       phi = ranmar() * twopi
 
-      this%Phot4k_CtrCF(1) = nu * h_ev * 1.D-6
-      this%Phot4k_CtrCF(2) = this%Phot4k_CtrCF(1) * this%sin_theta_obs * DCOS(phi)
-      this%Phot4k_CtrCF(3) = this%Phot4k_CtrCF(1) * this%sin_theta_obs * DSIN(phi)
-      this%Phot4k_CtrCF(4) = this%Phot4k_CtrCF(1) * this%cos_theta_obs
+      this%Phot4k_CtrCF_ini(1) = nu * h_ev * 1.D-6
+      this%Vector_of_Momentum_ini(1) = this%sin_theta_obs * DCOS(phi)
+      this%Vector_of_Momentum_ini(2) = this%sin_theta_obs * DSIN(phi)
+      this%Vector_of_Momentum_ini(3) = this%cos_theta_obs
+      this%Phot4k_CtrCF_ini(2:4) = this%Phot4k_CtrCF_ini(1) * &
+                                   this%Vector_of_Momentum_ini(1: 3) 
 
       this%j_Enu_theta = this%j_theta_nu_emissity( nu, this%cos_theta_obs, this%sin_theta_obs )
       this%E_ini = this%Phot4k_CtrCF(1) 
@@ -175,8 +175,8 @@
           ( two * planck_h * ( this%E_ini * 1.D6 * erg_of_one_ev / planck_h )**3 / Cv**2 / &
                        ( dexp( this%E_ini / this%T_e ) - one ) ) 
 
-      this%Phot4k_CovCF = this%Phot4k_CtrCF
-      this%Phot4k_CovCF(1) = - this%Phot4k_CovCF(1)   
+      this%Phot4k_CovCF_ini = this%Phot4k_CtrCF_ini
+      this%Phot4k_CovCF_ini(1) = - this%Phot4k_CovCF_ini(1)   
       end subroutine j_nu_theta_emissity_sampling_Sub
  
 !*******************************************************************************************************

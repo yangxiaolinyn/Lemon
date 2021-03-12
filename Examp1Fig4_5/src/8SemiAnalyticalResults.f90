@@ -61,7 +61,7 @@
       REAL(mcp) :: j_nu, D, L, R_sphere, r_xy, r_max, dr, dtheta, theta_xy
       REAL(mcp) :: dnu, nu_low, nu_up, v_Lv(0: 500), Length_0
       REAL(mcp) :: alpha, nu, costhetaB, sinthetaB, alpha_nu 
-      integer(kind=8) :: i, j, k, Nr, Nt, Nn
+      integer :: i, j, k, Nr, Nt, Nn
 
       v_Lv = zero
       R_sphere = phot%R_out
@@ -101,7 +101,7 @@
               enddo
           ENDDO
       ENDDO
-      open(unit=16, file='./spectrum/vLv_Integral2.txt', status="replace") 
+      open(unit=16, file='./spectrum/vLv_Integral3.txt', status="replace") 
       do k = 0,Nn
           write(unit = 16, fmt = *)v_Lv( k )
       enddo 

@@ -42,20 +42,20 @@
  
       contains    
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Set_initial_parameter_values_Sub( this, theobs, phiobs )
+      SUBROUTINE Set_initial_parameter_values_Sub( this, theobs, phiobs, y1, y2, Te, Rout )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       IMPLICIT NONE
       class(Photon) :: this
-      REAL(mcp), INTENT(IN) :: theobs, phiobs
+      REAL(mcp), INTENT(IN) :: theobs, phiobs, y1, y2, Te, Rout
       !TYPE(Photon_Emitter), INTENT(INOUT) :: Emitter
       !TYPE(Photon), INTENT(INOUT) :: Phot 
       REAL(mcp) :: E_low, E_up
   
 
-      this%ln_nu1 = 8.D0
-      this%ln_nu2 = 15.D0
-      this%T_e = 100.D0 * mec2 
-      this%R_out = one
+      this%ln_nu1 = y1
+      this%ln_nu2 = y2
+      this%T_e = Te
+      this%R_out = Rout
 
       E_low = 1.D-5
       E_up = 1.D1 
@@ -90,15 +90,15 @@
       this%musin_ini = dsqrt( one - this%mucos**2 )
       this%phi_ini = twopi * ranmar()
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      this%x_ini = this%r * this%musin * dcos( this%phi )
-      this%y_ini = this%r * this%musin * dsin( this%phi )
-      this%z_ini = this%r * this%mucos
+      this%x_ini = this%r_ini * this%musin_ini * dcos( this%phi_ini )
+      this%y_ini = this%r_ini * this%musin_ini * dsin( this%phi_ini )
+      this%z_ini = this%r_ini * this%mucos_ini
       this%Vector_of_position_ini(1) = this%x_ini
       this%Vector_of_position_ini(2) = this%y_ini
       this%Vector_of_position_ini(3) = this%z_ini
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       CALL this%j_nu_theta_emissity_sampling( )  
-      this%Vector_of_Momentum_ini(1:3) = this%Phot4k_CtrCF(2:4) / this%Phot4k_CtrCF(1)  
+      !this%Vector_of_Momentum_ini(1:3) = this%Phot4k_CtrCF(2:4) / this%Phot4k_CtrCF(1)  
 
       RETURN
       END SUBROUTINE Emitter_A_Photon_Sub
