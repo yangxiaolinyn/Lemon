@@ -42,11 +42,11 @@
  
       contains    
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Set_initial_parameter_values_Sub( this, theobs, phiobs, y1, y2, Te, Rout )
+      SUBROUTINE Set_initial_parameter_values_Sub( this, theobs, phiobs, y1, y2, Te, ne, Rout )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       IMPLICIT NONE
       class(Photon) :: this
-      REAL(mcp), INTENT(IN) :: theobs, phiobs, y1, y2, Te, Rout
+      REAL(mcp), INTENT(IN) :: theobs, phiobs, y1, y2, Te, ne, Rout
       !TYPE(Photon_Emitter), INTENT(INOUT) :: Emitter
       !TYPE(Photon), INTENT(INOUT) :: Phot 
       REAL(mcp) :: E_low, E_up
@@ -59,7 +59,7 @@
 
       E_low = 1.D-5
       E_up = 1.D1 
-      this%n_e = 1.D20 
+      this%n_e = ne
       this%logE_low = DLOG10(E_low)
       this%logE_up = DLOG10(E_up)
       this%effect_number = 0

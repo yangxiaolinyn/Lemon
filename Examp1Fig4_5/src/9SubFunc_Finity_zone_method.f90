@@ -11,11 +11,11 @@
     CONTAINS 
 !**************************************************************************************
     SUBROUTINE mimick_of_photon_with_finity_zone( Total_Phot_Num, the_obs, &
-                phi_obs, y1, y2, Te, Rout, SemiAnalyResults, MCResults )
+                phi_obs, y1, y2, Te, ne, Rout, SemiAnalyResults, MCResults )
 !************************************************************************************** 
     implicit none  
     integer(kind = 8), intent(in) :: Total_Phot_Num
-    real(mcp), intent(in) :: the_obs, phi_obs, y1, y2, Te, Rout
+    real(mcp), intent(in) :: the_obs, phi_obs, y1, y2, Te, ne, Rout
     type(Photon) :: phot 
     character*80, intent(in) :: SemiAnalyResults, MCResults 
     integer(kind = 8) :: Num_Photons
@@ -50,7 +50,7 @@
     Num_Photons = 0 
     phot%v_L_v_i = zero 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    CALL phot%Set_initial_parameter_values( the_obs, phi_obs, y1, y2, Te, Rout ) 
+    CALL phot%Set_initial_parameter_values( the_obs, phi_obs, y1, y2, Te, ne, Rout ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CALL MPI_BARRIER( MPI_COMM_WORLD, ierr )
     if( myid == np-1 ) then
