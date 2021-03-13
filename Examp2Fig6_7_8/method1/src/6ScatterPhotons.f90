@@ -1,5 +1,6 @@
       module ScatterPhoton
-      use Basic_Variables_And_Methods
+      !use Basic_Variables_And_Methods
+      use PhotonEmitter
       implicit none
       !integer, parameter :: N_sigma = 1000
       !integer, parameter :: N_H3 = 4000
@@ -7,7 +8,7 @@
       !real(mcp), dimension(0:N_H3) :: H3Array
       !real(mcp), parameter :: n_e = 2.D16
        
-      type, public, extends(Basic_Variables_And_Methods_Of_Particle) :: ScatPhoton
+      type, public, extends(Photon_Emitter) :: ScatPhoton
           real(mcp), dimension(1:3) :: PhotAxisX
           real(mcp), dimension(1:3) :: PhotAxisY
           real(mcp), dimension(1:3) :: PhotAxisZ

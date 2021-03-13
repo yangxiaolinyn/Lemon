@@ -28,8 +28,8 @@
           real(mcp) :: time_travel
           real(mcp) :: t_standard
           real(mcp) :: r_obs
-          real(mcp) :: R_in
-          real(mcp) :: R_out
+          !real(mcp) :: R_in
+          !real(mcp) :: R_out
           real(mcp) :: Important_Sampling_Const
           logical :: test_it = .FALSE.
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
