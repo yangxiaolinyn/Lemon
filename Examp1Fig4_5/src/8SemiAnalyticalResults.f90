@@ -74,8 +74,7 @@
       do k = 0,Nn
           write(unit = 19, fmt = *)v_Lv( k )
       enddo
-      close(unit=19) 
-      stop
+      close(unit=19)  
     else
     endif
       close(unit=16)  
@@ -142,8 +141,7 @@
       do k = 0,Nn
           write(unit = 19, fmt = *)v_Lv( k )
       enddo
-      close(unit=19) 
-      stop
+      close(unit=19)  
     else
     endif
       close(unit=16)  
