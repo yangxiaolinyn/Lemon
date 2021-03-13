@@ -4,7 +4,7 @@
 
       ns = 500
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      Openr,lunAo10,'./vLv_Integral1.txt',/Get_Lun
+      Openr,lunAo10,'./SARtobs=90.000pobs=0.000ne=1.0E+15.txt',/Get_Lun
       Point_lun,lunAo10,0
       Lv_Int=fltarr(ns)
       ReadF,lunAo10,Lv_Int
@@ -18,7 +18,7 @@
           Lv_Int_total = Lv_Int_total + Lv_Int(i)
       endfor
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      Openr,lunAo10,'./vLv_MC_1.txt',/Get_Lun
+      Openr,lunAo10,'./MCRtobs=90.000pobs=0.000ne=1.0E+15.txt',/Get_Lun
       Point_lun,lunAo10,0
       Lv_MC=fltarr(ns)
       ReadF,lunAo10,Lv_MC
@@ -28,30 +28,7 @@
       for i=0,ns-1 do begin 
           Lv_MC_total = Lv_MC_total + Lv_MC(i)
       endfor
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      Openr,lunAo10,'./vLv_Integral3.txt',/Get_Lun
-      Point_lun,lunAo10,0
-      Lv_Int2=fltarr(ns)
-      ReadF,lunAo10,Lv_Int2
-      free_lun,lunAo10   
-
-      Lv_Int2_total = 0.
-      vv8 = fltarr(ns)
-      for i=0,ns-1 do begin 
-          vv8(i) = 8.+(15.-8.)/ns*i
-          Lv_Int2_total = Lv_Int2_total + Lv_Int2(i)
-      endfor
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      Openr,lunAo10,'./vLv_MC_2.txt',/Get_Lun
-      Point_lun,lunAo10,0
-      Lv_MC2=fltarr(ns)
-      ReadF,lunAo10,Lv_MC2
-      free_lun,lunAo10  
-
-      Lv_MC2_total = 0.
-      for i=0,ns-1 do begin 
-          Lv_MC2_total = Lv_MC2_total + Lv_MC2(i)
-      endfor
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ;total1=total(yy(*))
@@ -65,7 +42,7 @@
       l=16 & xxss=l*(ratio) & yyss=l
       ;xoff=(LL-xxss)/2.,yoff=(3*LL/2.-yyss)/2.,
       !p.font = 0
-      device,filename='vLv_04.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
+      device,filename='vLv_01.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
       /color,xoff=(2-xxss)/2.0,yoff=(2-yyss)/2.,$
       set_font='Times-Roman';, /tt_font
 
@@ -86,11 +63,13 @@
       cyan = 253
       magenta = 254
 
+      cs = 2.0
+
       xlen=0.7
       ylen=0.7
       xlow = 8.
       xup =  15. 
-      ylow = -19
+      ylow = -16
       yup = -1
       posup=[(1.-xlen)/2.,(1.-ylen)/2.,(1.+xlen)/2.,(1.+ylen)/2.] 
       !x.style = 0
@@ -98,21 +77,22 @@
       plot,[xlow,xup],[ylow,yup],pos=[posup],/noerase,/nodata,/device,$
          xrange=[xlow,xup],yrange=[ylow,yup],/ynozero,/normal,xstyle=1+4,ystyle=1+4
  
-      axis,xaxis=1,xticks=7,xminor=2,xtickname=replicate(' ',12)
+      axis,xaxis=1,xticks=7,xminor=2,xtickname=replicate(' ',12), charsize=cs
       axis,xaxis=0,xticks=7,xminor=2,xrange=[xlow,xup],xstyle=1,$;font=-1,$;,xtickname=replicate(' ',6),$;,
-      charsize=1,xtitle=textoidl('Log(\nu)');,xthick=tickth,color=colors
+      charsize=cs,xtitle=textoidl('Log(\nu)[Hz]');,xthick=tickth,color=colors
 
       ;axis,yaxis=0,ytitle=textoidl('Log(\nu L_\nu[erg s^{-1}])'),yticks=10,yminor=2,yrange=[ylow,yup],ystyle=1
-      axis,yaxis=0,ytitle=textoidl('Log(\nu L_\nu[erg s^{-1}])'),yticks=6,yminor=3,yrange=[ylow,yup],ystyle=1
-      axis,yaxis=1,ytickname=replicate(' ',20),yticks=8,yminor=2
+      axis,yaxis=0,ytitle=textoidl('Log(\nu L_\nu[erg s^{-1}])'),yticks=5,$
+          yminor=3,yrange=[ylow,yup],ystyle=1, charsize=cs
+      axis,yaxis=1,ytickname=replicate(' ',20),yticks=5,yminor=3, charsize=cs
       dyy = 0.35
       y0 = 5
       for i=0,0 do begin
-          ;oplot,vv(*),alog10(Lv_Int / Lv_Int_total),thick=2,color=black,linestyle=6;,psym=-4 
-          ;oplot,vv(*),alog10(Lv_MC / Lv_MC_total),thick=6,color=black,linestyle=1;,psym=-4 
+          oplot,vv(*),alog10(Lv_Int / Lv_Int_total),thick=2,color=black,linestyle=6;,psym=-4 
+          oplot,vv(*),alog10(Lv_MC / Lv_MC_total),thick=6,color=black,linestyle=1;,psym=-4 
 
-          oplot,vv(*),alog10(Lv_Int2 / Lv_Int2_total),thick=2,color=black,linestyle=6;,psym=-4 
-          oplot,vv(*),alog10(Lv_MC2 / Lv_MC2_total),thick=6,color=black,linestyle=1;,psym=-4 
+          ;oplot,vv(*),alog10(Lv_Int2 / Lv_Int2_total),thick=2,color=black,linestyle=6;,psym=-4 
+          ;oplot,vv(*),alog10(Lv_MC2 / Lv_MC2_total),thick=6,color=black,linestyle=1;,psym=-4 
           ;oplot,vv8(*),alog10(v_Lv2(*)/v_Lv2_total),thick=2,color=black,linestyle=6;,psym=-4
           ;oplot,vv8(*),alog10(vLv8(*)/Lv8_total),thick=6,color=black,linestyle=1;,psym=4
           ;oplot,vv(*)-3,vv(*)*1.5,thick=2,color=cyan,linestyle=6;,psym=-4

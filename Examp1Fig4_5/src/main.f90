@@ -10,7 +10,10 @@
     y1 = 8.D0
     y2 = 15.D0
     Te = 100.D0 * mec2
-    ne = 1.D20
+    ! Fig4, n_e = 1.E15
+    !ne = 1.D15
+    ! Fig5, n_e = 1.E20
+    ne = 1.D20 
     Rout = one
 
     write(tobs, "(f8.3)")the_obs
