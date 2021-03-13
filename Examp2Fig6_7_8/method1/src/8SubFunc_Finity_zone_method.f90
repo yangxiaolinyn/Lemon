@@ -9,24 +9,21 @@
 
     CONTAINS 
 !**************************************************************************************
-    SUBROUTINE mimick_of_photon_with_finity_zone( Total_Phot_Num, tau, T_e, T_s, n_e )
+    SUBROUTINE mimick_of_photon_with_finity_zone( Total_Phot_Num, tau, &
+                           T_e, T_s, n_e, CrossSec_filename, MCResults )
 !************************************************************************************** 
     implicit none
     integer(kind = 8), intent(in) :: Total_Phot_Num
     real(mcp), intent(in) :: tau, T_e, T_s, n_e
-    !real(mcp) :: T_e, E, dt, t = 0.D0, p_length, E_low, E_up 
+    character*80, intent(in) :: CrossSec_filename, MCResults
     integer(kind = 8) :: scatter_Times = 0
     integer(kind = 8) :: Num_Photons 
-    !real(mcp) :: R_out, R_in, rea, img
-    logical :: At_outer_Shell, At_inner_Shell
-    !type(Photon_Emitter) :: Emitter
+    logical :: At_outer_Shell, At_inner_Shell 
     type(Photon) :: phot
     type(ScatPhoton) :: sphot
     integer :: send_num, recv_num, send_tag, RECV_SOURCE, status(MPI_STATUS_SIZE) 
     integer :: effect_Photon_Number_Sent 
-    integer :: effect_Photon_Number_Recv, cases
-    real(mcp), dimension(0:400, 0:400) :: disk_image_Sent, disk_image_Recv
-    real(mcp), dimension(1:500, 1:1000) :: ET_array_Recv, ET_array_Sent
+    integer :: effect_Photon_Number_Recv, cases  
     real(mcp) :: v_L_v_Sent(1:500), v_L_v_Recv(1:500), temp_ET 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     integer i,j,del,reals
@@ -54,7 +51,8 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Num_Photons = 0 
     phot%v_L_v_i = zero
-    call phot%Set_Initial_Parameters_And_Conditions( tau, T_e, T_s, n_e ) 
+    call phot%Set_Initial_Parameters_And_Conditions( tau, T_e, &
+                                   T_s, n_e, CrossSec_filename ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     Do 
         Num_Photons = Num_Photons + 1 
@@ -104,23 +102,15 @@
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 112     continue
-        If ( mod(Num_photons,1000000)==0 ) then
-        !write(unit = *, fmt = *)'*************************************************************************' 
-        write(unit = *, fmt = *)'*************************************************************************'
-        !write(unit = *, fmt = *)'*****                                                               *****' 
-        !write(unit = *, fmt = *)'*****                                                               *****' 
+        If ( mod(Num_photons,1000000)==0 ) then 
+        write(unit = *, fmt = *)'*************************************************************************' 
         write(unit = *, fmt = *)'***** The',Num_Photons,'th Photons have been scattered', &
                                   phot%scatter_times, &
                          'times and Escapted from the region !!!!!!!'      
-        write(unit = *, fmt = *)'***** My Duty Photon Number is: ',myid, mydutyphot 
-        !write(unit = *, fmt = *)'***** The Photon goes to infinity is', phot%Go2infinity
-        !write(unit = *, fmt = *)'***** The Photon has fall into BH is', phot%fall2BH
-        !write(unit = *, fmt = *)'*****                                                               *****' 
-        !write(unit = *, fmt = *)'*****                                                               *****' 
-        !write(unit = *, fmt = *)'*************************************************************************' 
+        write(unit = *, fmt = *)'***** My Duty Photon Number is: ',myid, mydutyphot   
         write(unit = *, fmt = *)'*************************************************************************'
         endif
-    If( Num_Photons > mydutyphot )EXIT
+        If( Num_Photons > mydutyphot )EXIT
     !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Enddo 
     !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,39 +169,21 @@
                   phot%v_L_v_i = phot%v_L_v_i + v_L_v_Recv
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
               enddo
-          endif
-!* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+          endif 
+
           write(*,*)'There are', phot%effect_number, 'of total', Total_Phot_Num, 'photons',&
                         'arrive at the plate of observer!!'
-!* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
           !open(unit=15, file='tdiskg.txt', status="replace") 
           !open(unit=16, file='./image/ET2.txt', status="replace") 
-          open(unit=17, file='./spectrum/vLv_finity_tau=004.txt', status="replace")
-!* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-          !do i = 1, 1000
-          !    temp_ET = zero
-          !    do j = 1,500
-          !        temp_ET = temp_ET + phot%v_L_v_i_ET(j,i)
-          !    enddo
-          !    write(unit = 16, fmt = *)temp_ET
-          !enddo
-!* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-          !do j = 0,100
-          !    write(unit = 16, fmt = *)phot%delta_pds(j)
-          !enddo
-!* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+          open(unit=17, file='./spectrum/vLv_finity_tau=004.txt', status="replace")  
+
           do j = 1,500
               write(unit = 17, fmt = *)phot%v_L_v_i(j)
           enddo
-!* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-          !close(unit=15) 
-          !close(unit=16) 
           close(unit=17) 
-!* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
       endif  
-!* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-!* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- 
 !===========================================================
     call MPI_FINALIZE ( ierr )
 !===========================================================

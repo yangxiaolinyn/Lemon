@@ -43,11 +43,13 @@
  
       contains
 !************************************************************************************ 
-      SUBROUTINE Set_Initial_Parameters_And_Conditions_Sub( this, tau, T_e, T_s, n_e ) 
+      SUBROUTINE Set_Initial_Parameters_And_Conditions_Sub( this, &
+                            tau, T_e, T_s, n_e, CrossSec_filename ) 
 !************************************************************************************
       IMPLICIT NONE
       class(Photon) :: this
       REAL(mcp), INTENT(IN) :: tau, T_e, T_s, n_e
+      character*80, intent(in) :: CrossSec_filename
       integer cases
       real(mcp) :: E_up, E_low
  
@@ -61,7 +63,7 @@
       this%logE_up = DLOG10( E_up )
       this%n_e = n_e
       this%R_out = tau / Sigma_T / this%n_e   
-      CALL this%Set_Cross_Section_3Te()
+      CALL this%Set_Cross_Section_Te( CrossSec_filename )
       this%effect_number = 0
 
       RETURN
