@@ -1,0 +1,30 @@
+RootsUnit.o: \
+	ConstantsUnit.o
+
+ellfunctionsUnit.o: \
+	ConstantsUnit.o \
+	RootsUnit.o
+
+BlcoordinateUnit.o: \
+	ConstantsUnit.o \
+	RootsUnit.o \
+	ellfunctionsUnit.o
+
+SphericalMotion.o: \
+	ConstantsUnit.o \
+	RootsUnit.o \
+	ellfunctionsUnit.o
+
+PmFindingUnit.o: \
+	ConstantsUnit.o \
+	RootsUnit.o \
+	ellfunctionsUnit.o \
+	BlcoordinateUnit.o
+
+ObserEmitterUnit.o: \
+	ConstantsUnit.o \
+	RootsUnit.o \
+	ellfunctionsUnit.o \
+	BlcoordinateUnit.o \
+	PmFindingUnit.o	
+	
