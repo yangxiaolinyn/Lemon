@@ -72,7 +72,7 @@
             !sphot%Scal_Factor_after, sphot%Scal_Factor_before, Scatter_Times
             CALL phot%Set_InI_Conditions_For_Next_Scattering( ) 
             CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )  
-            if( phot%w_ini / phot%w_ini_em <= 1.D-15 )exit 
+            if( phot%w_ini / phot%w_ini_em <= 1.D-20 )exit 
             !if( phot%scatter_times > 100 )stop
             CALL phot%Photon_Electron_Scattering( phot%T_e )
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,11 +80,11 @@
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
         If ( mod(Num_photons,20000)==0 .and. myid == np-1 ) then 
-        write(unit = *, fmt = *)'*************************************************************************' 
+        !write(unit = *, fmt = *)'*************************************************************************' 
         write(unit = *, fmt = *)'***** The',Num_Photons,'th Photons have been scattered', &
                                   phot%scatter_times, &
                          'times and Escapted from the region !!!!!!!'      
-        write(unit = *, fmt = *)'***** My Duty Photon Number is: ',myid, mydutyphot   
+        write(unit = *, fmt = *)'***** My Duty Photon Number is: ',myid, mydutyphot, phot%n_e  
         write(unit = *, fmt = *)'*************************************************************************'
         endif
         If( Num_Photons > mydutyphot )EXIT

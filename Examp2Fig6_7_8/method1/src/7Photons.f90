@@ -54,7 +54,7 @@
       CALL this%Set_Emin_Emax()  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       !E_low = Emitter%E_low1 !1.D-5
-      E_up = 3.D1  !this%E_up1 !1.D1 
+      E_up = 6.D1  !this%E_up1 !1.D1 
       this%T_e = T_e 
 
       this%logE_low = DLOG10( this%E_low1 )
@@ -103,11 +103,13 @@
       if( this%r_p > this%R_out )then
           this%test_it = .true.
           this%p_scattering = this%Get_scatter_distance2( ) 
+  write(*,*)'f^mu0 = ', ( this%Scattered_Phot4k_In_Elec_CF(2)**2 + this%Scattered_Phot4k_In_Elec_CF(3)**2 + &
+             this%Scattered_Phot4k_In_Elec_CF(4)**2 ) / this%Scattered_Phot4k_In_Elec_CF(1)**2 
     write(*,*)'f^mu1 = ', ( this%Scattered_Phot4k_In_Elec(2)**2 + this%Scattered_Phot4k_In_Elec(3)**2 + &
                          this%Scattered_Phot4k_In_Elec(4)**2 ) / this%Scattered_Phot4k_In_Elec(1)**2 
     write(*,*)'f^mu2 = ', ( this%Temp_Matrix_1X3(1)**2 + this%Temp_Matrix_1X3(2)**2 + &
                            this%Temp_Matrix_1X3(3)**2 ) / this%Scattered_Phot4k_In_Elec(1)**2     
- 
+          write(*,*)'101=', this%Elec_gama, this%Elec_V
           write(*,*)'102=', this%r_p, this%p_scattering, this%NormalA
           write(*,*)'103=', dsqrt( this%Vector_of_position_ini(1)**2+&
                    this%Vector_of_position_ini(2)**2+this%Vector_of_position_ini(3)**2 ), this%r_ini, &

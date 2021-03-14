@@ -14,8 +14,8 @@
     tau = 3.D0
     T_e = 4.D0 * mec2
     T_s = 1.D-8 * mec2
-    ne = 1.D17
-    Rout = 100.D0
+    !ne = 1.D17
+    Rout = 1.D5
 
     y1 = 11.D0
     y2 = 22.D0  ! \nu = 10^y

@@ -152,7 +152,7 @@
       this%Phot4k_CovCF_ini = this%Phot4k_CtrCF_ini
       this%Phot4k_CovCF_ini(1) = - this%Phot4k_CovCF_ini(1)
 
-      this%w_ini_em = ( v / this%T_s )**3 / ( dexp( v / this%T_s ) - one )! * dsin(theta)
+      this%w_ini_em = ( v / this%T_s )**3 / ( dexp( v / this%T_s ) - one ) * dsin(theta)
       this%w_ini = this%w_ini_em
  
       !write(*,*)'ss3===', this%w_ini, this%w_ini_em, dexp( v / this%T_s ), v
