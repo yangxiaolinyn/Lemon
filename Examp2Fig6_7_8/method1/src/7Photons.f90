@@ -84,9 +84,8 @@
       integer cases 
    
       this%p_scattering = this%Get_scatter_distance2( )   
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      cases = 1
-      Call this%Calc_Phot_Informations_At_Observor_2zones( cases ) 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+      Call this%Calc_Phot_Informations_At_Observor_2zones( ) 
       this%w_ini = this%w_ini * this%NormalA  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
       this%r_p = this%r_p2( this%Vector_of_position_ini, &
@@ -132,13 +131,11 @@
       REAL(mcp), INTENT(IN) :: T_e
       integer(kind = 8), intent(IN) :: Scatter_Times
       TYPE(Photon), INTENT(INOUT) :: phot
-      TYPE(ScatPhoton), INTENT(INOUT) :: sphot
-      integer cases 
+      TYPE(ScatPhoton), INTENT(INOUT) :: sphot 
  
       this%p_scattering = this%Get_scatter_distance2( )
-
-      cases = 1
-      Call this%Calc_Phot_Informations_At_Observor_2zones( cases )
+ 
+      Call this%Calc_Phot_Informations_At_Observor_2zones( )
       !write(*,*)'ss3=',this%w_ini
       this%w_ini = this%w_ini * this%NormalA
       !write(*,*)'ss4=',this%w_ini
@@ -186,14 +183,15 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      sphot%Phot4k_CtrCF = this%Phot4k_CtrCF_At_p 
+      this%Phot4k_CtrCF = this%Phot4k_CtrCF_At_p 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      CALL sphot%Set_Photon_Tetrad_In_CF() 
-      CALL sphot%Get_gama_mu_phi_Of_Scat_Elec(T_e) 
-      CALL sphot%Set_Elec_Tetrad_In_CF()
-      CALL sphot%Set_Phot4k_In_Elec_CF() 
+      CALL this%Set_Photon_Tetrad_In_CF( this%Phot4k_CtrCF_At_p(1:3) / &
+                                          this%Phot4k_CtrCF_At_p(1) ) 
+      CALL this%Get_gama_mu_phi_Of_Scat_Elec(T_e) 
+      CALL this%Set_Elec_Tetrad_In_CF()
+      CALL this%Set_Phot4k_In_Elec_CF() 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      CALL sphot%Compton_Scattering_WithOut_Polarizations()  
+      CALL this%Compton_Scattering_WithOut_Polarizations()  
  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       END SUBROUTINE Photon_Electron_Scattering_Sub
@@ -201,89 +199,25 @@
  
  
 !*******************************************************************************************************
-      subroutine Calc_Phot_Informations_At_Observor_2zones_Sub( this, cases )
+      subroutine Calc_Phot_Informations_At_Observor_2zones_Sub( this )
 !*******************************************************************************************************
       implicit none
       class(Photon) :: this
-      integer, intent(in) :: cases  
-      real(mcp), parameter :: al0 = -50.D0, be0 = -50.D0
-      real(mcp) :: gama_S, beta_T, f_the, f_phi, Sin_The_Obs, Cos_The_Obs
-      real(mcp) :: mup, mup0, p_max, p_temp, sign_p_th
-      real(mcp) :: Q_obs, U_obs, Psi_Obs, rdp
-      real(mcp) :: alpha, beta, delta_th = two / 100.D0, mu_obs 
-      real(mcp) :: delta_al = -two*al0 / 400.D0, delta_be = -two*be0 / 400.D0
-      real(mcp) :: sign_pth, r_times_p, r_ini2, p_ini_obs, index_i, a, b, del_x
+      !integer, intent(in) :: cases   
       real(mcp) :: index_i1, a1, b1, del_x1, angle
-      integer :: i, j, h, k, mu_i, N_low1
+      integer :: i, j, h, k, mu_i, N_low1, i_E, i_1
+  
+          this%frequency_v = DABS( this%Phot4k_CovCF_ini(1) ) * 1.D6 / h_ev 
+          i_1 = floor( ( dlog10(this%frequency_v) - this%y1 ) / (this%dy/two) )
+          if(mod(i_1, 2)==0)then
+              i_E = i_1 / 2
+          else
+              i_E = (i_1 + 1) / 2
+          endif 
+          if( i_E > Num_y .or. i_E < 0 )return  
+          this%v_L_v_i( i_E ) = this%v_L_v_i( i_E ) + this%w_ini * &
+                            dexp( - this%Optical_Depth_scatter ) 
  
-
-      If( cases == 1 )then
-          a1 = dlog10( this%nu_low )
-          b1 = dlog10( this%nu_up * 4.D8 ) !dlog10( this%nu_up )
-          del_x1 = (b1 - a1) / 500.D0
-          N_low1 =  floor( a1 / del_x1 )
-          this%frequency_v = DABS( this%Phot4k_CovCF_ini(1) ) * 1.D6 / h_ev
-          index_i1 = dlog10( this%frequency_v / this%nu_low )
-           !write(*, *)'ss=', this%nu_low, this%frequency_v, this%nu_up * 4.D8
-           !write(*, *)'ss=', a1, b1
-          if( this%frequency_v >= this%nu_up * 4.D8 .or. this%frequency_v <= this%nu_low )then 
-              return
-          endif
-          !if( index_i1 >= b1 .or. index_i1 <= a1 )then 
-          !    return
-          !endif 
-          k = floor( index_i1 / del_x1 ) + 1
-          this%v_L_v_i(k) = this%v_L_v_i(k) + this%w_ini * &
-                            dexp( - this%Optical_Depth_scatter )
-          !If( DABS( this%Phot4k_CovCF_ini(1) ) < 10.D-3 .OR. &
-          !    DABS( this%Phot4k_CovCF_ini(1) ) > 20.D-3 )return
-          !index_i = dlog10( this%time_arrive_observer - this%t_standard ) 
-          !if( index_i > b .or. index_i < a )then
-              !write(*,*)'dddd===', index_i
-              !return
-          !endif
-          !i = floor( index_i / del_x ) + 2 + N_low
-          !If (i > 1000) then
-              !i=1000
-              !write(*,*)'sss2=', i, 
-              !return
-          !endif
-          !this%v_L_v_i_ET(k, i) = this%v_L_v_i_ET(k, i) + this%w_ini * 0.01D0* &
-          !                  dexp( - this%Optical_Depth_scatter )! * DABS( this%Phot4k_CovCF_ini(1) )
-          !write(*,*)'i,k1',i, k, this%time_travel,  p_ini_obs / Cv  
-          !this%time_arrive_observer = zero
-      else If ( cases == 2 ) then 
-          a1 = dlog10( this%nu_low )
-          b1 = dlog10( this%nu_up ) !dlog10( this%nu_up )
-          del_x1 = (b1 - a1) / 500.D0
-          N_low1 =  floor( a1 / del_x1 )
-          this%frequency_v = DABS( this%Phot4k_CovCF_ini(1) ) * 1.D6 / h_ev
-          index_i1 = dlog10( this%frequency_v / this%nu_low )
-          !write(*, *)'ss1=', this%nu_low, this%frequency_v, this%nu_up * 4.D8
-          !write(*, *)'ss2=', this%w_ini
-          !write(*, *)'ss=', a1, b1
-          if( this%frequency_v >= this%nu_up .or. this%frequency_v <= this%nu_low )then 
-              return
-          endif
-          k = floor( index_i1 / del_x1 ) + 1
-          this%v_L_v_i(k) = this%v_L_v_i(k) + this%w_ini
-          !this%v_L_v_i(k) = this%v_L_v_i(k) + this%w_ini 
-          If( DABS( this%Phot4k_CovCF_ini(1) ) < 10.D-3 .OR. &
-              DABS( this%Phot4k_CovCF_ini(1) ) > 20.D-3 )return
-          index_i = dlog10( this%time_arrive_observer - this%t_standard ) 
-          !index_i = dlog10( this%time_arrive_observer ) 
-          if( index_i > b .or. index_i < a )then
-              !write(*,*)'dddd===', index_i
-              return
-          endif
-          !i = floor( index_i / del_x ) + 2 + N_low
-          If (i > 1000) then
-              i=1000
-              !write(*,*)'sss2=', i, 
-              return
-          endif
-          !this%v_L_v_i_ET(k, i) = this%v_L_v_i_ET(k, i) + this%w_ini! * this%Phot4k_CovCF_ini(1) 
-      Endif 
       return
       end subroutine Calc_Phot_Informations_At_Observor_2zones_Sub
 !******************************************************************************************************* 

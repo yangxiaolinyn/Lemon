@@ -74,17 +74,17 @@
       procedure, public :: Set_Elec_Tetrad_In_CF        => Set_Elec_Tetrad_In_CF_Sub
       procedure, public :: Vector_Cross_Product         => Vector_Cross_Product_Sub
       procedure, public :: Get_gama_mu_phi_Of_Scat_Elec => &
-                            Get_gama_mu_phi_Of_Scatter_Electron_Sub
+                           Get_gama_mu_phi_Of_Scatter_Electron_Sub
       procedure, public :: Set_Phot4k_In_Elec_CF        => Set_Phot4k_In_Elec_CF_Sub
       procedure, public :: Compton_Scattering_With_Zero_QU => &
-                            Compton_Scattering_With_Zero_QU_Sub
+                           Compton_Scattering_With_Zero_QU_Sub
       procedure, public :: Compton_Scattering_WithOut_Polarizations => &
-                            Compton_Scattering_WithOut_Polarizations_Sub
+                           Compton_Scattering_WithOut_Polarizations_Sub
       procedure, public :: Set_f4_In_Elec_CF            => Set_f4_In_Elec_CF_Sub
       procedure, public :: Set_Phot_f4_Tetrad_In_Elec_CF   => &
-                            Set_Phot_f4_Tetrad_In_Elec_CF_Sub
+                           Set_Phot_f4_Tetrad_In_Elec_CF_Sub
       procedure, public :: Compton_Scattering_With_Polarization  => &
-                            Compton_Scattering_With_Polarization_Sub
+                           Compton_Scattering_With_Polarization_Sub
       !procedure, public :: Set_Tetrad_Of_Scat_Phot4k_In_CF => Set_Tetrad_Of_Scat_Phot4k_In_CF_Sub
       !procedure, public :: Get_Scat_Pola_Vector_f4_and_QU  => Get_Scat_Pola_Vector_f4_and_QU_Sub
       procedure, public :: ComptonScaPhoSampling
@@ -117,17 +117,19 @@
       contains
   
 !*******************************************************************************************************
-      subroutine Set_Photon_Tetrad_In_CF_Sub(this)
+      subroutine Set_Photon_Tetrad_In_CF_Sub(this, Vector_P)
 !*******************************************************************************************************
       implicit none
       class(ScatPhoton) :: this
+      real(mcp), intent(in) :: Vector_P(1: 3) ! unit Vector of photon's 3 momentum.
       real(mcp), dimension(1:3) :: e_p
       real(mcp) :: Vector_Length
 !**********************************************************************
  
-      this%PhotAxisZ(1) = this%Phot4k_CtrCF(2) / this%Phot4k_CtrCF(1)
-      this%PhotAxisZ(2) = this%Phot4k_CtrCF(3) / this%Phot4k_CtrCF(1)
-      this%PhotAxisZ(3) = this%Phot4k_CtrCF(4) / this%Phot4k_CtrCF(1)
+      !this%PhotAxisZ(1) = this%Phot4k_CtrCF(2) / this%Phot4k_CtrCF(1)
+      !this%PhotAxisZ(2) = this%Phot4k_CtrCF(3) / this%Phot4k_CtrCF(1)
+      !this%PhotAxisZ(3) = this%Phot4k_CtrCF(4) / this%Phot4k_CtrCF(1)
+      this%PhotAxisZ = Vector_P
 
       e_p(1) = zero
       e_p(2) = zero
