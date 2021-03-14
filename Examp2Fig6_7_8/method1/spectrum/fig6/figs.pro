@@ -4,7 +4,7 @@
 
       ns = 500
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      Openr,lunAo10,'./MCRTe=2.044tau=0.0001.txt',/Get_Lun
+      Openr,lunAo10,'./MCRTe=2.044tau=0.0001.dat',/Get_Lun
       Point_lun,lunAo10,0
       lv=fltarr(ns)
       ReadF,lunAo10,lv
