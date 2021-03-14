@@ -9,11 +9,11 @@
     CONTAINS 
 !**************************************************************************************
     SUBROUTINE mimick_of_photon_with_finity_zone( Total_Phot_Num, tau, &
-                           T_e, T_s, n_e, y1, y2, CrossSec_filename, MCResults )
+                           T_e, T_s, n_e, Rout, y1, y2, CrossSec_filename, MCResults )
 !************************************************************************************** 
     implicit none
     integer(kind = 8), intent(in) :: Total_Phot_Num
-    real(mcp), intent(in) :: tau, T_e, T_s, n_e, y1, y2
+    real(mcp), intent(in) :: tau, T_e, T_s, n_e, Rout, y1, y2
     character*80, intent(in) :: CrossSec_filename, MCResults
     integer(kind = 8) :: scatter_Times = 0
     integer(kind = 8) :: Num_Photons 
@@ -52,7 +52,7 @@
     phot%my_ID = myid
     phot%num_process = np
     call phot%Set_Initial_Parameters_And_Conditions( tau, T_e, &
-                                   T_s, n_e, y1, y2, CrossSec_filename ) 
+                                   T_s, n_e, Rout, y1, y2, CrossSec_filename ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     Do 
         Num_Photons = Num_Photons + 1 

@@ -39,11 +39,11 @@
       contains
 !************************************************************************************ 
       SUBROUTINE Set_Initial_Parameters_And_Conditions_Sub( this, &
-                            tau, T_e, T_s, n_e, y1, y2, CrossSec_filename ) 
+                            tau, T_e, T_s, n_e, Rout, y1, y2, CrossSec_filename ) 
 !************************************************************************************
       IMPLICIT NONE
       class(Photon) :: this
-      REAL(mcp), INTENT(IN) :: tau, T_e, T_s, n_e, y1, y2
+      REAL(mcp), INTENT(IN) :: tau, T_e, T_s, n_e, Rout, y1, y2
       character*80, intent(in) :: CrossSec_filename
       integer cases
       real(mcp) :: E_up, E_low
@@ -63,8 +63,8 @@
           ! new variable y and E = 10^y, and logE_up =y2, logE_low = y1, dindexE = dy, 
           ! E is the energy of the photon.
 
-      this%n_e = n_e
-      this%R_out = tau / Sigma_T / this%n_e
+      this%n_e = tau / Rout / Sigma_T
+      this%R_out = Rout!tau / Sigma_T / this%n_e
       this%CrossSectFileName = CrossSec_filename
       !CALL this%Set_Cross_Section_Te( CrossSec_filename )
 

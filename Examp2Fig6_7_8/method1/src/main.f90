@@ -15,6 +15,7 @@
     T_e = 4.D0 * mec2
     T_s = 1.D-8 * mec2
     ne = 1.D17
+    Rout = 100.D0
 
     y1 = 11.D0
     y2 = 22.D0  ! \nu = 10^y
@@ -28,7 +29,7 @@
 
     Total_Phot_Num = 1D7
     call mimick_of_photon_with_finity_zone( Total_Phot_Num, tau, T_e, &
-                                T_s, ne, y1, y2, CrossSec_filename, MCResults )
+                                T_s, ne, Rout, y1, y2, CrossSec_filename, MCResults )
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     END PROGRAM main

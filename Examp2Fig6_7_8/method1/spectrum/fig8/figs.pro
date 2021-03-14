@@ -4,19 +4,18 @@
 
       ns = 500
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      Openr,lunAo10,'./MCRTe=2.044tau=0.0001.dat',/Get_Lun
+      Openr,lunAo10,'./MCRTe=2.044tau=3.0000.dat',/Get_Lun
       Point_lun,lunAo10,0
-      lv=fltarr(ns)
-      ReadF,lunAo10,lv
+      lv3=fltarr(ns)
+      ReadF,lunAo10,lv3
       free_lun,lunAo10
  
       vv = fltarr(ns)
-      a1 = 11. 
-      a2 = 22.
+      a1 = 11.
+      a2 = 22. 
       for i=0,500-1 do begin
           vv(i) = (a2-a1)/499*i + a1
-      endfor
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      endfor 
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
  
@@ -32,7 +31,7 @@
       l=16 & xxss=l*(ratio) & yyss=l
       ;xoff=(LL-xxss)/2.,yoff=(3*LL/2.-yyss)/2.,
       !p.font = 0
-      device,filename='vLv1.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
+      device,filename='vLv_1.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
       /color,xoff=(2-xxss)/2.0,yoff=(2-yyss)/2.,$
       set_font='Times-Roman';, /tt_font
 
@@ -57,7 +56,7 @@
       ylen=0.7
       xlow = 11
       xup = 22
-      ylow = -19
+      ylow = -3
       yup = 1
       posup=[(1.-xlen)/2.,(1.-ylen)/2.,(1.+xlen)/2.,(1.+ylen)/2.] 
       plot,[xlow,xup],[ylow,yup],pos=[posup],/noerase,/nodata,/device,$
@@ -67,14 +66,14 @@
       axis,xaxis=0,xticks=11,xminor=2,xrange=[xlow,xup],xstyle=1,$;font=-1,$;,xtickname=replicate(' ',6),$;,
       charsize=1,xtitle=textoidl('Log(v)[H_z]');,xthick=tickth,color=colors
 
-      axis,yaxis=0,ytitle=textoidl('Log(\nu L_\nu[erg s^{-1}])'),yticks=5,yminor=4,$
+      axis,yaxis=0,ytitle=textoidl('Log(\nu L_\nu[erg s^{-1}])'),yticks=4,yminor=5,$
                    yrange=[ylow,yup],ystyle=1
-      axis,yaxis=1,ytickname=replicate(' ',12),yticks=5,yminor=4,ystyle=1
+      axis,yaxis=1,ytickname=replicate(' ',12),yticks=4,yminor=5,ystyle=1
       dyy = 0.35
       y0 = 5
       for i=0,0 do begin
-          oplot,vv(*),alog10(lv(*) /max(lv) ),thick=3,color=black,linestyle=6;,psym=-4
-          ;oplot,vv(*),alog10(lv3(*) /max(lv3) )+0.5,thick=3,color=black,linestyle=6;,psym=-4
+           ;oplot,vv(*),alog10(lv(*) /max(lv) ),thick=3,color=black,linestyle=6;,psym=-4
+           oplot,vv(*),alog10(lv3(*) /max(lv3) )+0.5,thick=3,color=black,linestyle=6;,psym=-4
           ;oplot,vv(*),alog10(lv2(*) /max(lv2)),thick=3,color=black,linestyle=6;,psym=-4
           ;oplot,vv(*),alog10(lv4(*) /max(lv4)),thick=3,color=red,linestyle=3;,psym=-4
           ;print, alog10(lv2(0:200) /max(lv2)), vv(*)
