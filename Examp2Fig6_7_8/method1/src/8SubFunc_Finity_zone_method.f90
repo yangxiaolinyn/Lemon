@@ -79,7 +79,7 @@
         END DO Scattering_loop
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
-        If ( mod(Num_photons,1000)==0 .and. myid =np-1 ) then 
+        If ( mod(Num_photons,1000)==0 .and. myid == np-1 ) then 
         write(unit = *, fmt = *)'*************************************************************************' 
         write(unit = *, fmt = *)'***** The',Num_Photons,'th Photons have been scattered', &
                                   phot%scatter_times, &
