@@ -99,6 +99,23 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
       this%r_p = this%r_p2( this%Vector_of_position_ini, &
                       this%Vector_of_Momentum_ini, this%p_scattering )
+
+      if( this%r_p > this%R_out )then
+          this%test_it = .true.
+          this%p_scattering = this%Get_scatter_distance2( ) 
+    write(*,*)'f^mu1 = ', ( this%Scattered_Phot4k_In_Elec(2)**2 + this%Scattered_Phot4k_In_Elec(3)**2 + &
+                         this%Scattered_Phot4k_In_Elec(4)**2 ) / this%Scattered_Phot4k_In_Elec(1)**2 
+    write(*,*)'f^mu2 = ', ( this%Temp_Matrix_1X3(1)**2 + this%Temp_Matrix_1X3(2)**2 + &
+                           this%Temp_Matrix_1X3(3)**2 ) / this%Scattered_Phot4k_In_Elec(1)**2     
+ 
+          write(*,*)'102=', this%r_p, this%p_scattering, this%NormalA
+          write(*,*)'103=', dsqrt( this%Vector_of_position_ini(1)**2+&
+                   this%Vector_of_position_ini(2)**2+this%Vector_of_position_ini(3)**2 ), this%r_ini, &
+               dsqrt( this%Vector_of_Momentum_ini(1)**2+this%Vector_of_Momentum_ini(2)**2+&
+               this%Vector_of_Momentum_ini(3)**2 ), this%r_p2( this%Vector_of_position_ini, &
+                 this%Vector_of_Momentum_ini, this%p_scattering ) 
+          stop
+      endif
  
       this%Vector_of_position_p = this%Vector_of_position
   

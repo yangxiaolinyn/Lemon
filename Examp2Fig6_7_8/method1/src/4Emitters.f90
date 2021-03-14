@@ -21,6 +21,7 @@
           real(mcp) :: dnu 
           integer :: num_process, my_ID
           character*80 :: CrossSectFileName
+          real(mcp) :: Scattered_Phot4k_In_Elec(1: 4), Temp_Matrix_1X3(1: 3)
         
 
       contains 

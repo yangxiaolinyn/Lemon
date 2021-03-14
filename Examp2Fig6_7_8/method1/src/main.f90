@@ -11,7 +11,7 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     call InitRandom( )
  
-    tau = 1.D-1
+    tau = 3.D0
     T_e = 4.D0 * mec2
     T_s = 1.D-8 * mec2
     ne = 1.D17
@@ -21,10 +21,9 @@
   
     write(Te, "(f8.3)")T_e
     write(taus, "(f8.4)")tau
-    CrossSec_filename = trim('./data/SigArrTe=')//trim(adjustl(Te))//&
-                      trim('tau=')//trim(adjustl(taus))//trim('.txt') ! the total scattering 
+    CrossSec_filename = trim('./data/SigArrTe=')//trim(adjustl(Te))//trim('.dat') ! the total scattering 
     MCResults = trim('./spectrum/MCRTe=')//trim(adjustl(Te))//&
-                      trim('tau=')//trim(adjustl(taus))//trim('.txt')
+                      trim('tau=')//trim(adjustl(taus))//trim('.dat')
 
 
     Total_Phot_Num = 1D7

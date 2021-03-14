@@ -588,7 +588,7 @@
       class(ScatPhoton) :: this 
       real(mcp) :: epsi, r, phip, mupsi, mu_tilde_p, sinmu_tilde, sinpsi, &
                    sinmu_tilde_p, sin_tilphi_p, cos_tilphi_p, N_temp
-      real(mcp), dimension(1:4) :: Scattered_Phot4k_In_Elec
+      !real(mcp), dimension(1:4) :: Scattered_Phot4k_In_Elec
       real(mcp), dimension(1:3, 1:3) :: Temp_Matrix_3X3, TTemp_Matrix_3X3, PTemp_Matrix_3X3
       real(mcp), dimension(1:3) :: Temp_Matrix_1X3
       real(mcp), dimension(1:3) :: Temp_Vector, f3_scat_e_tilde
@@ -657,29 +657,29 @@
                                                        sinmu_tilde_p * sin_tilphi_p
       this%Scattered_Phot4k_In_Elec_CF(4) = this%Scattered_Phot4k_In_Elec_CF(1) * mu_tilde_p
 
-      Scattered_Phot4k_In_Elec(1) = this%Elec_gama * ( this%Scattered_Phot4k_In_Elec_CF(1) + &
+      this%Scattered_Phot4k_In_Elec(1) = this%Elec_gama * ( this%Scattered_Phot4k_In_Elec_CF(1) + &
                                          this%Elec_V * this%Scattered_Phot4k_In_Elec_CF(4) )
-      Scattered_Phot4k_In_Elec(4) = this%Elec_gama * ( this%Scattered_Phot4k_In_Elec_CF(4) + &
+      this%Scattered_Phot4k_In_Elec(4) = this%Elec_gama * ( this%Scattered_Phot4k_In_Elec_CF(4) + &
                                          this%Elec_V * this%Scattered_Phot4k_In_Elec_CF(1) )
-      Scattered_Phot4k_In_Elec(2) = this%Scattered_Phot4k_In_Elec_CF(2) ! x component
-      Scattered_Phot4k_In_Elec(3) = this%Scattered_Phot4k_In_Elec_CF(3) ! y component
+      this%Scattered_Phot4k_In_Elec(2) = this%Scattered_Phot4k_In_Elec_CF(2) ! x component
+      this%Scattered_Phot4k_In_Elec(3) = this%Scattered_Phot4k_In_Elec_CF(3) ! y component
 
 
-      !write(*,*)'f^mu1 = ', ( Scattered_Phot4k_In_Elec(2)**2 + Scattered_Phot4k_In_Elec(3)**2 + &
-      !                   Scattered_Phot4k_In_Elec(4)**2 ) / Scattered_Phot4k_In_Elec(1)**2
+      !write(*,*)'f^mu1 = ', ( this%Scattered_Phot4k_In_Elec(2)**2 + this%Scattered_Phot4k_In_Elec(3)**2 + &
+      !                   this%Scattered_Phot4k_In_Elec(4)**2 ) / this%Scattered_Phot4k_In_Elec(1)**2
       !**********************************************************************
       !*** To obtain the Scattered 4 momentum of photon in the CF 
       !**********************************************************************
       CALL Matrix_Multiplication33X33_Sub( this%Matrix_Of_Tetrad_Of_ElecAxis, &
                          this%Matrix_Of_Tetrad_Of_PhotAxis, Temp_Matrix_3X3 )
-      CALL Matrix_Multiplication13X33_Sub( Scattered_Phot4k_In_Elec(2:4), &
-                                       Temp_Matrix_3X3, Temp_Matrix_1X3 )
+      CALL Matrix_Multiplication13X33_Sub( this%Scattered_Phot4k_In_Elec(2:4), &
+                                       Temp_Matrix_3X3, this%Temp_Matrix_1X3 )
 
       !write(*,*)'f^mu2 = ', ( Temp_Matrix_1X3(1)**2 + Temp_Matrix_1X3(2)**2 + &
-      !                        Temp_Matrix_1X3(3)**2 ) / Scattered_Phot4k_In_Elec(1)**2      
+      !                        Temp_Matrix_1X3(3)**2 ) / this%Scattered_Phot4k_In_Elec(1)**2      
  
-      this%Scattered_Phot4k_CF(1) = Scattered_Phot4k_In_Elec(1)
-      this%Scattered_Phot4k_CF(2:4) = Temp_Matrix_1X3
+      this%Scattered_Phot4k_CF(1) = this%Scattered_Phot4k_In_Elec(1)
+      this%Scattered_Phot4k_CF(2:4) = this%Temp_Matrix_1X3
       this%Scattered_Phot4k_CovCF = this%Scattered_Phot4k_CF
       this%Scattered_Phot4k_CovCF(1) = - this%Scattered_Phot4k_CF(1)
       !this%Scal_Factor_after = this%Scattered_Phot4k_CF(1) / this%Scattered_Phot4k_In_Elec_CF(1)
