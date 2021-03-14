@@ -67,6 +67,8 @@
           logical :: test = .False.
           real(mcp) :: r11
           real(mcp), dimension(1:10) :: test_quantity
+          integer(kind=8) :: effect_number
+          integer(kind=8) :: scatter_times
       contains
       !procedure, public :: ini_posi => set_ini_position
       !procedure, public :: ini_P_mu => set_ini_four_moment
@@ -541,7 +543,8 @@
                  this%Scattered_Phot4k_CF(4)**2 ) / dabs(this%Scattered_Phot4k_CF(1)) > 1.021D0 )then
            write(*,*)'&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
            write(*, *)'ttt12=', dsqrt(  this%Scattered_Phot4k_CF(2)**2+this%Scattered_Phot4k_CF(3)**2+ &
-                 this%Scattered_Phot4k_CF(4)**2 ) / dabs( this%Scattered_Phot4k_CF(1) )
+       this%Scattered_Phot4k_CF(4)**2 ) / dabs( this%Scattered_Phot4k_CF(1) ), this%w_ini, &
+            this%scatter_times, this%Scattered_Phot4k_CF(1)
            write(*,*)'&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
            write(*, *)'ppp=', dsqrt( Scattered_Phot4k_In_Elec(2)**2 + Scattered_Phot4k_In_Elec(3)**2 + &
                              Scattered_Phot4k_In_Elec(4)**2 ),Scattered_Phot4k_In_Elec(1), &
@@ -661,6 +664,9 @@
       Scattered_Phot4k_In_Elec(2) = this%Scattered_Phot4k_In_Elec_CF(2) ! x component
       Scattered_Phot4k_In_Elec(3) = this%Scattered_Phot4k_In_Elec_CF(3) ! y component
 
+
+      !write(*,*)'f^mu1 = ', ( Scattered_Phot4k_In_Elec(2)**2 + Scattered_Phot4k_In_Elec(3)**2 + &
+      !                   Scattered_Phot4k_In_Elec(4)**2 ) / Scattered_Phot4k_In_Elec(1)**2
       !**********************************************************************
       !*** To obtain the Scattered 4 momentum of photon in the CF 
       !**********************************************************************
@@ -668,7 +674,10 @@
                          this%Matrix_Of_Tetrad_Of_PhotAxis, Temp_Matrix_3X3 )
       CALL Matrix_Multiplication13X33_Sub( Scattered_Phot4k_In_Elec(2:4), &
                                        Temp_Matrix_3X3, Temp_Matrix_1X3 )
-      
+
+      !write(*,*)'f^mu2 = ', ( Temp_Matrix_1X3(1)**2 + Temp_Matrix_1X3(2)**2 + &
+      !                        Temp_Matrix_1X3(3)**2 ) / Scattered_Phot4k_In_Elec(1)**2      
+ 
       this%Scattered_Phot4k_CF(1) = Scattered_Phot4k_In_Elec(1)
       this%Scattered_Phot4k_CF(2:4) = Temp_Matrix_1X3
       this%Scattered_Phot4k_CovCF = this%Scattered_Phot4k_CF

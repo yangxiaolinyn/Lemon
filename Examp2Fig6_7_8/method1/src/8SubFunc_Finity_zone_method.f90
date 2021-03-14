@@ -3,7 +3,6 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     USE RandUtils 
     USE Photons
-    USE MPI 
     IMPLICIT NONE 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -40,7 +39,6 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     write(*,*)'MyId Is:  ', np, myid, namelen
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    call InitRandom( myid )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
     if( myid == np-1 ) then
         mydutyphot = Total_Phot_Num / np + &
@@ -51,47 +49,37 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Num_Photons = 0 
     phot%v_L_v_i = zero
+    phot%my_ID = myid
+    phot%num_process = np
     call phot%Set_Initial_Parameters_And_Conditions( tau, T_e, &
                                    T_s, n_e, y1, y2, CrossSec_filename ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     Do 
         Num_Photons = Num_Photons + 1 
-        phot%scatter_times = 0
-        phot%At_outer_Shell = .false.
-        phot%At_inner_Shell = .false.  
+        phot%scatter_times = 0   
         CALL phot%Emitter_A_Photon( ) 
         CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )    
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-        CALL phot%Photon_Electron_Scattering( phot%T_e, sphot )
+        CALL phot%Photon_Electron_Scattering( phot%T_e )
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Scattering_loop: Do
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
             phot%scatter_times = phot%scatter_times + 1
-            !write(*,*)'ss2===', phot%scatter_times, phot%p_scattering, phot%E_ini, phot%nu_up*h_ev/1.D6
+            !write(*,*)'ss2===', phot%scatter_times, phot%w_ini, phot%w_ini_em
             !if( phot%scatter_times > 1.D5)write(*,*)'ss===',phot%scatter_times,phot%p_scattering, phot%R_in
             !If ( myid == np-1 ) write(*,*)'Scatter_Times = ', phot%W_ini, phot%w_p, Scatter_Times
             !If ( myid == np-1 ) write(*,*)'Scatter_Times = ', phot%dv_ini, phot%dv_p, &
             !sphot%Scal_Factor_after, sphot%Scal_Factor_before, Scatter_Times
-            CALL phot%Set_InI_Conditions_For_Next_Scattering( T_e, phot, sphot )   
-            CALL phot%Determine_Next_Scattering_Site( T_e, phot, sphot, Scatter_Times )
-           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
-            If ( phot%At_outer_Shell ) then
-                cases = 2
-                !Call phot%Calc_Phot_Informations_At_Observor_2zones( cases )
-                phot%At_outer_Shell = .False.
-                phot%Go2infinity = .TRUE. 
-                Exit 
-            endif
-            !write(*,*)'ss=',phot%w_ini
-            if( phot%w_ini <= 1.D-15 )exit
-            !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            CALL phot%Photon_Electron_Scattering( T_e, sphot )
+            CALL phot%Set_InI_Conditions_For_Next_Scattering( ) 
+            CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )  
+            if( phot%w_ini / phot%w_ini_em <= 1.D-15 )exit 
+            !if( phot%scatter_times > 100 )stop
+            CALL phot%Photon_Electron_Scattering( phot%T_e )
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         END DO Scattering_loop
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-112     continue
-        If ( mod(Num_photons,1000000)==0 ) then 
+ 
+        If ( mod(Num_photons,1000)==0 .and. myid =np-1 ) then 
         write(unit = *, fmt = *)'*************************************************************************' 
         write(unit = *, fmt = *)'***** The',Num_Photons,'th Photons have been scattered', &
                                   phot%scatter_times, &
@@ -104,10 +92,8 @@
     Enddo 
     !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      If ( myid /= np-1 ) then
-          send_num = 1
-          send_tag = 0 
- 
+      If ( myid /= np-1 ) then 
+
           send_num = Num_y + 1
           send_tag = 2
           v_L_v_Sent = phot%v_L_v_i
@@ -119,8 +105,7 @@
               do RECV_SOURCE = 0, np-2   
                   recv_num = Num_y + 1
                   call MPI_RECV(v_L_v_Recv,recv_num,MPI_DOUBLE_PRECISION,RECV_SOURCE,&
-                                2,MPI_COMM_WORLD,status,ierr) 
-                  !write(*,*)'sdf500==', v_L_v_Recv
+                                2,MPI_COMM_WORLD,status,ierr)  
                   write(*,*)'master Processor ',myid,' has receved v_L_v Processor:', RECV_SOURCE 
                   phot%v_L_v_i = phot%v_L_v_i + v_L_v_Recv 
               enddo
@@ -129,18 +114,17 @@
           write(*,*)'There are', phot%effect_number, 'of total', Total_Phot_Num, 'photons',&
                         'arrive at the plate of observer!!'
  
-          open(unit=17, file='./spectrum/vLv_finity_tau=004.txt', status="replace")  
+          open(unit=17, file = MCResults, status="replace")  
 
-          do j = 1,500
+          do j = 0, Num_y
               write(unit = 17, fmt = *)phot%v_L_v_i(j)
           enddo
-          close(unit=17) 
-
+          close(unit=17)  
       endif  
 !===========================================================
-    call MPI_FINALIZE ( ierr )
+      call MPI_FINALIZE ( ierr )
 !===========================================================
-    END SUBROUTINE mimick_of_photon_with_finity_zone
+      END SUBROUTINE mimick_of_photon_with_finity_zone
  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       END MODULE Statistial_Method_Of_Finity_zone

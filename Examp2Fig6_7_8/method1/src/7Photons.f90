@@ -47,12 +47,14 @@
       character*80, intent(in) :: CrossSec_filename
       integer cases
       real(mcp) :: E_up, E_low
+      integer :: ierr
  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-      CALL this%Set_Emin_Emax() 
+      this%T_s = T_s
+      CALL this%Set_Emin_Emax()  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       !E_low = Emitter%E_low1 !1.D-5
-      E_up = 2.D1  !this%E_up1 !1.D1 
+      E_up = 3.D1  !this%E_up1 !1.D1 
       this%T_e = T_e 
 
       this%logE_low = DLOG10( this%E_low1 )
@@ -65,7 +67,15 @@
       this%R_out = tau / Sigma_T / this%n_e
       this%CrossSectFileName = CrossSec_filename
       !CALL this%Set_Cross_Section_Te( CrossSec_filename )
-      call this%Set_Cross_Section_Array_Whth_Te( )
+
+      CALL MPI_BARRIER( MPI_COMM_WORLD, ierr )
+      If( this%my_id == this%num_process-1 )then  
+          call this%Set_Cross_Section_Array_Whth_Te( )
+      endif 
+      CALL MPI_BARRIER( MPI_COMM_WORLD, ierr )
+      CALL MPI_BCAST( this%sigmaaTeE_FST, N_sigma + 1, MPI_DOUBLE_PRECISION, &
+                        this%num_process-1, MPI_COMM_WORLD, ierr ) 
+
       this%effect_number = 0
  
       this%y1 = y1
@@ -81,8 +91,7 @@
 !************************************************************************************
       IMPLICIT NONE
       class(Photon) :: this  
-      integer cases 
-   
+  
       this%p_scattering = this%Get_scatter_distance2( )   
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
       Call this%Calc_Phot_Informations_At_Observor_2zones( ) 
@@ -90,6 +99,7 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
       this%r_p = this%r_p2( this%Vector_of_position_ini, &
                       this%Vector_of_Momentum_ini, this%p_scattering )
+ 
       this%Vector_of_position_p = this%Vector_of_position
   
       this%Phot4k_CtrCF_At_p = this%Phot4k_CtrCF_ini
@@ -101,19 +111,16 @@
  
 
 !************************************************************************************
-      SUBROUTINE Set_InI_Conditions_For_Next_Scattering_Sub( this, T_e, phot, sphot )
+      SUBROUTINE Set_InI_Conditions_For_Next_Scattering_Sub( this )
 !************************************************************************************
       IMPLICIT NONE
-      class(Photon) :: this
-      REAL(mcp), INTENT(IN) :: T_e
-      TYPE(Photon), INTENT(INOUT) :: phot
-      TYPE(ScatPhoton), INTENT(INOUT) :: sphot 
+      class(Photon) :: this 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      this%Phot4k_CtrCF_ini = sphot%Scattered_Phot4k_CF
-      this%Phot4k_CovCF_ini = sphot%Scattered_Phot4k_CovCF
+      this%Phot4k_CtrCF_ini = this%Scattered_Phot4k_CF
+      this%Phot4k_CovCF_ini = this%Scattered_Phot4k_CovCF
       this%Vector_of_Momentum_ini(1:3) = this%Phot4k_CtrCF_ini(2:4) / this%Phot4k_CtrCF_ini(1)
-   
-      this%E_ini = DABS( this%Phot4k_CovCF_ini(1) ) 
+ 
+      this%E_ini = DABS( this%Phot4k_CtrCF_ini(1) ) 
       !write(*,*)'5555==', this%E_ini, this%Phot4k_CovCF_ini(1)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       this%r_ini = this%r_p
@@ -124,29 +131,15 @@
 
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Determine_Next_Scattering_Site_Sub( this, T_e, phot, sphot, Scatter_Times )
+      SUBROUTINE Determine_Next_Scattering_Site_Sub( this )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       IMPLICIT NONE
-      class(Photon) :: this
-      REAL(mcp), INTENT(IN) :: T_e
-      integer(kind = 8), intent(IN) :: Scatter_Times
-      TYPE(Photon), INTENT(INOUT) :: phot
-      TYPE(ScatPhoton), INTENT(INOUT) :: sphot 
- 
-      this%p_scattering = this%Get_scatter_distance2( )
- 
-      Call this%Calc_Phot_Informations_At_Observor_2zones( )
-      !write(*,*)'ss3=',this%w_ini
-      this%w_ini = this%w_ini * this%NormalA
-      !write(*,*)'ss4=',this%w_ini
-      !this%direct_escaped = .false. 
-      !write(*,*)'8888==', this%E_ini, this%Phot4k_CovCF_ini(1)
-          !write(*,*)'666=', this%time_travel 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !If ( this%At_outer_Shell ) RETURN
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      this%time_travel = this%time_travel + this%p_scattering / Cv
-          !write(*,*)'101=', this%time_travel,  this%p_scattering/ CV
+      class(Photon) :: this 
+
+      this%p_scattering = this%Get_scatter_distance2( ) 
+      Call this%Calc_Phot_Informations_At_Observor_2zones( ) 
+      this%w_ini = this%w_ini * this%NormalA 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
       this%r_p = this%r_p2( this%Vector_of_position_ini, &
                  this%Vector_of_Momentum_ini, this%p_scattering ) 
       if( this%r_p > this%R_out )then
@@ -174,24 +167,24 @@
 
 
 !************************************************************************************
-      SUBROUTINE Photon_Electron_Scattering_Sub( this, T_e, sphot )
+      SUBROUTINE Photon_Electron_Scattering_Sub( this, T_e )
 !************************************************************************************
       IMPLICIT NONE
       class(Photon) :: this
-      REAL(mcp), INTENT(IN) :: T_e
-      TYPE(ScatPhoton), INTENT(INOUT) :: sphot
+      REAL(mcp), INTENT(IN) :: T_e 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       this%Phot4k_CtrCF = this%Phot4k_CtrCF_At_p 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      CALL this%Set_Photon_Tetrad_In_CF( this%Phot4k_CtrCF_At_p(1:3) / &
+      CALL this%Set_Photon_Tetrad_In_CF( this%Phot4k_CtrCF_At_p(2:4) / &
                                           this%Phot4k_CtrCF_At_p(1) ) 
       CALL this%Get_gama_mu_phi_Of_Scat_Elec(T_e) 
       CALL this%Set_Elec_Tetrad_In_CF()
       CALL this%Set_Phot4k_In_Elec_CF() 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      CALL this%Compton_Scattering_WithOut_Polarizations()  
+      !CALL this%Compton_Scattering_WithOut_Polarizations() 
+      CALL this%Compton_Scattering_With_Zero_QU() 
  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       END SUBROUTINE Photon_Electron_Scattering_Sub

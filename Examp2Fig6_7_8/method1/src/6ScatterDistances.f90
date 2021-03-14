@@ -14,8 +14,6 @@
           real(mcp), dimension(0:N_sigma) :: sigmaaTeE_50
           real(mcp), dimension(0:N_sigma) :: sigmaaTeE_400
           real(mcp), dimension(0:N_sigma) :: sigmaaTeE_FST
-          integer(kind=8) :: effect_number
-          integer(kind=8) :: scatter_times
           logical :: mymethod
           real(mcp) :: NormalA
           real(mcp) :: n_e_in
@@ -116,8 +114,8 @@
       endif
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       If (Get_scatter_distance2 < zero) then
-          write(*,*)'sdf==',Get_scatter_distance2, r1, this%NormalA,  Sigma_I, this%r_times_p, &
-          this%r_ini, this%R_out
+          write(*,*)'sdfss==',Get_scatter_distance2, r1, this%NormalA,  Sigma_I, this%r_times_p, &
+          this%r_ini, this%R_out, p_out1
           stop
       endif
       If (Get_scatter_distance2 == zero) then
@@ -210,7 +208,7 @@
           i = floor( ( dlog10( Ep ) - this%logE_low ) / this%dindexE )
       endif
       if ( dlog10( Ep ) > this%logE_up ) then
-          write(*, *)'f2 = ', i, this%logE_low, this%logE_up, dlog10( Ep ), this%dindexE 
+          !write(*, *)'f2 = ', i, this%logE_low, this%logE_up, dlog10( Ep ), this%dindexE 
           Ep = 10.D0**this%logE_up
           i = floor( ( dlog10( Ep ) - this%logE_low ) / this%dindexE ) - 1
       endif

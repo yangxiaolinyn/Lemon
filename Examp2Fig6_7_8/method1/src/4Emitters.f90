@@ -1,5 +1,6 @@
       module PhotonEmitter 
       use Basic_Variables_And_Methods
+      USE MPI 
       implicit none 
       integer, parameter :: N_wt1 = 2000
 
@@ -17,9 +18,8 @@
           real(mcp) :: nu_up
           real(mcp) :: ln_nu1
           real(mcp) :: ln_nu2
-          real(mcp) :: dnu
-          real(mcp) :: my_ID
-          integer :: num_process
+          real(mcp) :: dnu 
+          integer :: num_process, my_ID
           character*80 :: CrossSectFileName
         
 
@@ -103,7 +103,7 @@
           if(f1 < this%f_max * 1.D-7)exit
           this%E_up1 = this%E_up1 * 1.1D0
       ENDDO
-      if( .true. )then
+      if( .false. )then
           this%ln_nu2 = 22.D0
           this%ln_nu1 = 11.D0
           this%nu_low = 10.D0**(11.D0)
@@ -152,8 +152,10 @@
       this%Phot4k_CovCF_ini(1) = - this%Phot4k_CovCF_ini(1)
 
       this%w_ini_em = ( v / this%T_s )**3 / ( dexp( v / this%T_s ) - one )! * dsin(theta)
-      this%w_ini = this%w_ini_em  
+      this%w_ini = this%w_ini_em
  
+      !write(*,*)'ss3===', this%w_ini, this%w_ini_em, dexp( v / this%T_s ), v
+      !if(this%w_ini_em == zero)stop
       
       end subroutine get_Phot4k_CtrCF_CovCF_Sub
 
