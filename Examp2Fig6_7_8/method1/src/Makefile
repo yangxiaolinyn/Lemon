@@ -74,7 +74,7 @@ OBJS =  $(OUT_DIR)/ConstantsUnit.o \
         $(OUT_DIR)/4Emitters.o \
         $(OUT_DIR)/5CrossSection.o \
         $(OUT_DIR)/6ScatterPhotons.o \
-        $(OUT_DIR)/6ScatterDistance.o \
+        $(OUT_DIR)/6ScatterDistances.o \
         $(OUT_DIR)/7Photons.o \
         $(OUT_DIR)/8SubFunc_Finity_zone_method.o \
         $(OUT_DIR)/main.o
@@ -105,9 +105,9 @@ $(OUT_DIR)/3BasicVariablesAndMethods.o: $(OUT_DIR)/0Integration.o $(OUT_DIR)/2Su
 $(OUT_DIR)/4Emitters.o: $(OUT_DIR)/3BasicVariablesAndMethods.o
 $(OUT_DIR)/5CrossSection.o: $(OUT_DIR)/ConstantsUnit.o
 $(OUT_DIR)/6ScatterPhotons.o: $(OUT_DIR)/3BasicVariablesAndMethods.o
-$(OUT_DIR)/6ScatterDistance.o: $(OUT_DIR)/5CrossSection.o $(OUT_DIR)/6ScatterPhotons.o
-$(OUT_DIR)/7Photons.o: $(OUT_DIR)/6ScatterDistance.o $(OUT_DIR)/4Emitters.o 
-$(OUT_DIR)/8SubFunc_Finity_zone_method.o: $(OUT_DIR)/6ScatterDistance.o \
+$(OUT_DIR)/6ScatterDistances.o: $(OUT_DIR)/5CrossSection.o $(OUT_DIR)/6ScatterPhotons.o
+$(OUT_DIR)/7Photons.o: $(OUT_DIR)/6ScatterDistances.o $(OUT_DIR)/4Emitters.o 
+$(OUT_DIR)/8SubFunc_Finity_zone_method.o: $(OUT_DIR)/6ScatterDistances.o \
 			 $(OUT_DIR)/7Photons.o
 $(OUT_DIR)/main.o: $(OUT_DIR)/8SubFunc_Finity_zone_method.o
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

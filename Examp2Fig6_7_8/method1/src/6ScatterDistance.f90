@@ -594,7 +594,7 @@
                                    action = "write", iostat = istat)
           !call Set_xi_wi_all()
           call gauleg_x_w( -one, one, x1000, w1000, 1000 )
-          call gaulag( x0lag362, w0lag362, 362, zero ) 
+          call gaulag( x0la362, w0la362, 362, zero ) 
  
           if (istat == 0) then
               if( this%my_ID == this%num_process - 1 )then
@@ -607,10 +607,10 @@
                   this%sigmaaTeE_FST(i) = gama_Integration( this%T_e, Ephoton, &
                                    x1000, w1000, 1000, x0la362, w0la362, 362 )
  
-                  !if(i == N_sigma)this%sigmaaTeE_400(i) = sigma_a( this%T_e, Ephoton )
+                  if( mod(i, 100)==0 )this%sigmaaTeE_400(i) = sigma_a( this%T_e, Ephoton )
                   write(unit = 19, fmt = *)this%sigmaaTeE_FST(i)
                   if( mod(i, 100)==0 )write(unit = *, fmt = *)i, 'Sigma_Te = ', &
-                                     this%sigmaaTeE_FST(i) 
+                                     this%sigmaaTeE_FST(i), this%sigmaaTeE_400(i)
               enddo
           else
               write(unit = *, fmt = *)'The SigmaArray File Open Failed. The code have to Stop!!', istat

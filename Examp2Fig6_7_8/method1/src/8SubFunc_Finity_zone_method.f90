@@ -58,21 +58,11 @@
         Num_Photons = Num_Photons + 1 
         phot%scatter_times = 0
         phot%At_outer_Shell = .false.
-        phot%At_inner_Shell = .false.
-        phot%time_arrive_observer = zero
-        phot%time_travel = zero
+        phot%At_inner_Shell = .false.  
         CALL phot%Emitter_A_Photon( ) 
-        CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( T_e, phot )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-            If ( phot%At_outer_Shell ) then
-                cases = 2
-                !Call phot%Calc_Phot_Informations_At_Observor_2zones( cases )
-                phot%At_outer_Shell = .False.
-                phot%Go2infinity = .TRUE.
-                goto 112 
-            endif  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        CALL phot%FIRST_SCATTERING_OF_PHOT_ELCE( T_e, phot, sphot )
+        CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )    
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+        CALL phot%Photon_Electron_Scattering( phot%T_e, sphot )
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Scattering_loop: Do
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -96,7 +86,7 @@
             !write(*,*)'ss=',phot%w_ini
             if( phot%w_ini <= 1.D-15 )exit
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            CALL phot%Photon_Electron_Scattering( T_e, phot, sphot )
+            CALL phot%Photon_Electron_Scattering( T_e, sphot )
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         END DO Scattering_loop
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
