@@ -606,13 +606,11 @@
                   Ephoton = 10**( this%logE_low + this%dindexE * i )
                   this%sigmaaTeE_FST(i) = gama_Integration( this%T_e, Ephoton, &
                                    x1000, w1000, 1000, x0la362, w0la362, 362 )
-                  !this%sigmaaTeE_FST(i) = gama_Integration2( this%T_e, Ephoton, &
-                  !       x1000, w1000, 1000 ) 
+ 
                   !if(i == N_sigma)this%sigmaaTeE_400(i) = sigma_a( this%T_e, Ephoton )
                   write(unit = 19, fmt = *)this%sigmaaTeE_FST(i)
                   if( mod(i, 100)==0 )write(unit = *, fmt = *)i, 'Sigma_Te = ', &
-                                     this%sigmaaTeE_FST(i), &
-                        gama_Integration2( this%T_e, Ephoton, x1000, w1000, 1000 )
+                                     this%sigmaaTeE_FST(i) 
               enddo
           else
               write(unit = *, fmt = *)'The SigmaArray File Open Failed. The code have to Stop!!', istat
