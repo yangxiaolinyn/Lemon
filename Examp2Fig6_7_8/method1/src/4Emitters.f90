@@ -18,6 +18,9 @@
           real(mcp) :: ln_nu1
           real(mcp) :: ln_nu2
           real(mcp) :: dnu
+          real(mcp) :: my_ID
+          integer :: num_process
+          character*80 :: CrossSectFileName
         
 
       contains 

@@ -13,7 +13,7 @@
           real(mcp), dimension(0:N_sigma) :: sigmaaTeE_230
           real(mcp), dimension(0:N_sigma) :: sigmaaTeE_50
           real(mcp), dimension(0:N_sigma) :: sigmaaTeE_400
-          real(mcp), dimension(0:N_sigma) :: sigmaaTeE
+          real(mcp), dimension(0:N_sigma) :: sigmaaTeE_FST
           integer(kind=8) :: effect_number
           integer(kind=8) :: scatter_times
           logical :: mymethod
@@ -70,14 +70,15 @@
           procedure, public :: sigma_fn
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          procedure, public :: Set_Cross_Section   => Set_Cross_Section_sub  
+          !procedure, public :: Set_Cross_Section => Set_Cross_Section_sub  
+          procedure, public :: Set_Cross_Section_Array_Whth_Te => Set_Cross_Section_Array_Whth_Te_sub
+          !procedure, public :: Set_Cross_Section_Te => Set_Cross_Section_Te_sub 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !   Subroutines for non-Kerr space-time
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
           procedure, public :: get_Tau2                           =>  get_Tau2_fn
           procedure, public :: Get_scatter_distance
           procedure, public :: Get_scatter_distance2 
-          procedure, public :: Set_Cross_Section_Te => Set_Cross_Section_Te_sub
           procedure, public :: n_e_p => n_e_p_fn
           procedure, public :: get_Tau2_At_out_zone => get_Tau2_At_out_zone_fn
           procedure, public :: Integration_Of_OpticalDepth
@@ -88,18 +89,19 @@
           procedure, public :: RandomNum2p_case3   =>   RandomNum2p_case3_fn
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           procedure, public :: RandNum2p_case1_Finit_Space   =>  &
-                                RandNum2p_case1_Finit_Space_fn
+                               RandNum2p_case1_Finit_Space_fn
           procedure, public :: RandNum2p_case2_Finit_Space   =>  &
-                                RandNum2p_case2_Finit_Space_fn
+                               RandNum2p_case2_Finit_Space_fn
           procedure, public :: RandNum2p_case3_Finit_Space   =>  &
-                                RandNum2p_case3_Finit_Space_fn
+                               RandNum2p_case3_Finit_Space_fn
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       end type Photon_With_ScatDistance
  
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      private :: Set_Cross_Section_sub  
-      private :: Set_Cross_Section_Te_sub 
+      !private :: Set_Cross_Section_sub  
+      !private :: Set_Cross_Section_Te_sub
+      private :: Set_Cross_Section_Array_Whth_Te_sub 
       private :: n_e_p_fn
       private :: get_Tau2_At_out_zone_fn
       private :: RandomNum2p_case3_fn
@@ -563,107 +565,66 @@
    
       n_e_p_fn = this%n_e0 * this%R_in / dsqrt( this%r_ini**2 + p**2 + two*p*this%r_times_p ) 
       end function n_e_p_fn
+  
  
 !*******************************************************************************************************
-      subroutine Set_Cross_Section_sub(this, T_e)
+      subroutine Set_Cross_Section_Array_Whth_Te_sub(this)
 !*******************************************************************************************************
       implicit none
-      class(Photon_With_ScatDistance) :: this
-      real(mcp), intent(in) :: T_e
+      class(Photon_With_ScatDistance) :: this 
+      !real(mcp) :: T_e
       real(mcp) :: temp, Ephoton
-      real(mcp) :: dindexE
+      real(mcp) :: dindexE, NorN
       integer(kind = 8) :: i, j, k, N, istat
-
-      this%dindexE = ( this%logE_up - this%logE_low )/dfloat(N_sigma)
-      open(unit=18, file = './data/SigmaArray.dat', status = "old", &
+  
+      open(unit=18, file = this%CrossSectFileName, status = "old", &
                            action = "read", iostat = istat)
+ 
       if (istat == 0) then
-              write(unit = *, fmt = *)'************************************************************' 
-              write(unit = *, fmt = *)'************************************************************' 
-              write(unit = *, fmt = *)' Now reading the SigmaArray data from file..... '
-              write(unit = *, fmt = *)'************************************************************' 
-              write(unit = *, fmt = *)'************************************************************' 
+              if( this%my_ID == this%num_process - 1 )then
+                  write(unit = *, fmt = *)'************************************************************'    
+                  write(unit = *, fmt = *)' Now reading the SigmaArray data from file..... ' 
+                  write(unit = *, fmt = *)'************************************************************'
+              endif  
           do i = 0, N_sigma
-              read(unit = 18, fmt = *)this%sigmaaTeE(i)
+              read(unit = 18, fmt = *)this%sigmaaTeE_FST(i)
           enddo
       else
-          open(unit=19, file = './data/SigmaArray.dat', status = "replace", &
+          open(unit=19, file = this%CrossSectFileName, status = "replace", &
                                    action = "write", iostat = istat)
+          !call Set_xi_wi_all()
+          call gauleg_x_w( -one, one, x1000, w1000, 1000 )
+          call gaulag( x0lag362, w0lag362, 362, zero ) 
+ 
           if (istat == 0) then
-              write(unit = *, fmt = *)'************************************************************' 
-              write(unit = *, fmt = *)'************************************************************' 
-              write(unit = *, fmt = *)'Now Writting the SigmaArray data to the file.....'
-              write(unit = *, fmt = *)'************************************************************' 
-              write(unit = *, fmt = *)'************************************************************' 
-              do i = 0, N_sigma
-                  write(unit = *, fmt = *)'herer'
+              if( this%my_ID == this%num_process - 1 )then
+                  write(unit = *, fmt = *)'************************************************************'  
+                  write(unit = *, fmt = *)'Now Writting the SigmaArray data to the file.....' 
+                  write(unit = *, fmt = *)'************************************************************'
+              endif 
+              do i = 0, N_sigma 
                   Ephoton = 10**( this%logE_low + this%dindexE * i )
-                  this%sigmaaTeE(i) = sigma_a(T_e, Ephoton)
-                  write(unit = 19, fmt = *)this%sigmaaTeE(i)
-                  write(unit = *, fmt = *)i
+                  this%sigmaaTeE_FST(i) = gama_Integration( this%T_e, Ephoton, &
+                                   x1000, w1000, 1000, x0la362, w0la362, 362 )
+                  !this%sigmaaTeE_FST(i) = gama_Integration2( this%T_e, Ephoton, &
+                  !       x1000, w1000, 1000 ) 
+                  !if(i == N_sigma)this%sigmaaTeE_400(i) = sigma_a( this%T_e, Ephoton )
+                  write(unit = 19, fmt = *)this%sigmaaTeE_FST(i)
+                  if( mod(i, 100)==0 )write(unit = *, fmt = *)i, 'Sigma_Te = ', &
+                                     this%sigmaaTeE_FST(i), &
+                        gama_Integration2( this%T_e, Ephoton, x1000, w1000, 1000 )
               enddo
           else
-              write(unit = *, fmt = *)'The SigmaArray File are Open Failed. The code have to Stop!!'
+              write(unit = *, fmt = *)'The SigmaArray File Open Failed. The code have to Stop!!', istat
               Stop
           endif
           close(unit=19)
+          write(unit = *, fmt = *)trim('The  ')//trim(this%CrossSectFileName)//&
+                                  trim(' File has been successfully created!!!')     
       endif
-      close(unit=18)
-      !i = 0
-      !do 
-      !    Ephoton = 10**( this%logE_low + this%dindexE * i )
-           !this%sigmaaTeE(i) = sigma_a(T_e, Ephoton)
-      !    sigmaaTeE(i) = sigma_a(T_e, Ephoton)
-      !    i = i + 1
-      ! !   write(*,*)i, N_sigma
-      !    if ( i > N_sigma ) exit
-      !enddo
-      end subroutine Set_Cross_Section_sub
+      close(unit=18) 
+      end subroutine Set_Cross_Section_Array_Whth_Te_sub
 
-!*******************************************************************************************************
-      subroutine Set_Cross_Section_Te_sub( this, CrossSec_filename )
-!*******************************************************************************************************
-      implicit none
-      class(Photon_With_ScatDistance) :: this
-      character*80, intent(in) :: CrossSec_filename 
-      real(mcp) :: temp, Ephoton
-      real(mcp) :: dindexE
-      integer(kind = 8) :: i, j, k, N, istat
-
-      this%dindexE = ( this%logE_up - this%logE_low )/dfloat(N_sigma)
-      write(*,*)'crossection=', this%logE_up, this%logE_low
-      open(unit=18, file = CrossSec_filename, status = "old", &
-                           action = "read", iostat = istat)
-      if (istat == 0) then
-              write(unit = *, fmt = *)'************************************************************'  
-              write(unit = *, fmt = *)' Now reading the SigmaArray data from file..... ' 
-              write(unit = *, fmt = *)'************************************************************' 
-          do i = 0, N_sigma
-              read(unit = 18, fmt = *)this%sigmaaTeE_400(i)
-          enddo
-      else
-          open(unit=19, file = CrossSec_filename, status = "replace", &
-                                   action = "write", iostat = istat)
- 
-          if (istat == 0) then
-              write(unit = *, fmt = *)'************************************************************'  
-              write(unit = *, fmt = *)'Now Writting the SigmaArray data to the file.....' 
-              write(unit = *, fmt = *)'************************************************************' 
-              do i = 0, N_sigma
-                  write(unit = *, fmt = *)'herer'
-                  Ephoton = 10**( this%logE_low + this%dindexE * i )
-                  this%sigmaaTeE_400(i) = sigma_a( this%T_e, Ephoton )
-                  write(unit = 19, fmt = *)this%sigmaaTeE_400(i)
-                  write(unit = *, fmt = *)i
-              enddo
-          else
-              write(unit = *, fmt = *)'The SigmaArray File are Open Failed. The code have to Stop!!'
-              Stop
-          endif
-          close(unit=19)
-      endif
-      close(unit=18)      
-      end subroutine Set_Cross_Section_Te_sub
 
 !*******************************************************************************************************
       function sigma_fn(this, T_e, Ephoton, p)

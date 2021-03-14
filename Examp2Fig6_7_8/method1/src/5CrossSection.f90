@@ -1,5 +1,6 @@
       module CrossSection
       use constants 
+      use Integrations
       implicit none
 
       contains
@@ -34,7 +35,7 @@
         delta = 1.D-2
         b = one + delta
         do   
-            temp = fpts_gama(a, b, eps, d, f_temp, T_e, E)
+            temp = fpts_gamasc(a, b, eps, d, f_temp, T_e, E)
             !write(*,*)ant,temp,b
             ant = ant + temp
             if ( temp <= 1.D-15 ) exit
@@ -77,7 +78,7 @@
         end function ff1
 
 !******************************************************************************************************* 
-        function f_temp(gama, T_e, E) result(ant)
+        function f_tempsc(gama, T_e, E) result(ant)
 !*******************************************************************************************************
         implicit none
         real(mcp) :: ant
@@ -89,10 +90,10 @@
         eps = 1.D-7
         d = 1.D-7
         ant = fpts_mu(-one, one, eps, d, ff, gama, E)/(two*theta*bessk(n,one/theta))&
-                      *dsqrt(one-one/gama/gama)*gama**2*dexp(-gama/theta) 
+                      *dsqrt(one-one/gama/gama)*gama**2*dexp(-gama/theta)
         !write(*,*)ant
         return
-        end function f_temp
+        end function f_tempsc
 
 !*******************************************************************************************************
         function fpts_mu(a, b, eps, d, ff, gama, E) result(ant)
@@ -142,7 +143,7 @@
         end subroutine ppp
 
 !*******************************************************************************************************
-        function fpts_gama(a, b, eps, d, f_temp, T_e, E) result(ant)
+        function fpts_gamasc(a, b, eps, d, f_temp, T_e, E) result(ant)
 !*******************************************************************************************************
         implicit none
         real(mcp) :: ant
@@ -153,17 +154,17 @@
 
         h = b - a
         integal = zero 
-        f0 = f_temp(a, T_e, E) 
-        f1 = f_temp(b, T_e, E)
+        f0 = f_tempsc(a, T_e, E) 
+        f1 = f_tempsc(b, T_e, E)
         t0 = h*(f0 + f1)/two 
             
-        call ppp1(a, b, h, f0, f1, t0, eps, d, integal, f_temp, T_e, E)
+        call ppp1sc(a, b, h, f0, f1, t0, eps, d, integal, f_temp, T_e, E)
         ant = integal
         return
-        end function fpts_gama
+        end function fpts_gamasc
 
 !*******************************************************************************************************
-        recursive subroutine ppp1(x0, x1, h, f0, f1, t0, eps, d, integal, f_temp, T_e, E)
+        recursive subroutine ppp1sc(x0, x1, h, f0, f1, t0, eps, d, integal, f_temp, T_e, E)
 !*******************************************************************************************************
         implicit none
         real(mcp), intent(in) :: x0, x1, h, f0, f1, t0, eps, d, T_e, E
@@ -172,7 +173,7 @@
         real(mcp), external :: f_temp
 
         x = x0 + h/two 
-        f = f_temp(x, T_e, E)
+        f = f_tempsc(x, T_e, E)
         t1 = h*(f0 + f)/four 
         t2 = h*(f + f1)/four
         p = dabs(t0 - (t1 + t2))  
@@ -182,15 +183,100 @@
         else 
             g = h/two
             eps1 = eps/1.4D0
-            call ppp1(x0, x, g, f0, f, t1, eps1, d, integal, f_temp, T_e, E)
-            call ppp1(x, x1, g, f, f1, t2, eps1, d, integal, f_temp, T_e, E)
+            call ppp1sc(x0, x, g, f0, f, t1, eps1, d, integal, f_temp, T_e, E)
+            call ppp1sc(x, x1, g, f, f1, t2, eps1, d, integal, f_temp, T_e, E)
         endif
-        end subroutine ppp1
+        end subroutine ppp1sc
  
 
 !*******************************************************************************************************
-        DOUBLE PRECISION FUNCTION bessi0(x)
+      real(mcp) function F_mu( E, gama, mu )
 !*******************************************************************************************************
+      implicit none
+      real(mcp), intent(in) :: E, gama, mu  
+      real(mcp) ::  h, aa, bb, g, w1, Fmu, v_speed, temp, epsi
+      integer :: j
+
+      v_speed = dsqrt( one - one / gama / gama ) 
+      epsi = ( two * E / mec2 ) * gama * ( one - mu * v_speed )
+      if (epsi > 1.D-4) then 
+          temp = ( (one - four/epsi - eight/epsi/epsi)*dlog(one + epsi)&
+                + half + eight/epsi - half/(one + epsi)**two )/epsi !*(three*sigma_T/four)
+      else
+          temp = (one - epsi) * four / three
+      endif
+      F_mu = ( one - mu * v_speed ) * temp
+      return
+      end function F_mu
+ 
+
+!*******************************************************************************************************
+      real(mcp) function mu_Integration( E, gama, t, w, n )
+!*******************************************************************************************************
+      implicit none
+      real(mcp), intent(in) :: E, gama
+      integer, intent(in) :: n
+      real(mcp), intent(in) :: t(0: n-1), w(0: n-1)
+      real(mcp) ::  h, aa, bb, g, w1, x, Fmu
+      real(mcp) :: integal 
+      integer :: j
+    
+      aa = - one
+      bb = one
+      w1 = zero
+      do j = 0, n - 1
+          !x = ( ( bb - aa ) * t(j) + ( bb + aa ) ) / two
+          Fmu = F_mu( E, gama, t(j) )
+          w1 = w1 + Fmu * w(j) 
+      enddo
+      mu_Integration = w1
+      return
+      end function mu_Integration
+ 
+
+!*******************************************************************************************************
+      real(mcp) function gama_Integration( T_e, E, t, w, n, t0la, w0la, nla )
+!*******************************************************************************************************
+      implicit none
+      real(mcp), intent(in) :: T_e, E 
+      integer, intent(in) :: n, nla
+      real(mcp), intent(in) :: t(0: n-1), w(0: n-1), t0la(0: nla-1), w0la(0: nla-1)!, &
+                 !t1la(0: nla-1), w1la(0: nla-1), t0la(0: nla-1), w0la(0: nla-1), &
+                 !t10la(0: nla-1), w10la(0: nla-1)
+      real(mcp) :: w3, w0, w1, w2, gama0, gama1, gama2, Ints
+      real(mcp) :: integal, eps, theta, Denomenator, Coef_A
+      integer :: j
+
+      theta = T_e / mec2
+      w3 = zero
+      w0 = zero
+      w1 = zero
+      w2 = zero
+      Denomenator = two * theta * bessk( 2, one / theta )
+      Coef_A = theta * dexp( - one / theta ) * three * sigma_T / four / Denomenator
+      do j = 0, nla - 1
+          gama0 = t0la(j) * theta + one
+          Ints = mu_Integration( E, gama0, t, w, n ) * &
+                 dsqrt( one - one / gama0 ** 2 ) * gama0**2
+          w0 = w0 + Ints * w0la(j)
+          !gama1 = t1la(j) * theta + one
+          !Ints = mu_Integration( E, gama1, t, w, n ) / Denomenator &
+          !       * dsqrt( one - one / gama1 ** 2 )
+          !w1 = w1 + Ints * w1la(j)
+          !gama2 = t2la(j) * theta + one
+          !Ints = mu_Integration( E, gama2, t, w, n ) / Denomenator &
+          !       * dsqrt( one - one / gama2 ** 2 )
+          !w2 = w2 + Ints * w2la(j)
+          !w3 = w3 + w2la(j) * t2la(j)**8
+      enddo
+      !write(*, *)'fffffff=', w3, 10 * 9*8*7*6*5*24
+      gama_Integration = Coef_A * ( w0 )!/ theta**2 + w1 * two / theta + w2 )
+      return
+      end function gama_Integration
+
+
+!*******************************************************************************************************
+        DOUBLE PRECISION FUNCTION bessi0(x)
         double precision, intent(in) :: x
         !Returns the modified Bessel function I0 (x) for any real x.
         double precision :: ax
@@ -202,13 +288,13 @@
         DATA q1,q2,q3,q4,q5,q6,q7,q8,q9/0.39894228d0,0.1328592d-1,&
                 0.225319d-2,-0.157565d-2,0.916281d-2,-0.2057706d-1,&
                 0.2635537d-1,-0.1647633d-1,0.392377d-2/
-        if (abs(x).lt.3.75) then
-            y=(x/3.75)**2
+        if (dabs(x).lt.3.75) then
+            y=(x/3.75D0)**2
             bessi0=p1+y*(p2+y*(p3+y*(p4+y*(p5+y*(p6+y*p7)))))
         else
-            ax=abs(x)
-            y=3.75/ax
-            bessi0=(exp(ax)/sqrt(ax))*(q1+y*(q2+y*(q3+y*(q4 &
+            ax=dabs(x)
+            y=3.75D0/ax
+            bessi0=(dexp(ax)/dsqrt(ax))*(q1+y*(q2+y*(q3+y*(q4 &
                 +y*(q5+y*(q6+y*(q7+y*(q8+y*q9))))))))
         endif
         return
@@ -230,11 +316,11 @@
         -0.1062446d-1,0.587872d-2,-0.251540d-2,0.53208d-3/
         if (x.le.2.0) then   !    Polynomial fit.
             y=x*x/4.0
-            bessk0=(-log(x/2.0)*bessi0(x))+(p1+y*(p2+y*(p3+&
+            bessk0=(-dlog(x/2.0)*bessi0(x))+(p1+y*(p2+y*(p3+&
                        y*(p4+y*(p5+y*(p6+y*p7))))))
         else
             y=(2.0/x)
-            bessk0=(exp(-x)/sqrt(x))*(q1+y*(q2+y*(q3+&
+            bessk0=(dexp(-x)/dsqrt(x))*(q1+y*(q2+y*(q3+&
                        y*(q4+y*(q5+y*(q6+y*q7))))))
         endif
         return
@@ -254,13 +340,13 @@
         DATA q1,q2,q3,q4,q5,q6,q7,q8,q9/0.39894228d0,-0.3988024d-1,&
                 -0.362018d-2,0.163801d-2,-0.1031555d-1,0.2282967d-1,&
                 -0.2895312d-1,0.1787654d-1,-0.420059d-2/
-        if (abs(x) < 3.75) then  ! Polynomial fit.
+        if (dabs(x) < 3.75) then  ! Polynomial fit.
             y=(x/3.75)**2
             bessi1=x*(p1+y*(p2+y*(p3+y*(p4+y*(p5+y*(p6+y*p7))))))
         else
-            ax=abs(x)
+            ax=dabs(x)
             y=3.75/ax
-            bessi1=(exp(ax)/sqrt(ax))*(q1+y*(q2+y*(q3+y*(q4+&
+            bessi1=(dexp(ax)/dsqrt(ax))*(q1+y*(q2+y*(q3+y*(q4+&
                   y*(q5+y*(q6+y*(q7+y*(q8+y*q9))))))))
             if(x.lt.0.)bessi1=-bessi1
         endif
@@ -282,11 +368,11 @@
                 0.1504268d-1,-0.780353d-2,0.325614d-2,-0.68245d-3/
         if (x <= 2.D0) then !Polynomial fit.
             y=x*x/4.0
-            bessk1=(log(x/2.0)*bessi1(x))+(1.0/x)*(p1+y*(p2+&
+            bessk1=(dlog(x/2.0)*bessi1(x))+(1.0/x)*(p1+y*(p2+&
                     y*(p3+y*(p4+y*(p5+y*(p6+y*p7))))))
         else
             y=2.0/x
-            bessk1=(exp(-x)/sqrt(x))*(q1+y*(q2+y*(q3+&
+            bessk1=(dexp(-x)/dsqrt(x))*(q1+y*(q2+y*(q3+&
                  y*(q4+y*(q5+y*(q6+y*q7))))))
         endif
         return

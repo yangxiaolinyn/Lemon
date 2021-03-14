@@ -59,11 +59,18 @@
       !E_low = Emitter%E_low1 !1.D-5
       E_up = 2.D1  !this%E_up1 !1.D1 
       this%T_e = T_e 
+
       this%logE_low = DLOG10( this%E_low1 )
       this%logE_up = DLOG10( E_up )
+      this%dindexE = ( this%logE_up - this%logE_low )/dfloat(N_sigma) !Here indexE means a
+          ! new variable y and E = 10^y, and logE_up =y2, logE_low = y1, dindexE = dy, 
+          ! E is the energy of the photon.
+
       this%n_e = n_e
-      this%R_out = tau / Sigma_T / this%n_e   
-      CALL this%Set_Cross_Section_Te( CrossSec_filename )
+      this%R_out = tau / Sigma_T / this%n_e
+      this%CrossSectFileName = CrossSec_filename
+      !CALL this%Set_Cross_Section_Te( CrossSec_filename )
+      call this%Set_Cross_Section_Array_Whth_Te( )
       this%effect_number = 0
 
       RETURN

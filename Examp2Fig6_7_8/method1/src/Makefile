@@ -67,6 +67,7 @@ OBJS =  $(OUT_DIR)/ConstantsUnit.o \
         $(OUT_DIR)/RootsUnit.o \
         $(OUT_DIR)/ellfunctionsUnit.o \
         $(OUT_DIR)/BlcoordinateUnit.o \
+        $(OUT_DIR)/0Integration.o \
         $(OUT_DIR)/1RandUtils.o \
         $(OUT_DIR)/2SubroutineFunctions.o \
         $(OUT_DIR)/3BasicVariablesAndMethods.o \
