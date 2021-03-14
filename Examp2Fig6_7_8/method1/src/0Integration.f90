@@ -1,6 +1,8 @@
       module Integrations
       use constants 
       implicit none
+      integer, parameter :: Num_y = 500  ! The number of grid of y of observed spectrum, and 
+                            ! \nu = 10^y, where \nu is the observed frequency.
       real(mcp), parameter :: c1 = 20.D0
       real(mcp), parameter :: c2 = 2.D0**(11.D0/6.D0)
       real(mcp), parameter :: c3 = 2.D0**(11.D0/12.D0) * 8.D0

@@ -103,7 +103,7 @@
           if(f1 < this%f_max * 1.D-7)exit
           this%E_up1 = this%E_up1 * 1.1D0
       ENDDO
-      if(.false.)then
+      if( .true. )then
           this%ln_nu2 = 22.D0
           this%ln_nu1 = 11.D0
           this%nu_low = 10.D0**(11.D0)

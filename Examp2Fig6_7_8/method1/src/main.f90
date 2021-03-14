@@ -1,3 +1,4 @@
+
     program main
     use Statistial_Method_Of_Finity_zone
     implicit none
@@ -11,6 +12,9 @@
     T_e = 4.D0 * mec2
     T_s = 1.D-8 * mec2
     ne = 1.D17
+
+    y1 = 11.D0
+    y2 = 22.D0
   
     write(Te, "(f8.3)")T_e
     write(taus, "(f8.3)")tau
@@ -22,7 +26,7 @@
 
     Total_Phot_Num = 4D8
     call mimick_of_photon_with_finity_zone( Total_Phot_Num, tau, T_e, &
-                                T_s, ne, CrossSec_filename, MCResults )  
+                                T_s, ne, y1, y2, CrossSec_filename, MCResults )  
 
     END PROGRAM main
 

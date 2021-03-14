@@ -6,10 +6,8 @@
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
       type, public, extends(Photon_With_ScatDistance) :: Photon 
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
-          real(mcp) :: v_L_v_i(1:500)
-          real(mcp) :: v_L_v_i_ET(1:500, 1:1000)
-          !real(mcp) :: nu_low
-          !real(mcp) :: nu_up 
+          real(mcp) :: v_L_v_i(0: Num_y)  
+          real(mcp) :: y1, y2, dy
 
       contains 
 !*******************************************************************************************************  
@@ -41,11 +39,11 @@
       contains
 !************************************************************************************ 
       SUBROUTINE Set_Initial_Parameters_And_Conditions_Sub( this, &
-                            tau, T_e, T_s, n_e, CrossSec_filename ) 
+                            tau, T_e, T_s, n_e, y1, y2, CrossSec_filename ) 
 !************************************************************************************
       IMPLICIT NONE
       class(Photon) :: this
-      REAL(mcp), INTENT(IN) :: tau, T_e, T_s, n_e
+      REAL(mcp), INTENT(IN) :: tau, T_e, T_s, n_e, y1, y2
       character*80, intent(in) :: CrossSec_filename
       integer cases
       real(mcp) :: E_up, E_low
@@ -69,6 +67,10 @@
       !CALL this%Set_Cross_Section_Te( CrossSec_filename )
       call this%Set_Cross_Section_Array_Whth_Te( )
       this%effect_number = 0
+ 
+      this%y1 = y1
+      this%y2 = y2
+      this%dy = ( this%y2 - this%y1 ) / Num_y
 
       RETURN
       END SUBROUTINE Set_Initial_Parameters_And_Conditions_Sub
@@ -131,14 +133,10 @@
       integer(kind = 8), intent(IN) :: Scatter_Times
       TYPE(Photon), INTENT(INOUT) :: phot
       TYPE(ScatPhoton), INTENT(INOUT) :: sphot
-      integer cases
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      integer cases 
+ 
+      this%p_scattering = this%Get_scatter_distance2( )
 
-      !write(*,*)'6666==', this%E_ini, this%Phot4k_CovCF_ini(1)  
-      this%p_scattering = this%Get_scatter_distance2( )  
-      !write(*,*)'7777==', this%E_ini, this%Phot4k_CovCF_ini(1)
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !this%direct_escaped = .True.
       cases = 1
       Call this%Calc_Phot_Informations_At_Observor_2zones( cases )
       !write(*,*)'ss3=',this%w_ini
@@ -216,14 +214,9 @@
       real(mcp) :: delta_al = -two*al0 / 400.D0, delta_be = -two*be0 / 400.D0
       real(mcp) :: sign_pth, r_times_p, r_ini2, p_ini_obs, index_i, a, b, del_x
       real(mcp) :: index_i1, a1, b1, del_x1, angle
-      integer :: i, j, h, k, mu_i, N_low, N_low1
+      integer :: i, j, h, k, mu_i, N_low1
+ 
 
-      a = -10.D0
-      b = 1.D0
-      del_x = (b-a) / 1000.D0
-      N_low = -floor(a/del_x)
-      p_ini_obs = - this%r_times_p + dsqrt( this%r_times_p**2 + this%r_obs**2 - this%r_ini**2 )
-      this%time_arrive_observer = this%time_travel + p_ini_obs / Cv 
       If( cases == 1 )then
           a1 = dlog10( this%nu_low )
           b1 = dlog10( this%nu_up * 4.D8 ) !dlog10( this%nu_up )
