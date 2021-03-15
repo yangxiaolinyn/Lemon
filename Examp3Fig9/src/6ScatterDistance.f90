@@ -1,12 +1,9 @@
       module ScatDistance_FlatSP
-      use ScatterPhoton
-      !use CrossSection 
+      use ScatterPhoton 
       implicit none 
 
-      type, public, extends(ScatPhoton) :: Photon_With_ScatDistance_FlatSP
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-!* The BL coordinates of the photon at p, which determines the BL coordinates  *
-!* by YNOGK functions: r(p), mucos(p), phi(p), t(p), sigma(p)                  *
+      type, public, extends(ScatPhoton) :: Photon_With_ScatDistance_FlatSP 
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
           real(mcp), dimension(0:N_sigma) :: sigmaaTeE_85
           real(mcp), dimension(0:N_sigma) :: sigmaaTeE_230

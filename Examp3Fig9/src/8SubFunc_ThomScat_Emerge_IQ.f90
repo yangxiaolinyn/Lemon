@@ -9,15 +9,15 @@
 
     CONTAINS 
 !**************************************************************************************
-    SUBROUTINE mimick_of_ph_finity_zone_Emerge_IQ( Total_Phot_Num, tau )
+    SUBROUTINE mimick_of_ph_finity_zone_Emerge_IQ( Total_Phot_Num, &
+                       tau, MCResultsFileNameI, MCResultsFileNameQ )
 !************************************************************************************** 
     implicit none
     real(mcp), intent(inout) :: tau
+    character*80 :: MCResultsFileNameI, MCResultsFileNameQ
     integer(kind = 8) :: Num_Photons
-    integer(kind = 8), intent(in) :: Total_Phot_Num 
-    !type(Photon_Emitter) :: Emitter
+    integer(kind = 8), intent(in) :: Total_Phot_Num  
     type(Photon_FlatSP) :: phot
-    type(ScatPhoton) :: sphot
     integer :: send_num, recv_num, send_tag, RECV_SOURCE, status(MPI_STATUS_SIZE)   
     real(mcp) :: I_Recv(0 : Num_PolDeg), Q_Recv(0 : Num_PolDeg)  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,17 +51,14 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
         Num_Photons = Num_Photons + 1 
         phot%scatter_times = 0   
-        CALL phot%Emitter_A_Photon( )
-        !CALL phot%Transmit_Data_And_Parameters_From_Emitter2Photon( Emitter )
-        CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( ) 
-        CALL phot%FIRST_SCATTERING_OF_PHOT_ELCE( sphot ) 
+        CALL phot%Emitter_A_Photon() 
+        CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )  
+        CALL phot%Photon_Electron_Scattering( )
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Scattering_loop: Do
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-            phot%scatter_times = phot%scatter_times + 1
-            !write(*,*)'ss2===', phot%scatter_times, phot%p_scattering!, phot%E_ini, phot%nu_up*h_ev/1.D6 
-            CALL phot%Set_InI_Conditions_For_Next_Scattering( sphot )   
-            CALL phot%Determine_Next_Scattering_Site( sphot )
+            phot%scatter_times = phot%scatter_times + 1 
+            CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( ) 
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
             !if(phot%I_IQ < 0.D0)write(*,*)'w_ini =', phot%w_ini, phot%I_IQ!, phot%Optical_Depth_scatter,&
                    !phot%z_tau
@@ -73,18 +70,18 @@
             !if( phot%scatter_times > 100 )exit
             !if( phot%z_tau > 50.D0 .or. dabs(phot%I_IQ) <= 1.D-5) exit
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            CALL phot%Photon_Electron_Scattering( sphot )
+            CALL phot%Photon_Electron_Scattering( )
             !if( dabs( sphot%Scattered_Phot4k_CF(1) ) >= 1.D-1 * mec2 )exit
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         END DO Scattering_loop
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
-        If ( mod(Num_Photons, 5000)==0 ) then 
-        write(unit = *, fmt = *)'*************************************************************************' 
+        If ( mod(Num_Photons, 5000)==0 .and. myid == np - 1 ) then 
+        !write(unit = *, fmt = *)'*************************************************************************' 
         write(unit = *, fmt = *)'***** The', Num_Photons,'th Photons have been scattered', &
                                   phot%scatter_times, &
                          'times and Escapted from the region !!!!!!!'      
-        write(unit = *, fmt = *)'***** My Duty Photon Number is: ',myid, mydutyphot,  Num_PolDeg   
+        write(unit = *, fmt = *)'***** My Duty Photon Number is: ',myid, mydutyphot
         write(unit = *, fmt = *)'*************************************************************************'
         endif
     If( Num_Photons > mydutyphot )EXIT
@@ -130,8 +127,8 @@
               phot%PolarArrayd( i ) = DSQRT( phot%PolarArrayQ(i)**2 + phot%PolarArrayU(i)**2 &
                                              ) / phot%PolarArrayI(i) 
           enddo 
-          open(unit=10, file='./spectrum/EIQ_I_tau=50.txt', status="replace") 
-          open(unit=11, file='./spectrum/EIQ_Q_tau=50.txt', status="replace")     
+          open(unit=10, file = MCResultsFileNameI, status="replace") 
+          open(unit=11, file = MCResultsFileNameQ, status="replace")     
           do j = 0, Num_PolDeg
               write(unit = 10, fmt = *)phot%PolarArrayI(j)
               write(unit = 11, fmt = *)phot%PolarArrayQ(j) 

@@ -15,6 +15,7 @@
           real(mcp) :: Phi_Scat
           real(mcp) :: Cos_Phi_Scat
           real(mcp) :: Sin_Phi_Scat   
+          real(mcp) :: Q_IQ_scat
       contains 
 !*******************************************************************************************************
       procedure, public :: Tompson_Scattering_WithOut_Polarization_IQ  =>   &
@@ -34,24 +35,16 @@
       class(ScatPhoton) :: this 
       real(mcp) :: epsi, r, phip, mupsi, mu_tilde_p, sinmu_tilde, sinpsi, &
                    sinmu_tilde_p, sin_tilphi_p, cos_tilphi_p, N_temp, beta, &
-                   A_const, B_const, C_const, QlI, mu_ini, N_normal
-      !real(mcp), dimension(1:4) :: Scattered_Phot4k_In_Elec
-      !real(mcp), dimension(1:3, 1:3) :: Temp_Matrix_3X3, TTemp_Matrix_3X3, PTemp_Matrix_3X3
-      !real(mcp), dimension(1:3) :: Temp_Matrix_1X3
-      !real(mcp), dimension(1:3) :: Temp_Vector, f3_scat_e_tilde
-      !real(mcp), dimension(1:4) :: f4_scat_e
+                   A_const, B_const, C_const, QlI, mu_ini, N_normal 
       real(mcp) :: psi_p
       !****************************************************************************
 
       !****************************************************************************
       real(mcp) :: a, b, c 
       Complex*16 :: roots3(1: 3), rts(1: 3)
-      integer :: del, cases_f
+      integer :: del 
       !****************************************************************************
-
-      !mutilde = this%Elec_Phot_mu_In_Elec_CF
-      !Etilde  = this%Phot4k_CtrCF(1) 
-      !epsi = two * dabs( Etilde ) / mec2
+ 
       mu_ini = this%Vector_of_Momentum_ini(3)
       QlI = this%Q_IQ / this%I_IQ
       A_const = three - mu_ini**2 + ( one - mu_ini**2 ) * QlI ! - mu_ini
@@ -134,8 +127,12 @@
           write(*, *)'mms55==',  this%I_IQ, this%Q_IQ, N_temp, mupsi, mu_ini, QlI
           stop
       endif
-      this%Q_IQ = this%I_IQ * ( ( one - mupsi**2 ) * ( one - three * mu_ini**2 ) + QlI * three * &
+      !this%Q_IQ = this%I_IQ * ( ( one - mupsi**2 ) * ( one - three * mu_ini**2 ) + QlI * three * &
+      !              ( one - mupsi**2 ) * ( one - mu_ini**2 ) ) / N_temp * three / 16.D0
+
+      this%Q_IQ_scat = this%I_IQ * ( ( one - mupsi**2 ) * ( one - three * mu_ini**2 ) + QlI * three * &
                     ( one - mupsi**2 ) * ( one - mu_ini**2 ) ) / N_temp * three / 16.D0
+
       !this%I_IQ = this%I_IQ * N_normal * three / 16.D0
 
       !write(*, *)'mms44==',this%I_IQ,   N_normal * three / 16.D0
@@ -151,18 +148,13 @@
          ! stop
       !endif 
       !**********************************************************************
-      !*** To obtain the Scattered 4 momentum of photon in the CF 
+      !*** To obtain the Scattered mu_zp
       !********************************************************************** 
-      
-      this%Scattered_Phot4k_CF(1) = this%Phot4k_CtrCF(1) 
-      this%Scattered_Phot4k_CF(2:3) = zero
-      this%Scattered_Phot4k_CF(4) = mupsi
-      !this%Scattered_Phot4k_CovCF = this%Scattered_Phot4k_CF
-      !this%Scattered_Phot4k_CovCF(1) = - this%Scattered_Phot4k_CF(1)
-
-      !if( this%Scattered_Phot4k_CF(4) / dabs(this%Scattered_Phot4k_CF(1)) > 1.D0 )then
-         !write(*, *)'mms0000==', this%Scattered_Phot4k_CF / dabs(this%Scattered_Phot4k_CF(1))
-      !endif 
+       
+      this%mu_zp_ini = mupsi
+      if( isnan( mupsi ) )write(*, *)'mms=', mupsi 
+      this%Q_IQ = this%Q_IQ_scat
+ 
       !*************************************************************************************************  
       end Subroutine Tompson_Scattering_WithOut_Polarization_IQ_Sub 
 !*******************************************************************************************************
