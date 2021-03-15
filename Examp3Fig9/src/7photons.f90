@@ -69,9 +69,10 @@
       dy = one / Num_PolDeg
       do i = 1, Num_PolDeg
           this%mu_estis(i) = i * dy
+          this%mu_estis_sq(i) = this%mu_estis(i)**2
       enddo
       this%mu_estis(0) = dy * 0.5D0
-      this%mu_estis_sq = this%mu_estis**2
+      this%mu_estis_sq(0) = this%mu_estis(0)**2
 
       this%tau_max = tau 
       this%PolarArrayI = zero
@@ -110,7 +111,7 @@
       !write(*,*)'ss2=', this%z_tau, this%p_scattering, this%Vector_of_Momentum_ini(3) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
       !this%Phot4k_CtrCF_At_p = this%Phot4k_CtrCF_ini  
-      this%mu_zp_p = this%mu_zp_ini  
+      this%mu_zp_p = this%mu_zp_ini
 
       RETURN
       END SUBROUTINE Determine_P_Of_Scatt_Site_And_Quantities_At_p_Sub 

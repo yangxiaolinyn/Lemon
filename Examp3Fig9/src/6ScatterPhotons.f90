@@ -45,7 +45,8 @@
       integer :: del 
       !****************************************************************************
  
-      mu_ini = this%Vector_of_Momentum_ini(3)
+      !mu_ini = this%Vector_of_Momentum_ini(3)
+      mu_ini = this%mu_zp_p
       QlI = this%Q_IQ / this%I_IQ
       A_const = three - mu_ini**2 + ( one - mu_ini**2 ) * QlI ! - mu_ini
       B_const = three * mu_ini**2 - ( one + three * ( one - mu_ini**2 ) * QlI )

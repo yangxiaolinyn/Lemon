@@ -98,32 +98,32 @@
       real(mcp) :: p_out1, Sigma_I, tau1, eta
       integer(kind=8) :: i, path_cases
     
-      if( this%Vector_of_Momentum_ini(3) > zero )then
+      if( this%mu_zp_ini > zero )then
 
-          p_out1 =  this%z_tau / this%Vector_of_Momentum_ini(3)
+          p_out1 =  this%z_tau / this%mu_zp_ini
           this%InterSection_Cases = 1
           this%Optical_Depth_scatter = p_out1 
           this%NormalA = one - dexp( - p_out1 )
           r1 = ranmar()
           Temp_log = dlog( one - r1 * this%NormalA ) 
-          Get_scatter_distance_IQ = this%z_tau + Temp_log * this%Vector_of_Momentum_ini(3)  
+          Get_scatter_distance_IQ = this%z_tau + Temp_log * this%mu_zp_ini
           !write(*, *)'ff11=', Get_scatter_distance4, p_out1, this%Z_max, this%z_ini, &
-          !             this%Vector_of_Momentum_ini(3), dexp( - p_out1 * Sigma_I )
+          !             this%mu_zp_ini, dexp( - p_out1 * Sigma_I )
 
-      else if( this%Vector_of_Momentum_ini(3) < zero )then
+      else if( this%mu_zp_ini < zero )then
 
-          p_out1 = - ( this%tau_max - this%z_tau ) / this%Vector_of_Momentum_ini(3)
+          p_out1 = - ( this%tau_max - this%z_tau ) / this%mu_zp_ini
           this%InterSection_Cases = - 1
           this%Optical_Depth_scatter = p_out1 
           this%NormalA = one - dexp( - p_out1 )
           r1 = ranmar()
           Temp_log = dlog( one - r1 * this%NormalA ) 
           !Get_scatter_distance_IQ = - dlog( one - r1 * this%NormalA ) 
-          Get_scatter_distance_IQ = this%z_tau - Temp_log * dabs( this%Vector_of_Momentum_ini(3) )
+          Get_scatter_distance_IQ = this%z_tau - Temp_log * dabs( this%mu_zp_ini )
 
-      else if( this%Vector_of_Momentum_ini(3) == zero )then
+      else if( this%mu_zp_ini == zero )then
 
-          !p_out1 = - ( this%tau_max - this%z_tau ) / this%Vector_of_Momentum_ini(3)
+          !p_out1 = - ( this%tau_max - this%z_tau ) / this%mu_zp_ini
           this%InterSection_Cases = - 2
           !this%Optical_Depth_scatter = p_out1 
           this%NormalA = one! - dexp( - p_out1 )
@@ -134,7 +134,7 @@
      
       if( isnan(Get_scatter_distance_IQ) ) then
            write(*,*)'ends=',Get_scatter_distance_IQ, r1, this%NormalA,  &
-             this%InterSection_Cases, p_out1, this%z_tau, this%Vector_of_Momentum_ini(3)
+             this%InterSection_Cases, p_out1, this%z_tau, this%mu_zp_ini
            stop
       endif 
 
@@ -144,12 +144,12 @@
       endif
       if(p_out1 < zero )then
           write(*,*)'sdf12==',Get_scatter_distance_IQ, this%InterSection_Cases, p_out1, this%z_ini,&
-           this%Vector_of_Momentum_ini(3) 
+           this%mu_zp_ini
        endif 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       If (Get_scatter_distance_IQ < zero) then
           write(*,*)'sdf==',Get_scatter_distance_IQ, p_out1, Sigma_I, this%Z_max, this%z_ini, &
-              this%Vector_of_Momentum_ini(3), this%InterSection_Cases
+              this%mu_zp_ini, this%InterSection_Cases
           stop
       endif
       If (Get_scatter_distance_IQ == zero) then

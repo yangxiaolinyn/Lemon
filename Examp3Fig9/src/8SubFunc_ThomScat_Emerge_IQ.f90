@@ -59,14 +59,11 @@
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
             phot%scatter_times = phot%scatter_times + 1 
             CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( ) 
-            !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
-            !if(phot%I_IQ < 0.D0)write(*,*)'w_ini =', phot%w_ini, phot%I_IQ!, phot%Optical_Depth_scatter,&
-                   !phot%z_tau
-            !write(*,*)'w_ini =',phot%w_ini, phot%I_IQ, phot%Q_IQ , phot%z_tau, phot%scatter_times !,&
-            !      phot%z_tau
+            if( phot%I_IQ <= 1.D-10 )exit
+            !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+            !write(*,*)'w_ini =', phot%I_IQ, phot%Q_IQ , phot%z_tau, phot%scatter_times 
             !if( phot%scatter_times >= 2.D3 )exit
             !if( phot%I_IQ / phot%w_ini0 <= 1.D-6 )exit
-            if( phot%I_IQ <= 1.D-25 )exit
             !if( phot%scatter_times > 100 )exit
             !if( phot%z_tau > 50.D0 .or. dabs(phot%I_IQ) <= 1.D-5) exit
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
