@@ -1,24 +1,21 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      MODULE Method_Of_FLST_ThomScat_Emerge_IQ
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !USE constants
-      USE RandUtils
-      USE Photons_FlatSP
-      USE MPI
-      IMPLICIT NONE 
+    MODULE Method_Of_FLST_ThomScat_Emerge_IQ
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+    USE RandUtils
+    USE Photons_FlatSP
+    USE MPI
+    IMPLICIT NONE 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      CONTAINS
-
+    CONTAINS 
 !**************************************************************************************
     SUBROUTINE mimick_of_ph_finity_zone_Emerge_IQ( Total_Phot_Num, tau )
 !************************************************************************************** 
     implicit none
     real(mcp), intent(inout) :: tau
-    real(mcp) :: E, E_low, E_up  
     integer(kind = 8) :: Num_Photons
     integer(kind = 8), intent(in) :: Total_Phot_Num 
-    type(Photon_Emitter_BB) :: Emitter
+    !type(Photon_Emitter) :: Emitter
     type(Photon_FlatSP) :: phot
     type(ScatPhoton) :: sphot
     integer :: send_num, recv_num, send_tag, RECV_SOURCE, status(MPI_STATUS_SIZE)   
@@ -36,7 +33,7 @@
     call MPI_COMM_RANK (MPI_COMM_WORLD, myid, ierr)
     call MPI_GET_PROCESSOR_NAME(processor_name, namelen, ierr)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    write(*,*)'MyId Is:  ', np, myid, namelen
+    write(*,*)'MyId Is:  ', myid, np, namelen
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
     if( myid == np-1 ) then
         mydutyphot = Total_Phot_Num / np + &
@@ -46,33 +43,18 @@
     endif 
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    CALL phot%Set_initial_parameter_values( Emitter, tau )
+    CALL phot%Set_initial_parameter_values( tau ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    !CALL Set_xi_wi_all()
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    !CALL phot%Set_Cross_Section_3Te()
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    !CALL Set_psi_phi_chi_zera_array()
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Num_Photons = 0 
-    !phot%v_L_v_i = zero   
-    phot%tau_max = tau
-    !phot%Z_max = tau / Sigma_T / phot%n_e
-    !phot%d_theta = pi / two / 100.D0 
-    phot%PolarArrayI = zero
-    phot%PolarArrayQ = zero   
-    phot%PolarArrayU = zero
+    Num_Photons = 0  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     Do 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
         Num_Photons = Num_Photons + 1 
         phot%scatter_times = 0   
-        CALL phot%Emitter_A_Photon( Emitter )
-        CALL phot%Transmit_Data_And_Parameters_From_Emitter2Photon( Emitter )
-        CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-        CALL phot%FIRST_SCATTERING_OF_PHOT_ELCE( sphot )
-  !write(*,*)'****************************************************************************'
+        CALL phot%Emitter_A_Photon( )
+        !CALL phot%Transmit_Data_And_Parameters_From_Emitter2Photon( Emitter )
+        CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( ) 
+        CALL phot%FIRST_SCATTERING_OF_PHOT_ELCE( sphot ) 
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Scattering_loop: Do
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -83,11 +65,11 @@
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
             !if(phot%I_IQ < 0.D0)write(*,*)'w_ini =', phot%w_ini, phot%I_IQ!, phot%Optical_Depth_scatter,&
                    !phot%z_tau
-             !write(*,*)'w_ini =',phot%w_ini, phot%I_IQ, phot%Q_IQ , phot%z_tau, phot%scatter_times !,&
-              !      phot%z_tau
-             !if( phot%scatter_times >= 2.D3 )exit
-             !if( phot%I_IQ / phot%w_ini0 <= 1.D-6 )exit
-              if( phot%I_IQ <= 1.D-25 )exit
+            !write(*,*)'w_ini =',phot%w_ini, phot%I_IQ, phot%Q_IQ , phot%z_tau, phot%scatter_times !,&
+            !      phot%z_tau
+            !if( phot%scatter_times >= 2.D3 )exit
+            !if( phot%I_IQ / phot%w_ini0 <= 1.D-6 )exit
+            if( phot%I_IQ <= 1.D-25 )exit
             !if( phot%scatter_times > 100 )exit
             !if( phot%z_tau > 50.D0 .or. dabs(phot%I_IQ) <= 1.D-5) exit
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

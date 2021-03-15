@@ -1,9 +1,9 @@
       module ScatterPhoton
-      use Basic_Variables_And_Methods 
+      use PhotonEmitter
       implicit none 
 
 !*******************************************************************************************************
-      type, public, extends(Basic_Variables_And_Methods_Of_Particle) :: ScatPhoton 
+      type, public, extends(Photon_Emitter) :: ScatPhoton 
 !*******************************************************************************************************
           real(mcp), dimension(1:4) :: Phot4k_In_Elec_CF
           real(mcp), dimension(1:4) :: Scattered_Phot4k_In_Elec_CF
