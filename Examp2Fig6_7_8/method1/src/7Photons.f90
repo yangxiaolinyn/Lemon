@@ -1,6 +1,5 @@
       module Photons 
-      use ScatDistance
-      !use CrossSection 
+      use ScatDistance 
       implicit none 
 
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
@@ -64,7 +63,7 @@
           ! E is the energy of the photon.
 
       this%n_e = tau / Rout / Sigma_T
-      this%R_out = Rout!tau / Sigma_T / this%n_e
+      this%R_out = Rout !tau / Sigma_T / this%n_e
       this%CrossSectFileName = CrossSec_filename
       !CALL this%Set_Cross_Section_Te( CrossSec_filename )
 

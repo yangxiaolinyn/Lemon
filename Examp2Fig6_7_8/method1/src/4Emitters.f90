@@ -18,6 +18,7 @@
           real(mcp) :: nu_up
           real(mcp) :: ln_nu1
           real(mcp) :: ln_nu2
+          real(mcp) :: dln_nu12  ! dln_nu12 = ln_nu2 - ln_nu1
           real(mcp) :: dnu 
           integer :: num_process, my_ID
           character*80 :: CrossSectFileName
@@ -87,7 +88,7 @@
 !*******************************************************************************************************
       implicit none
       class(Photon_Emitter) :: this
-      real(mcp) :: maxn, f1, a2, b2, dE, dnu
+      real(mcp) :: f1 
       integer :: i, istat
  
       this%E_max = this%max_plankexp(2) * this%T_s
@@ -117,7 +118,8 @@
           this%ln_nu2 = dlog10( this%nu_up )
           this%ln_nu1 = dlog10( this%nu_low )
       endif
-      this%dnu = ( this%ln_nu2 - this%ln_nu1 ) / N_wt1
+      this%dln_nu12 = this%ln_nu2 - this%ln_nu1
+      !this%dnu = ( this%ln_nu2 - this%ln_nu1 ) / N_wt1
       !write(*, *)'mm=', this%E_low1*1.D6/h_ev, this%E_max*1.D6/h_ev, this%E_up1*1.D6/h_ev
       !write(*, *)'mm=', this%E_low1, this%E_max, this%E_up1
  
@@ -132,7 +134,7 @@
       real(mcp) :: maxn, theta, phi, w_ini, v, fn, nu, index_nu
       integer :: i
   
-      index_nu = this%ln_nu1 + ranmar()*( this%ln_nu2 - this%ln_nu1 )
+      index_nu = this%ln_nu1 + ranmar() * this%dln_nu12
  
       v = 10.D0**( index_nu ) * h_ev * 1.D-6
       this%Phot4k_CtrCF_ini(1) = v
