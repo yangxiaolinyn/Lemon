@@ -65,11 +65,7 @@
         Scattering_loop: Do
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
             phot%scatter_times = phot%scatter_times + 1
-            !write(*,*)'ss2===', phot%scatter_times, phot%w_ini, phot%w_ini_em
-            !if( phot%scatter_times > 1.D5)write(*,*)'ss===',phot%scatter_times,phot%p_scattering, phot%R_in
-            !If ( myid == np-1 ) write(*,*)'Scatter_Times = ', phot%W_ini, phot%w_p, Scatter_Times
-            !If ( myid == np-1 ) write(*,*)'Scatter_Times = ', phot%dv_ini, phot%dv_p, &
-            !sphot%Scal_Factor_after, sphot%Scal_Factor_before, Scatter_Times
+            !write(*,*)'ss2===', phot%scatter_times, phot%w_ini, phot%w_ini_em 
             CALL phot%Set_InI_Conditions_For_Next_Scattering( ) 
             CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )  
             if( phot%w_ini / phot%w_ini_em <= 1.D-20 )exit 
