@@ -117,11 +117,11 @@
   
       !**********************************************************************
  
-      if ( dabs(mupsi) < one ) then
-          sinpsi = dsqrt( one - mupsi**2 )
-      else
-          sinpsi = zero
-      endif  
+      !if ( dabs(mupsi) < one ) then
+      !    sinpsi = dsqrt( one - mupsi**2 )
+      !else
+      !    sinpsi = zero
+      !endif  
       !********************************************************************************** 
       N_temp = ( A_const + B_const * mupsi**2 + C_const * mupsi ) / N_normal
       if( N_temp < zero )then

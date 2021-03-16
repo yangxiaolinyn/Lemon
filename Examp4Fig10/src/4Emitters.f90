@@ -26,19 +26,11 @@
       class(Photon_Emitter) :: this
       real(mcp) :: v,  index_nu, phi
       real(mcp) :: sin_theta, cos_theta, C_tau
-   
-      this%Phot4k_CtrCF_ini(1) = one
- 
-      !cos_theta = ranmar() !one - two * ranmar() !dcos( pi /two * ranmar() ) 
-      !sin_theta = dsqrt( one - cos_theta**2 )
-      !phi = twopi * ranmar()
-  
-      !this%Vector_of_Momentum_ini(1) = sin_theta * DCOS(phi)
-      !this%Vector_of_Momentum_ini(2) = sin_theta * DSIN(phi)
-      !this%Vector_of_Momentum_ini(3) = cos_theta
-
-      !this%Phot4k_CtrCF_ini(2: 4) = this%Phot4k_CtrCF_ini(1) * this%Vector_of_Momentum_ini(1: 3)
-      this%mu_zp_ini = ranmar()
+    
+      do
+          this%mu_zp_ini = one - two * ranmar() !dabs( dcos( pi / two * ranmar() ) )
+          if( this%mu_zp_ini /= zero )exit
+      enddo 
  
       this%z_tau = this%tau_max / two
       this%w_ini_em = one 

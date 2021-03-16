@@ -171,7 +171,7 @@
       integer :: i_obs , i_mu
   
       !mup = this%Vector_of_Momentum_ini(3)
-      mup = this%mu_zp_p
+      mup = this%mu_zp_ini
       mup2 = mup**2
 
           do i_mu = 0, Num_PolDeg 
@@ -182,9 +182,9 @@
               vLv = dexp( - p_out1 ) / mu 
 
               Psi_I = ( this%I_IQ * ( 3.D0 - mup2 - mu2 + 3.D0 * mup2 * mu2 ) + &
-                        this%Q_IQ * ( one - mup2 ) * ( one - 3.D0 * mu2 )  )! * three / 16.D0
+                        this%Q_IQ * ( one - mup2 ) * ( one - 3.D0 * mu2 )  ) * three / 16.D0
               Psi_Q = ( this%I_IQ * ( one - mu2 ) * ( one - three * mup2 ) + this%Q_IQ * three * &
-                      ( one - mu2 ) * ( one - mup2 ) )! * three / 16.D0
+                      ( one - mu2 ) * ( one - mup2 ) ) * three / 16.D0
 
               !write(*, *)'ffs==', vLv, Psi_I, Psi_Q, vLv * Psi_I, vLv * Psi_Q
               this%PolarArrayI( i_mu ) = this%PolarArrayI( i_mu ) + vLv * Psi_I
