@@ -120,10 +120,10 @@
           endif 
           write(*,*)'There are', phot%effect_number, 'of total', Total_Phot_Num, 'photons',&
                         'arrive at the plate of observer!!'
-          do i = 0, Num_PolDeg
-              phot%PolarArrayd( i ) = DSQRT( phot%PolarArrayQ(i)**2 + phot%PolarArrayU(i)**2 &
-                                             ) / phot%PolarArrayI(i) 
-          enddo 
+          !do i = 0, Num_PolDeg
+          !    phot%PolarArrayd( i ) = DSQRT( phot%PolarArrayQ(i)**2 + phot%PolarArrayU(i)**2 &
+          !                                   ) / phot%PolarArrayI(i) 
+          !enddo 
           open(unit=10, file = MCResultsFileNameI, status="replace") 
           open(unit=11, file = MCResultsFileNameQ, status="replace")     
           do j = 0, Num_PolDeg

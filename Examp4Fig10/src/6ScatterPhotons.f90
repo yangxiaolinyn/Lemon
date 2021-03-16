@@ -26,8 +26,7 @@
       private :: Tompson_Scattering_WithOut_Polarization_IQ_Sub 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 
-      contains 
-
+      contains
 !*******************************************************************************************************
       Subroutine Tompson_Scattering_WithOut_Polarization_IQ_Sub( this )
 !*******************************************************************************************************
@@ -46,11 +45,11 @@
       !****************************************************************************
  
       !mu_ini = this%Vector_of_Momentum_ini(3)
-      mu_ini = this%mu_zp_p
+      mu_ini = this%mu_zp_ini       
       QlI = this%Q_IQ / this%I_IQ
-      A_const = three - mu_ini**2 + ( one - mu_ini**2 ) * QlI ! - mu_ini
+      A_const = three - mu_ini**2 + ( one - mu_ini**2 ) * QlI
       B_const = three * mu_ini**2 - ( one + three * ( one - mu_ini**2 ) * QlI )
-      C_const = zero !- mu_ini  ! * dexp( - this%z_tau )
+      C_const = zero !- mu_ini * dexp( - this%z_tau )
       N_normal = A_const * two + two / three * B_const
       
       !The cdf function is given by: mu^3 + a * mu^2 + b * mu + c = 0, and 
@@ -97,10 +96,11 @@
           else
               ! At this case B = 0, 
               !mupsi = ( - b + dsqrt(b**2 - four*a*c) ) / two / a
-              mupsi = - c / b
+               mupsi = - c / b
               if( dabs( mupsi ) > one  )then
-                  !write(*, *)'mms41==', A_const, B_const, mu_ini, a, b, c, mupsi
-                  mupsi = ( - b - dsqrt(b**2 - four*a*c) ) / two / a
+                  write(*, *)'mms41==', A_const, B_const, mu_ini, a, b, c, mupsi
+                  stop
+                  !mupsi = ( - b - dsqrt(b**2 - four*a*c) ) / two / a
                   if( dabs( mupsi ) > one  )then
                       mupsi = - c / b
                   else
@@ -123,14 +123,11 @@
       !    sinpsi = zero
       !endif  
       !********************************************************************************** 
-      N_temp = ( A_const + B_const * mupsi**2 + C_const * mupsi ) / N_normal
+      N_temp = ( A_const + B_const * mupsi**2 ) / N_normal
       if( N_temp < zero )then
           write(*, *)'mms55==',  this%I_IQ, this%Q_IQ, N_temp, mupsi, mu_ini, QlI
           stop
       endif
-      !this%Q_IQ = this%I_IQ * ( ( one - mupsi**2 ) * ( one - three * mu_ini**2 ) + QlI * three * &
-      !              ( one - mupsi**2 ) * ( one - mu_ini**2 ) ) / N_temp * three / 16.D0
-
       this%Q_IQ_scat = this%I_IQ * ( ( one - mupsi**2 ) * ( one - three * mu_ini**2 ) + QlI * three * &
                     ( one - mupsi**2 ) * ( one - mu_ini**2 ) ) / N_temp * three / 16.D0
 

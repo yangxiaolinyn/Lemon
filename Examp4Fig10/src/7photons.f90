@@ -74,10 +74,10 @@
       this%mu_estis(0) = dy * 0.5D0
       this%mu_estis_sq(0) = this%mu_estis(0)**2
 
-      this%tau_max = tau 
-      this%PolarArrayI = zero
-      this%PolarArrayQ = zero   
-      this%PolarArrayU = zero
+      this%tau_max = tau * two
+      !this%PolarArrayI = zero
+      !this%PolarArrayQ = zero   
+      !this%PolarArrayU = zero
    
       RETURN
       END SUBROUTINE Set_initial_parameter_values_Sub
@@ -152,7 +152,7 @@
               p_out1 = this%z_tau / mu
               vLv = dexp( - p_out1 ) / mu 
 
-              Psi_I = one 
+              Psi_I = one / two
               !Psi_Q = zero 
 
               this%PolarArrayI( i_mu ) = this%PolarArrayI( i_mu ) + vLv * Psi_I 
@@ -171,7 +171,7 @@
       integer :: i_obs , i_mu
   
       !mup = this%Vector_of_Momentum_ini(3)
-      mup = this%mu_zp_ini
+      mup = this%mu_zp_p
       mup2 = mup**2
 
           do i_mu = 0, Num_PolDeg 

@@ -74,14 +74,94 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
           procedure, public :: Get_scatter_distance_IQ    
+          procedure, public :: Get_scatter_distance_IQ2
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      end type Photon_With_ScatDistance_FlatSP
- 
+      end type Photon_With_ScatDistance_FlatSP 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
-      contains  
+      contains 
+           
+ 
+    
+
+!*******************************************************************************************************
+      real(mcp) function Get_scatter_distance_IQ2( this )
+!*******************************************************************************************************
+      implicit none
+      class(Photon_With_ScatDistance_FlatSP) :: this 
+      real(mcp) :: p, p1, p_max, func1_tau_max_value, rp, rtp 
+      real(mcp) :: temp,temp2, Sigma_atP, dp
+      real(mcp) :: r1,r2, rprobability, r3, tempA, Temp_log
+      real(mcp) :: sign_pr, p_out 
+      real(mcp) :: p_out1, Sigma_I, tau1, eta
+      integer(kind=8) :: i, path_cases
+    
+      if( this%mu_zp_ini > zero )then
+
+          p_out1 =  this%z_tau / this%mu_zp_ini
+          this%InterSection_Cases = 1
+          this%Optical_Depth_scatter = p_out1 
+          this%NormalA = one - dexp( - p_out1 )
+          r1 = ranmar()
+          Temp_log = dlog( one - r1 * this%NormalA ) 
+          Get_scatter_distance_IQ2 = this%z_tau + Temp_log * this%mu_zp_ini
+          !write(*, *)'ff11=', Get_scatter_distance4, p_out1, this%Z_max, this%z_ini, &
+          !             this%mu_zp_ini, dexp( - p_out1 * Sigma_I )
+
+      else if( this%mu_zp_ini < zero )then
+
+          p_out1 = - ( this%tau_max - this%z_tau ) / this%mu_zp_ini
+          this%InterSection_Cases = - 1
+          this%Optical_Depth_scatter = p_out1 
+          this%NormalA = one - dexp( - p_out1 )
+          r1 = ranmar()
+          Temp_log = dlog( one - r1 * this%NormalA ) 
+          !Get_scatter_distance_IQ2 = - dlog( one - r1 * this%NormalA ) 
+          Get_scatter_distance_IQ2 = this%z_tau - Temp_log * dabs( this%mu_zp_ini )
+
+      else if( this%mu_zp_ini == zero )then
+
+          !p_out1 = - ( this%tau_max - this%z_tau ) / this%mu_zp_ini
+          this%InterSection_Cases = - 2
+          !this%Optical_Depth_scatter = p_out1 
+          this%NormalA = one! - dexp( - p_out1 )
+          r1 = ranmar()
+          Get_scatter_distance_IQ2 = this%z_tau !- dlog( one - r1 * this%NormalA ) 
+
+      endif
+     
+      if( isnan(Get_scatter_distance_IQ2) ) then
+           write(*,*)'ends=',Get_scatter_distance_IQ2, r1, this%NormalA,  &
+             this%InterSection_Cases, p_out1, this%z_tau, this%mu_zp_ini
+           stop
+      endif 
+
+      if( this%test_it )then
+          write(*,*)'sdf2==', r1, this%NormalA, Get_scatter_distance_IQ2, p_out1, Sigma_I, this%R_out
+          write(*,*)'sdf3==',  this%r_times_p, this%r_ini, this%R_out
+      endif
+      if(p_out1 < zero )then
+          write(*,*)'sdf12==',Get_scatter_distance_IQ2, this%InterSection_Cases, p_out1, this%z_ini,&
+           this%mu_zp_ini
+       endif 
+      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      If (Get_scatter_distance_IQ2 < zero) then
+          write(*,*)'sdf==',Get_scatter_distance_IQ2, p_out1, Sigma_I, this%Z_max, this%z_ini, &
+              this%mu_zp_ini, this%InterSection_Cases
+          stop
+      endif
+      If (Get_scatter_distance_IQ2 == zero) then
+          write(*,*)'ends=',Get_scatter_distance_IQ2, r1, this%NormalA,  &
+             this%InterSection_Cases, p_out1, this%z_tau
+          stop
+      endif
+      return
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      end function Get_scatter_distance_IQ2
+
+ 
 !*******************************************************************************************************
       real(mcp) function Get_scatter_distance_IQ( this )
 !*******************************************************************************************************
@@ -145,7 +225,7 @@
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       If (Get_scatter_distance_IQ < zero) then
           write(*,*)'sdf==',Get_scatter_distance_IQ, p_out1, Sigma_I, this%Z_max, this%z_ini, &
-              this%mu_zp_ini, this%InterSection_Cases
+             this%mu_zp_ini, this%InterSection_Cases
           stop
       endif
       If (Get_scatter_distance_IQ == zero) then
@@ -156,8 +236,6 @@
       return
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       end function Get_scatter_distance_IQ
-
- 
  
 !*******************************************************************************************************
  

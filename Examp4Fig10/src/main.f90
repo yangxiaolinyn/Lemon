@@ -10,13 +10,14 @@
  
     call InitRandom() 
 !~~~~~~~~~~Optical depth~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    tau = 10.D0 
+    tau = 5.D0 
 !~~~~~~~~~~Number of photons need be traced!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Total_Phot_Num = 6.D6
+    Total_Phot_Num = 3.D6
  
     write(taus, "(f8.4)")tau
     MCResultsFileNameI = trim('./spectrum/EIQ_I_tau=')//trim(adjustl(taus))//trim('.dat')
-    MCResultsFileNameQ = trim('./spectrum/EIQ_Q_tau=')//trim(adjustl(taus))//trim('.dat')
+    MCResultsFileNameQ = trim('./spectrum/EIQ_Q_tau=')//trim(adjustl(taus))//trim('.dat') 
+
     call mimick_of_ph_finity_zone_Emerge_IQ( Total_Phot_Num, &
                  tau, MCResultsFileNameI, MCResultsFileNameQ )   
 

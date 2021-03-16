@@ -35,7 +35,7 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ;ns = 101
-      Openr,lunAo10,'./EIQ_I_tau=0.4000.dat',/Get_Lun
+      Openr,lunAo10,'./EIQ_I_tau=0.2000.dat',/Get_Lun
       Point_lun, lunAo10, 0
       IQ_I02=fltarr(ns)
       ReadF,lunAo10,IQ_I02
@@ -43,7 +43,7 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ;ns = 101
-      Openr,lunAo10,'./EIQ_Q_tau=0.4000.dat',/Get_Lun
+      Openr,lunAo10,'./EIQ_Q_tau=0.2000.dat',/Get_Lun
       Point_lun, lunAo10, 0
       IQ_Q02=fltarr(ns)
       ReadF,lunAo10,IQ_Q02
@@ -51,7 +51,7 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ;ns = 101
-      Openr,lunAo10,'./EIQ_I_tau=1.0000.dat',/Get_Lun
+      Openr,lunAo10,'./EIQ_I_tau=0.5000.dat',/Get_Lun
       Point_lun, lunAo10, 0
       IQ_I05=fltarr(ns)
       ReadF,lunAo10,IQ_I05
@@ -59,7 +59,7 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ;ns = 101
-      Openr,lunAo10,'./EIQ_Q_tau=1.0000.dat',/Get_Lun
+      Openr,lunAo10,'./EIQ_Q_tau=0.5000.dat',/Get_Lun
       Point_lun, lunAo10, 0
       IQ_Q05=fltarr(ns)
       ReadF,lunAo10,IQ_Q05
@@ -67,7 +67,7 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ;ns = 101
-      Openr,lunAo10,'./EIQ_I_tau=2.0000.dat',/Get_Lun
+      Openr,lunAo10,'./EIQ_I_tau=1.0000.dat',/Get_Lun
       Point_lun, lunAo10, 0
       IQ_I1=fltarr(ns)
       ReadF,lunAo10,IQ_I1
@@ -75,7 +75,7 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ;ns = 101
-      Openr,lunAo10,'./EIQ_Q_tau=2.0000.dat',/Get_Lun
+      Openr,lunAo10,'./EIQ_Q_tau=1.0000.dat',/Get_Lun
       Point_lun, lunAo10, 0
       IQ_Q1=fltarr(ns)
       ReadF,lunAo10,IQ_Q1
@@ -83,7 +83,7 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ;ns = 101
-      Openr,lunAo10,'./EIQ_I_tau=4.0000.dat',/Get_Lun
+      Openr,lunAo10,'./EIQ_I_tau=2.0000.dat',/Get_Lun
       Point_lun, lunAo10, 0
       IQ_I2=fltarr(ns)
       ReadF,lunAo10,IQ_I2
@@ -91,7 +91,7 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ;ns = 101
-      Openr,lunAo10,'./EIQ_Q_tau=4.0000.dat',/Get_Lun
+      Openr,lunAo10,'./EIQ_Q_tau=2.0000.dat',/Get_Lun
       Point_lun, lunAo10, 0
       IQ_Q2=fltarr(ns)
       ReadF,lunAo10,IQ_Q2
@@ -99,7 +99,7 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ;ns = 101
-      Openr,lunAo10,'./EIQ_I_tau=10.0000.dat',/Get_Lun
+      Openr,lunAo10,'./EIQ_I_tau=5.0000.dat',/Get_Lun
       Point_lun, lunAo10, 0
       IQ_I10=fltarr(ns)
       ReadF,lunAo10,IQ_I10
@@ -107,7 +107,7 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ;ns = 101
-      Openr,lunAo10,'./EIQ_Q_tau=10.0000.dat',/Get_Lun
+      Openr,lunAo10,'./EIQ_Q_tau=5.0000.dat',/Get_Lun
       Point_lun, lunAo10, 0
       IQ_Q10=fltarr(ns)
       ReadF,lunAo10,IQ_Q10
@@ -121,7 +121,7 @@
       l=16 & xxss=l*(ratio) & yyss=l
       ;xoff=(LL-xxss)/2.,yoff=(3*LL/2.-yyss)/2.,
       !p.font = 0
-      device,filename='./pd_Chand_q_4.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
+      device,filename='./pd_Chand_q_1.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
       /color,xoff=(2-xxss)/2.0,yoff=(2-yyss)/2.,$
       set_font='Times-Roman';, /tt_font
 
@@ -161,29 +161,29 @@
       dyy = 0.35
       y0 = 5
       for i=0,0 do begin
-          oplot, vv(*), lv(*) , thick=4, color=black, linestyle=1;,psym=-4  
+          oplot, vv(*), lv(*) , thick=4, color=black, linestyle=6;,psym=-4  
 
-           oplot, cosq1,  abs(IQ_Q02(0:ns-1))/(IQ_I02(0:ns-1)) , thick=4, color=black, linestyle=3;,psym=-4 
+           oplot, cosq1,  abs(IQ_Q02(0:ns-1))/(IQ_I02(0:ns-1)) , thick=4, color=black, linestyle=2;,psym=-4 
            oplot, cosq1,  abs(IQ_Q05(0:ns-1))/(IQ_I05(0:ns-1)) , thick=4, color=black, linestyle=5;,psym=-4 
-           oplot, cosq1,  abs(IQ_Q1(0:ns-1))/(IQ_I1(0:ns-1)) , thick=4, color=black, linestyle=2;,psym=-4 
+           oplot, cosq1,  abs(IQ_Q1(0:ns-1))/(IQ_I1(0:ns-1)) , thick=4, color=black, linestyle=3;,psym=-4 
            oplot, cosq1,  abs(IQ_Q2(0:ns-1))/(IQ_I2(0:ns-1)) , thick=4, color=black, linestyle=4;,psym=-4  
-           oplot, cosq1,  abs(IQ_Q10(0:ns-1))/(IQ_I10(0:ns-1)) , thick=4, color=black, linestyle=6;,psym=-4  
+           oplot, cosq1,  abs(IQ_Q10(0:ns-1))/(IQ_I10(0:ns-1)) , thick=4, color=black, linestyle=1;,psym=-4  
            ;oplot, cosq1,  abs(IQ_Q20(0:ns-1))/(IQ_I20(0:ns-1)) , thick=6, color=black, linestyle=1;,psym=-4   
       endfor 
       
       
       xyouts,0.82,0.158,textoidl('\tau=0.2'),charsize=1.2 
-      oplot, [0.67, 0.81],[0.16, 0.16], thick=4, color=black, linestyle=3
+      oplot, [0.67, 0.81],[0.16, 0.16], thick=4, color=black, linestyle=2
       xyouts,0.82,0.148,textoidl('\tau=0.5'),charsize=1.2  
       oplot, [0.67, 0.81],[0.15, 0.15], thick=4, color=black, linestyle=5
       xyouts,0.82,0.138,textoidl('\tau=1.0'),charsize=1.2 
-      oplot, [0.67, 0.81],[0.14, 0.14], thick=4, color=black, linestyle=2
+      oplot, [0.67, 0.81],[0.14, 0.14], thick=4, color=black, linestyle=3
       xyouts,0.82,0.128,textoidl('\tau=2.0'),charsize=1.2 
       oplot, [0.67, 0.81],[0.13, 0.13], thick=4, color=black, linestyle=4
       xyouts,0.82,0.118,textoidl('\tau=10.0'),charsize=1.2 
-      oplot, [0.67, 0.81],[0.12, 0.12], thick=4, color=black, linestyle=6
+      oplot, [0.67, 0.81],[0.12, 0.12], thick=4, color=black, linestyle=1
       xyouts,0.82,0.108,textoidl('\tau=\infty'),charsize=1.2 
-      oplot, [0.67, 0.81],[0.11, 0.11], thick=4, color=black, linestyle=1
+      oplot, [0.67, 0.81],[0.11, 0.11], thick=4, color=black, linestyle=6
       ;print, 3.e7 * (1e9)^0.25
       device,/close 
 
