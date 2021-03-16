@@ -59,7 +59,7 @@
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
             phot%scatter_times = phot%scatter_times + 1 
             CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( ) 
-            if( phot%I_IQ <= 1.D-10 )exit
+            if( phot%I_IQ <= 1.D-25 )exit
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
             !write(*,*)'w_ini =', phot%I_IQ, phot%Q_IQ , phot%z_tau, phot%scatter_times 
             !if( phot%scatter_times >= 2.D3 )exit

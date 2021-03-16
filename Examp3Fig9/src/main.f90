@@ -12,7 +12,7 @@
 !~~~~~~~~~~Optical depth~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     tau = 10.D0 
 !~~~~~~~~~~Number of photons need be traced!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Total_Phot_Num = 3.D6
+    Total_Phot_Num = 6.D6
  
     write(taus, "(f8.4)")tau
     MCResultsFileNameI = trim('./spectrum/EIQ_I_tau=')//trim(adjustl(taus))//trim('.dat')
