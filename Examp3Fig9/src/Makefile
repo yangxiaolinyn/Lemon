@@ -64,8 +64,6 @@ MPI_INCLUDE=/share/apps/intel/impi/4.0.3.008/intel64/include
 IF90 = ifort
 OBJS =  $(OUT_DIR)/ConstantsUnit.o \
         $(OUT_DIR)/RootsUnit.o \
-        $(OUT_DIR)/ellfunctionsUnit.o \
-        $(OUT_DIR)/BlcoordinateUnit.o \
         $(OUT_DIR)/1RandUtils.o \
         $(OUT_DIR)/0Integration.o \
         $(OUT_DIR)/0Integration2.o \
@@ -80,17 +78,19 @@ OBJS =  $(OUT_DIR)/ConstantsUnit.o \
         $(OUT_DIR)/main.o
  
         #$(OUT_DIR)/5CrossSection.o \
+        #$(OUT_DIR)/ellfunctionsUnit.o \
+        #$(OUT_DIR)/BlcoordinateUnit.o \
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $(OUT_DIR)/RootsUnit.o: $(OUT_DIR)/ConstantsUnit.o
-$(OUT_DIR)/ellfunctionsUnit.o: $(OUT_DIR)/RootsUnit.o
-$(OUT_DIR)/BlcoordinateUnit.o: $(OUT_DIR)/ellfunctionsUnit.o
+#$(OUT_DIR)/ellfunctionsUnit.o: $(OUT_DIR)/RootsUnit.o
+#$(OUT_DIR)/BlcoordinateUnit.o: $(OUT_DIR)/ellfunctionsUnit.o
 $(OUT_DIR)/0IntialParameters.o: $(OUT_DIR)/ConstantsUnit.o
 $(OUT_DIR)/0Integration.o: $(OUT_DIR)/ConstantsUnit.o
 $(OUT_DIR)/0Integration2.o: $(OUT_DIR)/ConstantsUnit.o
 $(OUT_DIR)/2SubroutineFunctions.o: $(OUT_DIR)/ConstantsUnit.o $(OUT_DIR)/1RandUtils.o
 $(OUT_DIR)/3BasicVariablesAndMethods.o: $(OUT_DIR)/0Integration.o $(OUT_DIR)/2SubroutineFunctions.o \
-             $(OUT_DIR)/BlcoordinateUnit.o $(OUT_DIR)/0IntialParameters.o
+          $(OUT_DIR)/0IntialParameters.o
 $(OUT_DIR)/4Emitters.o: $(OUT_DIR)/3BasicVariablesAndMethods.o
 #$(OUT_DIR)/5CrossSection.o: $(OUT_DIR)/ConstantsUnit.o
 $(OUT_DIR)/6ScatterPhotons.o: $(OUT_DIR)/3BasicVariablesAndMethods.o
@@ -109,8 +109,8 @@ $(bin): $(OBJS)
 $(MOD_DIR)/%.mod: %.o %.f90
 
 
-$(OUT_DIR)/%.o: $(YNOGK_DIR)/%.f90 Makefile
-	$(FC) -c -CB -O2 $(FFLAGS) $(INCFLAGS) $(FCFLAGS_free_f90) -I$(OUT_DIR) -module $(MOD_DIR) $< -o $@
+#$(OUT_DIR)/%.o: $(YNOGK_DIR)/%.f90 Makefile
+#	$(FC) -c -CB -O2 $(FFLAGS) $(INCFLAGS) $(FCFLAGS_free_f90) -I$(OUT_DIR) -module $(MOD_DIR) $< -o $@
 
 $(OUT_DIR)/%.o: $(LEMON_DIR)/%.f90 Makefile
 	$(FC) -c -CB -O2 $(FFLAGS) $(INCFLAGS) $(FCFLAGS_free_f90) -I$(OUT_DIR) -module $(MOD_DIR) $< -o $@

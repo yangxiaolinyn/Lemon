@@ -20,7 +20,9 @@ im = imager
 export bin sample im
 default: $(bin)
 
-$(bin): $(SRC_DIR)/*.*90 $(YNOGK_DIR)/*.*90
+#$(bin): $(SRC_DIR)/*.*90 $(YNOGK_DIR)/*.*90
+#	cd $(SRC_DIR) && make $(bin)
+$(bin): $(SRC_DIR)/*.*90
 	cd $(SRC_DIR) && make $(bin)
  
 
