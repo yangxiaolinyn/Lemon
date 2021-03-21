@@ -1,59 +1,18 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       MODULE Method_Of_FLST_ThomScat_Emerge_IQ
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !USE constants
-      USE RandUtils
-      !USE PhotonEmitterBB
-      USE Photons_FlatSP
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      USE RandUtils 
+      USE PhotonModule
       USE MPI
       IMPLICIT NONE 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       CONTAINS
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Set_initial_parameter_values( Phot, Emitter, tau )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      IMPLICIT NONE  
-      TYPE(Photon_Emitter), INTENT(INOUT) :: Emitter
-      TYPE(Photon_FlatSP), INTENT(INOUT) :: Phot 
-      REAL(mcp), INTENT(INOUT) :: tau
-      integer :: i 
-
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-!| Set Initial conditions for the Emitter
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
-      Emitter%tau_max = tau
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!| Set Initial conditions for the Photon                     !
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      phot%tau_max = tau   
- 
-      CALL Set_psi_phi_chi_zera_array() 
-      phot%effect_number = 0
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      phot%delta_pds = zero
-      phot%v_L_v_i = zero
-      phot%d_theta = one / Num_PolDeg
-      phot%d_phi =  twopi / Num_Phi 
-
-      phot%phi_estimat(1) = zero
-      phot%phi_estimat(2) = pi / two
-      !phot%phi_estimat(3) = pi / four
-      phot%phi_estimat(3) = pi
-      do i = 1, Num_PolDeg
-          phot%mu_estimates( i ) = phot%d_theta * i
-      enddo
-      phot%mu_estimates( 0 ) = 1.D-3
-   
-      RETURN
-      END SUBROUTINE Set_initial_parameter_values
-
-
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       SUBROUTINE Calculate_The_Diffuse_Reflection_of_Chandra( Phot )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       IMPLICIT NONE  
-      TYPE(Photon_FlatSP), INTENT(INOUT) :: Phot 
+      TYPE(Photons), INTENT(INOUT) :: Phot 
       INTEGER :: i, j
       REAL(mcp) :: mu, mu0, phi, phi0, I_r, I_l, U, V, IQUV_in(1: 3), IQU(1: 3), &
                    Irluv_in(1: 3), Irluv(1: 3)
@@ -136,200 +95,6 @@
       RETURN
       END SUBROUTINE Calculate_The_Diffuse_Reflection_of_Chandra
 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Emitter_A_Photon( Emitter )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      IMPLICIT NONE
-      TYPE(Photon_Emitter), INTENT(INOUT) :: Emitter  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      CALL Emitter%get_Phot4k_CtrCF_CovCF_Reflection()  
-
-      RETURN
-      END SUBROUTINE Emitter_A_Photon
-
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Transmit_Data_And_Parameters_From_Emitter2Photon( Emitter, Phot )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      IMPLICIT NONE
-      TYPE(Photon_Emitter), INTENT(IN) :: Emitter
-      TYPE(Photon_FlatSP), INTENT(INOUT) :: Phot 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      phot%r_ini      = Emitter%r
-      !phot%theta_ini  = Emitter%theta
-      !phot%mucos_ini  = Emitter%mucos
-      !phot%musin_ini  = Emitter%musin
-      !phot%phi_ini    = Emitter%phi 
-      phot%x_ini  = Emitter%x
-      phot%y_ini  = Emitter%y
-      phot%z_ini  = Emitter%z
-      phot%z_tau  = Emitter%z_tau
-      phot%Vector_of_Momentum_ini = Emitter%Vector_of_Momentum
-      phot%Vector_of_position_ini = Emitter%Vector_of_position
-      !phot%Phot4k_CtrCF_ini = Emitter%Phot4k_CtrCF 
-      !phot%Phot4k_CovCF_ini = Emitter%Phot4k_CovCF 
-      phot%cosphi_ini = Emitter%cosphi_ini
-      phot%sinphi_ini = Emitter%sinphi_ini
-      phot%cos2phi_ini = Emitter%cos2phi_ini
-      phot%sin2phi_ini = Emitter%sin2phi_ini
-      phot%phi_ini = Emitter%phi_ini
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      !phot%E_ini = DABS( Emitter%Phot4k_CovCF(1) )  
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      phot%w_ini = Emitter%w_ini_em 
-      phot%w_ini0 = Emitter%w_ini_em 
-      phot%Psi_I = one
-      phot%Psi_Q = one / 4.D0
-      phot%Psi_U = one / 4.D0
-      phot%Psi_V = one
-  
-      RETURN
-      END SUBROUTINE Transmit_Data_And_Parameters_From_Emitter2Photon
-
-!************************************************************************************ 
-      SUBROUTINE Determine_P_Of_Scatt_Site_And_Quantities_At_p( phot ) 
-!************************************************************************************
-      IMPLICIT NONE 
-      TYPE(Photon_FlatSP), INTENT(INOUT) :: phot 
-      integer cases
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   
-      phot%z_tau = phot%Get_scatter_distance_tau( )   
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-      CALL phot%Calc_Phot_Informations_At_Observer_Diffuse_Reflec() 
-      phot%Psi_I = phot%Psi_I * phot%NormalA  
-      phot%Psi_Q = phot%Psi_Q * phot%NormalA  
-      phot%Psi_U = phot%Psi_U * phot%NormalA  
-      phot%Psi_V = phot%Psi_V * phot%NormalA  
-      !write(*,*)'ss2=', phot%z_tau, phot%p_scattering, phot%Vector_of_Momentum_ini(3) 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
-      phot%Vector_of_Momentum_p = phot%Vector_of_Momentum_ini
-      !phot%Vector_of_position_p = phot%Vector_of_position_ini
-      !write(unit = *, fmt = *)'************************************************************'
-
-      RETURN
-      END SUBROUTINE Determine_P_Of_Scatt_Site_And_Quantities_At_p
-
-!************************************************************************************
-      SUBROUTINE FIRST_SCATTERING_OF_PHOT_ELCE( phot, sphot )
-!************************************************************************************
-      IMPLICIT NONE 
-      TYPE(Photon_FlatSP), INTENT(INOUT) :: phot
-      TYPE(ScatPhoton), INTENT(INOUT) :: sphot
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 
-      sphot%Vector_of_Momentum_ini = phot%Vector_of_Momentum_p
-      !sphot%Vector_of_position_ini = phot%Vector_of_position_p
-      sphot%Psi_I = phot%Psi_I
-      sphot%Psi_Q = phot%Psi_Q
-      sphot%Psi_U = phot%Psi_U
-      sphot%Psi_V = phot%Psi_V
-      sphot%cosphi_ini = phot%cosphi_ini
-      sphot%sinphi_ini = phot%sinphi_ini
-      sphot%cos2phi_ini = phot%cos2phi_ini
-      sphot%sin2phi_ini = phot%sin2phi_ini
-      sphot%phi_ini = phot%phi_ini  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      If( .true. )then
-          CALL phot%Calc_Phot_Inform_At_Observer_with_mu_phi_Given2(1)
-          CALL phot%Calc_Phot_Inform_At_Observer_with_mu_phi_Given2(2)
-          !CALL phot%Calc_Phot_Inform_At_Observer_with_mu_phi_Given2(3)
-          CALL phot%Calc_Phot_Inform_At_Observer_with_mu_phi_Given2(3)
-      endif
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      CALL sphot%Tompson_Scat_With_Polarized_Diffuse_Reflection()   
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      END SUBROUTINE FIRST_SCATTERING_OF_PHOT_ELCE
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-
-!************************************************************************************
-      SUBROUTINE Set_InI_Conditions_For_Next_Scattering( phot, sphot )
-!************************************************************************************
-      IMPLICIT NONE 
-      TYPE(Photon_FlatSP), INTENT(INOUT) :: phot
-      TYPE(ScatPhoton), INTENT(INOUT) :: sphot 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      phot%Vector_of_Momentum_ini(3) = sphot%Vector_of_Momentum_ini(3)
-      if( isnan( phot%Vector_of_Momentum_ini(3) ) )write(*, *)'mms=', phot%Phot4k_CtrCF_ini
-
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      phot%Psi_I = sphot%Psi_I
-      phot%Psi_Q = sphot%Psi_Q
-      phot%Psi_U = sphot%Psi_U
-      phot%Psi_V = sphot%Psi_V
-      phot%cosphi_ini = sphot%cosphi_ini
-      phot%sinphi_ini = sphot%sinphi_ini
-      phot%cos2phi_ini = sphot%cos2phi_ini
-      phot%sin2phi_ini = sphot%sin2phi_ini
-      phot%phi_ini = sphot%phi_ini
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 
-      !phot%E_ini = DABS( phot%Phot4k_CovCF_ini(1) ) 
-      !write(*,*)'5555==', phot%E_ini, phot%Phot4k_CovCF_ini(1) 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      END SUBROUTINE Set_InI_Conditions_For_Next_Scattering
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-
-
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Determine_Next_Scattering_Site( phot, sphot )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      IMPLICIT NONE 
-      TYPE(Photon_FlatSP), INTENT(INOUT) :: phot
-      TYPE(ScatPhoton), INTENT(INOUT) :: sphot
-      integer cases
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
-      phot%z_tau = phot%Get_scatter_distance_tau( ) 
-      !write(*,*)'7777==', phot%E_ini, phot%Phot4k_CovCF_ini(1)
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-      CALL phot%Calc_Phot_Informations_At_Observer_Diffuse_Reflec() 
-      !phot%w_ini = phot%w_ini * phot%NormalA   
-      phot%Psi_I = phot%Psi_I * phot%NormalA
-      phot%Psi_Q = phot%Psi_Q * phot%NormalA  
-      phot%Psi_U = phot%Psi_U * phot%NormalA  
-      phot%Psi_V = phot%Psi_V * phot%NormalA   
-      !write(*,*)'ss3=',phot%w_ini, phot%NormalA, phot%r_one_hvlmec2_one_cosE    
-      phot%Vector_of_Momentum_p = phot%Vector_of_Momentum_ini  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      END SUBROUTINE Determine_Next_Scattering_Site
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-!************************************************************************************
-      SUBROUTINE Photon_Electron_Scattering( phot, sphot )
-!************************************************************************************
-      IMPLICIT NONE 
-      TYPE(Photon_FlatSP), INTENT(INOUT) :: phot
-      TYPE(ScatPhoton), INTENT(INOUT) :: sphot
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 
-      sphot%Vector_of_Momentum_ini = phot%Vector_of_Momentum_p
-      !sphot%Vector_of_position_ini = phot%Vector_of_position_p
-      sphot%Psi_I = phot%Psi_I
-      sphot%Psi_Q = phot%Psi_Q
-      sphot%Psi_U = phot%Psi_U
-      sphot%Psi_V = phot%Psi_V
-      sphot%cosphi_ini = phot%cosphi_ini
-      sphot%sinphi_ini = phot%sinphi_ini
-      sphot%cos2phi_ini = phot%cos2phi_ini
-      sphot%sin2phi_ini = phot%sin2phi_ini
-      sphot%phi_ini = phot%phi_ini 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      If( .true. )then
-          CALL phot%Calc_Phot_Inform_At_Observer_with_mu_phi_Given2(1)
-          CALL phot%Calc_Phot_Inform_At_Observer_with_mu_phi_Given2(2)
-          !CALL phot%Calc_Phot_Inform_At_Observer_with_mu_phi_Given2(3)
-          CALL phot%Calc_Phot_Inform_At_Observer_with_mu_phi_Given2(3)
-      endif
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      CALL sphot%Tompson_Scat_With_Polarized_Diffuse_Reflection() 
- 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      END SUBROUTINE Photon_Electron_Scattering
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 !**************************************************************************************
     SUBROUTINE mimick_of_ph_finity_zone_Emerge_IQ( Total_Phot_Num, tau )
@@ -340,7 +105,7 @@
     integer(kind = 8) :: Num_Photons
     integer(kind = 8), intent(in) :: Total_Phot_Num 
     type(Photon_Emitter) :: Emitter
-    type(Photon_FlatSP) :: phot
+    type(Photons) :: phot
     type(ScatPhoton) :: sphot
     integer :: send_num, recv_num, send_tag, RECV_SOURCE, status(MPI_STATUS_SIZE)   
     !real(mcp) :: I_Recv(0 : Num_PolDeg), Q_Recv(0 : Num_PolDeg) 
@@ -376,7 +141,7 @@
     call InitRandom( myid )
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    CALL Set_initial_parameter_values( Phot, Emitter, tau ) 
+    CALL phot%Set_initial_parameter_values( Emitter, tau ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     If( myid == np - 1 )then
         call Calculate_The_Diffuse_Reflection_of_Chandra( Phot )
@@ -387,19 +152,19 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
         Num_Photons = Num_Photons + 1 
         phot%scatter_times = 0   
-        CALL Emitter_A_Photon( Emitter )
-        CALL Transmit_Data_And_Parameters_From_Emitter2Photon( Emitter, Phot )
-        CALL Determine_P_Of_Scatt_Site_And_Quantities_At_p( phot )
+        CALL phot%Emitter_A_Photon( Emitter )
+        CALL phot%Transmit_Data_And_Parameters_From_Emitter2Photon( Emitter )
+        CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-        CALL FIRST_SCATTERING_OF_PHOT_ELCE( phot, sphot )
+        CALL phot%FIRST_SCATTERING_OF_PHOT_ELCE( sphot )
   !write(*,*)'****************************************************************************'
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Scattering_loop: Do
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
             phot%scatter_times = phot%scatter_times + 1
             !write(*,*)'ss2===', phot%scatter_times, phot%p_scattering!, phot%E_ini, phot%nu_up*h_ev/1.D6 
-            CALL Set_InI_Conditions_For_Next_Scattering( phot, sphot )   
-            CALL Determine_Next_Scattering_Site( phot, sphot )
+            CALL phot%Set_InI_Conditions_For_Next_Scattering( sphot )   
+            CALL phot%Determine_Next_Scattering_Site( sphot )
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
             !if( phot%Optical_Depth_scatter >= 1.D2 )exit
              !if( phot%I_IQ / phot%w_ini0 <= 1.D-6 )exit
@@ -407,7 +172,7 @@
             !if( phot%scatter_times > 100 )exit
             !if( phot%z_tau > 50.D0 .or. dabs(phot%I_IQ) <= 1.D-5) exit
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            CALL Photon_Electron_Scattering( phot, sphot ) 
+            CALL phot%Photon_Electron_Scattering( sphot ) 
             !if(phot%scatter_times > 10)stop
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         END DO Scattering_loop

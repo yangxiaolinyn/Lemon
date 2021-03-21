@@ -1,14 +1,9 @@
-      module Photons_FlatSP
-      use ScatDistance_FlatSP
-      !use PhotonEmitterSyn
-      !use PhotonEmitter
-      !use ScatPhotSequences
+      module PhotonsEstimation
+      use ScatDistance_FlatSP 
       implicit none 
 
-      type, public, extends(Photon_With_ScatDistance_FlatSP) :: Photon_FlatSP
-!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-!* The BL coordinates of the photon at p, which determines the BL coordinates  *
-!* by YNOGK functions: r(p), mucos(p), phi(p), t(p), sigma(p)                  *
+!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+      type, public, extends(Photon_With_ScatDistance_FlatSP) :: Photons_Esti 
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
           real(mcp) :: v_L_v_i(1: vL_sc_up)  
           real(mcp) :: nu_obs 
@@ -73,7 +68,7 @@
                                Calc_Phot_Inform_At_Observer_with_mu_phi_Given2_Sub
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      end type Photon_FlatSP
+      end type Photons_Esti
   
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       private :: Calc_Phot_Informations_At_Observer_Flat_SPTM_Reflec_Sub
@@ -91,7 +86,7 @@
       subroutine Calc_Phot_Informations_At_Observer_Flat_SPTM_Reflec_Sub(this)
 !*******************************************************************************************************
       implicit none
-      class(Photon_FlatSP) :: this   
+      class(Photons_Esti) :: this   
       integer :: i, j, h, k, mu_i, N_low, N_low1, i_obs, i_phi, case_phi
       real(mcp) :: temp_P_X_f, vector1(1: 3), f4(1: 3), Axis_x(1: 3), &
                     Axis_y(1: 3), Axis_z(1: 3), cos_psi, Qpsi, Upsi, fx, fy, &
@@ -250,7 +245,7 @@
       subroutine Calc_Phot_Informations_At_Observer_Diffuse_Reflec_Sub(this)
 !*******************************************************************************************************
       implicit none
-      class(Photon_FlatSP) :: this   
+      class(Photons_Esti) :: this   
       integer :: i, j, h, k, i_obs, i_phi, case_phi  
       real(mcp) :: vLv
 
@@ -318,7 +313,7 @@
       subroutine Calc_Phot_Inform_At_Observer_Diffuse_Reflec_phi_Sub(this)
 !*******************************************************************************************************
       implicit none
-      class(Photon_FlatSP) :: this   
+      class(Photons_Esti) :: this   
       integer :: i, j, k, i_obs, i_phi, case_mu
       real(mcp) :: i_mu  
       real(mcp) :: vLv
@@ -388,7 +383,7 @@
       subroutine Calc_Phot_Inform_At_Observer_DiffRefl_phi_Estimat_Sub(this, mu_i)
 !*******************************************************************************************************
       implicit none
-      class(Photon_FlatSP) :: this   
+      class(Photons_Esti) :: this   
       integer, intent(in) :: mu_i
       integer :: i, j, k, i_obs, i_phi 
       real(mcp) :: i_mu  
@@ -428,7 +423,7 @@
       subroutine Calc_Phot_Inform_At_Observer_with_mu_phi_Given_Sub(this, mu_i)
 !*******************************************************************************************************
       implicit none
-      class(Photon_FlatSP) :: this   
+      class(Photons_Esti) :: this   
       integer, intent(in) :: mu_i
       integer :: i, j, k, i_phi 
       real(mcp) :: i_mu  
@@ -463,7 +458,7 @@
       subroutine Calc_Phot_Inform_At_Observer_with_mu_phi_Given2_Sub(this, phi_i)
 !*******************************************************************************************************
       implicit none
-      class(Photon_FlatSP) :: this   
+      class(Photons_Esti) :: this   
       integer, intent(in) :: phi_i
       integer :: i, j, k, i_mu  
       real(mcp) ::  vLv, phi_esti
@@ -498,7 +493,7 @@
       Subroutine Calcu_Psi_IQUV_for_Estimat_With_muphi_Geiven_Sub( this, mu_estimat, scat_estimat )
 !*******************************************************************************************************
       implicit none
-      class(Photon_FlatSP) :: this
+      class(Photons_Esti) :: this
       !integer, intent(in) :: mu_i
       real(mcp), intent(in) :: mu_estimat, scat_estimat
       real(mcp) :: r, phip, smu, &
@@ -631,7 +626,7 @@
       Subroutine Get_Psi_IQUV_for_Estimat_With_muphi_Geiven_Sub( this, mu, mu2, smu, mup, mup2, smup, &
                   scat_phi, f1, g2, g3, g4, g5, QlI, UlI )
 !*******************************************************************************************************
-      class(Photon_FlatSP) :: this 
+      class(Photons_Esti) :: this 
       real(mcp), intent(in) ::  mu, mu2, smu, mup, mup2, smup, scat_phi, f1, g2, g3, g4, g5, QlI, UlI 
 
       end Subroutine Get_Psi_IQUV_for_Estimat_With_muphi_Geiven_Sub
@@ -639,7 +634,7 @@
 !*******************************************************************************************************
 !*******************************************************************************************************
  
-      end module Photons_FlatSP
+      end module PhotonsEstimation
 
 
 

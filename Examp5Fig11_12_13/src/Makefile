@@ -72,10 +72,11 @@ OBJS =  $(OUT_DIR)/ConstantsUnit.o \
         $(OUT_DIR)/3BasicVariablesAndMethods.o \
         $(OUT_DIR)/4EmittersBlackBody.o \
         $(OUT_DIR)/Chandra_Diffuse_Reflection.o \
-        $(OUT_DIR)/6ScatterPhotons.o \
+        $(OUT_DIR)/5ScatterPhotons.o \
         $(OUT_DIR)/6ScatterDistance.o \
-        $(OUT_DIR)/7photons.o \
-        $(OUT_DIR)/8SubFunc_ThomScat_Diffuse_Reflection.o \
+        $(OUT_DIR)/7EstimationUnit.o \
+        $(OUT_DIR)/8photons.o \
+        $(OUT_DIR)/9SubFuncsForDiffuseReflection.o \
         $(OUT_DIR)/main.o
  
         #$(OUT_DIR)/5CrossSection.o \
