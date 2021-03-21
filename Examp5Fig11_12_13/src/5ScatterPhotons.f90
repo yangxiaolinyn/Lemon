@@ -95,6 +95,8 @@
       b = zero
       c = 3.D0 * B1
       d = a + c - 16.D0 * ranmar()
+      !write(*, *)'5ScatterPhoton ', mup, mup2, &
+      !         this%Psi_I, this%Psi_Q, this%Psi_U, t1, t2
     
       if( dabs( a ) > 1.D-7 )then
           call root3new(a, b, c, d, roots3, del)  
@@ -268,7 +270,7 @@
       this%sin2phi_ini = dsin(two*scat_phi)
       this%Vector_of_Momentum_ini(3) = mu
       if( isnan( this%Vector_of_Momentum_ini(3) ) )then
-          write(*, *)'5ScatterPhoton line 271: Scattered mu is NaN!', mu
+          write(*, *)'5ScatterPhoton line 271: Scattered mu is NaN!', mu, a, b, c, d
       endif
 
       !this%Psi_I = this%Psi_I  ! Psi_I is unchanged!

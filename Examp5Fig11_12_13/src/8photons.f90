@@ -51,7 +51,7 @@
       CALL Set_psi_phi_chi_zera_array() 
       this%effect_number = 0
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      this%delta_pds = zero
+      !this%delta_pds = zero
       this%v_L_v_i = zero
       this%d_theta = one / Num_PolDeg
       this%d_phi =  twopi / Num_Phi 
@@ -90,7 +90,7 @@
       this%Psi_Q = this%Psi_Q * this%NormalA  
       this%Psi_U = this%Psi_U * this%NormalA  
       this%Psi_V = this%Psi_V * this%NormalA  
-      !write(*,*)'ss2=', this%z_tau, this%p_scattering, this%Vector_of_Momentum_ini(3) 
+      !write(*,*)'ss2=', this%NormalA, this%Vector_of_Momentum_ini(3)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
       !this%Vector_of_Momentum_p = this%Vector_of_Momentum_ini
       !this%Vector_of_position_p = this%Vector_of_position_ini

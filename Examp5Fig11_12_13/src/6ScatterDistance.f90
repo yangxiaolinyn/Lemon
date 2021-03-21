@@ -19,9 +19,7 @@
           real(mcp) :: r_times_p
           real(mcp) :: T_e    
           real(mcp) :: Important_Sampling_Const
-          logical :: test_it = .FALSE.
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          real(mcp), dimension(0:100) :: delta_pds(0:100)
+          logical :: test_it = .FALSE. 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
           real(mcp) :: A_normal
           real(mcp) :: Sigma_Max
@@ -35,8 +33,7 @@
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
           real(mcp) :: Optical_Depth_scatter 
-          integer :: cases, InterSection_Cases
-          !real(mcp) :: Sigma_I0
+          integer :: cases, InterSection_Cases 
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
           !real(mcp) :: Z_max
           !real(mcp) :: ratio
@@ -64,11 +61,11 @@
 !*******************************************************************************************************
       implicit none
       class(Photon_With_ScatDistance_FlatSP) :: this 
-      real(mcp) :: p, p1, p_max, func1_tau_max_value, rp, rtp 
-      real(mcp) :: temp,temp2, dp
+      real(mcp) :: p, p1 
+      real(mcp) :: temp, dp
       real(mcp) :: r1, r2, r3
-      real(mcp) :: sign_pr, Temp_log
-      real(mcp) :: p_out1, Sigma_I, tau1, eta
+      real(mcp) :: Temp_log
+      real(mcp) :: p_out1, tau1, eta
       integer(kind=8) :: i, path_cases
     
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -84,39 +81,39 @@
 
       else if( this%Vector_of_Momentum_ini(3) < zero )then
 
-          p_out1 = - ( this%tau_max - this%z_tau ) / this%Vector_of_Momentum_ini(3)
+          !p_out1 = - ( this%tau_max - this%z_tau ) / this%Vector_of_Momentum_ini(3)
+          p_out1 = Infinity
           this%InterSection_Cases = - 1
           this%Optical_Depth_scatter = p_out1 
-          this%NormalA = one  - dexp( - p_out1 )
+          !this%NormalA = one  - dexp( - p_out1 )
+          this%NormalA = one !  - dexp( - p_out1 )
           r1 = ranmar()
           Temp_log = dlog( one - r1 * this%NormalA )
           Get_scatter_distance_tau = this%z_tau + Temp_log * this%Vector_of_Momentum_ini(3)  
-          !write(*, *)'ff22=',  Get_scatter_distance_tau, r1, this%NormalA
-
+ 
       else if( this%Vector_of_Momentum_ini(3) == zero )then
  
           this%InterSection_Cases = - 3
           this%Optical_Depth_scatter = Infinity 
-          this%NormalA = one 
-          r1 = ranmar()
+          this%NormalA = one  
           Get_scatter_distance_tau = this%z_tau
 
       endif 
   
       if( this%test_it )then
-          write(*,*)'sdf2==', r1, this%NormalA, Get_scatter_distance_tau, p_out1, Sigma_I 
+          write(*,*)'sdf2==', r1, this%NormalA, Get_scatter_distance_tau, p_out1 
           write(*,*)'sdf3==',  this%r_times_p, this%r_ini 
       endif
       if(p_out1 < zero )then
           write(*,*)'sdf12==',Get_scatter_distance_tau, this%InterSection_Cases, p_out1, this%z_ini,&
-           this%Vector_of_Momentum_ini(3), Sigma_I
+           this%Vector_of_Momentum_ini(3) 
        endif
       !if( Get_scatter_distance_tau > p_out1 )then
       !    write(*,*)'I111',Get_scatter_distance_tau, p_out1, Get_scatter_distance_tau - p_out1
       !endif
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       If (Get_scatter_distance_tau < zero) then
-          write(*,*)'sdfss==',Get_scatter_distance_tau, p_out1, Sigma_I , this%z_ini, &
+          write(*,*)'sdfss==',Get_scatter_distance_tau, p_out1, this%z_ini, &
               this%Vector_of_Momentum_ini(3), this%InterSection_Cases
           stop
       endif 
@@ -130,11 +127,11 @@
 !*******************************************************************************************************
       implicit none
       class(Photon_With_ScatDistance_FlatSP) :: this 
-      real(mcp) :: p, p1, p_max, func1_tau_max_value, rp, rtp 
-      real(mcp) :: temp,temp2, dp
+      real(mcp) :: p, p1 
+      real(mcp) :: temp, dp
       real(mcp) :: r1,r2, rprobability, r3, tempA, Temp_log
       real(mcp) :: sign_pr, p_out 
-      real(mcp) :: p_out1, Sigma_I, tau1, eta
+      real(mcp) :: p_out1, eta
       integer(kind=8) :: i, path_cases
     
       if( this%Vector_of_Momentum_ini(3) > zero )then
@@ -147,7 +144,7 @@
           Temp_log = dlog( one - r1 * this%NormalA ) 
           Get_scatter_distance_IQ = this%z_tau + Temp_log * this%Vector_of_Momentum_ini(3)  
           !write(*, *)'ff11=', Get_scatter_distance4, p_out1 , this%z_ini, &
-          !             this%Vector_of_Momentum_ini(3), dexp( - p_out1 * Sigma_I )
+          !             this%Vector_of_Momentum_ini(3), dexp( - p_out1 )
 
       else if( this%Vector_of_Momentum_ini(3) < zero )then
 
@@ -179,7 +176,7 @@
       endif 
 
       if( this%test_it )then
-          write(*,*)'sdf2==', r1, this%NormalA, Get_scatter_distance_IQ, p_out1, Sigma_I 
+          write(*,*)'sdf2==', r1, this%NormalA, Get_scatter_distance_IQ, p_out1 
           write(*,*)'sdf3==',  this%r_times_p, this%r_ini 
       endif
       if(p_out1 < zero )then
@@ -188,7 +185,7 @@
        endif 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       If (Get_scatter_distance_IQ < zero) then
-          write(*,*)'sdf==',Get_scatter_distance_IQ, p_out1, Sigma_I , this%z_ini, &
+          write(*,*)'sdf==',Get_scatter_distance_IQ, p_out1, this%z_ini, &
               this%Vector_of_Momentum_ini(3), this%InterSection_Cases
           stop
       endif

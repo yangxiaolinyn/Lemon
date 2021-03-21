@@ -55,7 +55,7 @@
       this%w_ini_em = one
       this%w_ini0 = one 
 
-      this%r_ini = zero
+      !this%r_ini = zero
       !this%theta_ini  = Emitter%theta
       !this%mucos_ini  = Emitter%mucos
       !this%musin_ini  = Emitter%musin

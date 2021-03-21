@@ -17,15 +17,14 @@
       REAL(mcp) :: mu, mu0, phi, phi0, I_r, I_l, U, V, IQUV_in(1: 3), IQU(1: 3), &
                    Irluv_in(1: 3), Irluv(1: 3)
       real(mcp), dimension(1:3, 1:3) :: QS_Matrix, QS_Matrix_rluv
-
-      !If ( myid == 0 ) then
+ 
           IQUV_in(1) = one
           IQUV_in(2) = one / four
           IQUV_in(3) = one / four
           Irluv_in(1) = (IQUV_in(1) + IQUV_in(2)) / two
           Irluv_in(2) = (IQUV_in(1) - IQUV_in(2)) / two
           Irluv_in(3) = IQUV_in(3)
-          mu0 = 0.2D0
+          mu0 = dabs( Phot%cos_Theta0 )
           phi0 = zero
           phi = zero
           100 FORMAT(' ', 4F20.13) 
@@ -91,31 +90,25 @@
           close(unit=17) 
           close(unit=18)
           !stop
-      !endif 
+ 
       RETURN
       END SUBROUTINE Calculate_The_Diffuse_Reflection_of_Chandra
 
 
 !**************************************************************************************
     SUBROUTINE Mimick_Photon_Diffuse_Transfer( Total_Phot_Num, &
-                        tau, mu0, phi0 )
+                        tau, mu0, phi0, MCResultsFNphi0180, MCResultsFNphi90 )
 !************************************************************************************** 
     implicit none
     real(mcp), intent(inout) :: tau, mu0, phi0
+    character*80, intent(in) :: MCResultsFNphi0180, MCResultsFNphi90
     real(mcp) :: E, E_low, E_up  
     integer(kind = 8) :: Num_Photons
     integer(kind = 8), intent(in) :: Total_Phot_Num 
     type(Photon_Emitter) :: Emitter
     type(Photons) :: phot
     type(ScatPhoton) :: sphot
-    integer :: send_num, recv_num, send_tag, RECV_SOURCE, status(MPI_STATUS_SIZE)   
-    !real(mcp) :: I_Recv(0 : Num_PolDeg), Q_Recv(0 : Num_PolDeg) 
-    !real(mcp) :: I0_Recv(0 : Num_PolDeg), Q0_Recv(0 : Num_PolDeg), &
-    !             U0_Recv(0 : Num_PolDeg), V0_Recv(0 : Num_PolDeg) 
-    !real(mcp) :: I180_Recv(0 : Num_PolDeg), Q180_Recv(0 : Num_PolDeg), &
-    !             U180_Recv(0 : Num_PolDeg), V180_Recv(0 : Num_PolDeg)
-    !real(mcp) :: I90_Recv(0 : Num_PolDeg), Q90_Recv(0 : Num_PolDeg), &
-    !             U90_Recv(0 : Num_PolDeg), V90_Recv(0 : Num_PolDeg) 
+    integer :: send_num, recv_num, send_tag, RECV_SOURCE, status(MPI_STATUS_SIZE)    
     real(mcp) :: IQUV0_Recv(1:4, 0: Num_PolDeg), IQUV90_Recv(1:4, 0: Num_PolDeg), &
                  IQUV180_Recv(1:4, 0: Num_PolDeg)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -159,31 +152,32 @@
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Scattering_loop: Do
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-            phot%scatter_times = phot%scatter_times + 1   
+            phot%scatter_times = phot%scatter_times + 1  
+            !write(unit = *, fmt = *)'*********************************', phot%scatter_times,  &
+            !         phot%Psi_I, phot%z_tau
             CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( ) 
+            if( phot%Psi_I <= 1.D-4 .or. phot%z_tau > tau )exit
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
             !if( phot%Optical_Depth_scatter >= 1.D2 )exit
             !if( phot%I_IQ / phot%w_ini0 <= 1.D-6 )exit
-            if(   phot%Psi_I <= 1.D-4 .or. phot%z_tau > 200.D0  )exit
             !if( phot%scatter_times > 100 )exit
-            !if( phot%z_tau > 50.D0 .or. dabs(phot%I_IQ) <= 1.D-5) exit
+            !if( phot%z_tau > 50.D0 .or. dabs(phot%I_IQ) <= 1.D-5) exit 
+            !if(phot%scatter_times > 20)stop
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            CALL phot%Photon_Electron_Scattering( ) 
-            !if(phot%scatter_times > 10)stop
+            CALL phot%Photon_Electron_Scattering( )
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         END DO Scattering_loop
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
-        If ( mod(Num_Photons, 500) == 0 .and. myid == np-1 ) then 
-        write(unit = *, fmt = *)'*************************************************************************' 
-        write(unit = *, fmt = *)'***** The', Num_Photons,'th Photons have been scattered', &
+        If ( mod(Num_Photons, 500) == 0 .and. myid == np-1 ) then  
+            write(unit = *, fmt = *)'***** The', Num_Photons,'th Photons have been scattered', &
                                   phot%scatter_times, &
                          'times and Escapted from the region !!!!!!!'      
-        write(unit = *, fmt = *)'***** My Duty Photon Number is: ',myid, mydutyphot,  Num_PolDeg   
-        write(unit = *, fmt = *)'*****  tau === ', phot%z_tau, phot%Psi_I
-        write(unit = *, fmt = *)'*************************************************************************'
+            write(unit = *, fmt = *)'***** My Duty Photon Number is: ',myid, mydutyphot,  Num_PolDeg   
+            write(unit = *, fmt = *)'*****  tau === ', phot%z_tau, phot%Psi_I
+            write(unit = *, fmt = *)'*************************************************************************'
         endif
-    If( Num_Photons > mydutyphot )EXIT
+        If( Num_Photons > mydutyphot )EXIT
     !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Enddo  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -205,8 +199,7 @@
           send_tag = 3
           call MPI_SEND( phot%PolarArrayIQUV180, send_num, MPI_DOUBLE_PRECISION, np-1, &
                         send_tag, MPI_COMM_WORLD, ierr)
-          write(*, *)'Processor ', myid, ' has send PolarArrayU to Processor:', np-1
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+          write(*, *)'Processor ', myid, ' has send PolarArrayU to Processor:', np-1  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       else 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -225,27 +218,17 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                   call MPI_RECV( IQUV180_Recv, recv_num, MPI_DOUBLE_PRECISION, RECV_SOURCE, &
                                 3, MPI_COMM_WORLD, status, ierr) 
-                  write(*,*)'master Processor ', myid,' Receives U data from Processor:', RECV_SOURCE 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+                  write(*,*)'master Processor ', myid,' Receives U data from Processor:', RECV_SOURCE  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                   phot%PolarArrayIQUV0 = phot%PolarArrayIQUV0 + IQUV0_Recv
                   phot%PolarArrayIQUV90 = phot%PolarArrayIQUV90 + IQUV90_Recv
-                  phot%PolarArrayIQUV180 = phot%PolarArrayIQUV180 + IQUV180_Recv   
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  phot%PolarArrayIQUV180 = phot%PolarArrayIQUV180 + IQUV180_Recv 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
               enddo
-          endif  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          write(*,*)'There are', phot%effect_number, 'of total', Total_Phot_Num, 'photons',&
-                        'arrive at the plate of observer!!'  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          open(unit=9, file='./spectrum/IQUV0_180_mu0=08_nozeroQUV.txt', status="replace")  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          open(unit=10, file='./spectrum/IQUV90_mu0=08_nozeroQUV.txt', status="replace") 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          endif   
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+          open(unit=9, file = MCResultsFNphi0180, status="replace")   
+          open(unit=10, file = MCResultsFNphi90, status="replace")  
           do j = 0, Num_PolDeg 
               write(unit = 9, fmt = 100)phot%PolarArrayIQUV0(1: 4, j)  
               write(unit = 10, fmt = 100)phot%PolarArrayIQUV90(1: 4, j) 
@@ -257,9 +240,7 @@
           enddo
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           close(unit=9)  
-          close(unit=10)     
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          close(unit=10)      
       endif   
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     call MPI_FINALIZE ( ierr ) 
