@@ -1,24 +1,22 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     program main  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    use Method_Of_FLST_ThomScat_Emerge_IQ 
-    !use Method_Of_FLST_DiffuseReflec
+    use Method_Of_FLST_ThomScat_Emerge_IQ  
     implicit none
-    real(mcp) :: theta_obs, tau
+    real(mcp) :: theta_obs, tau, mu0, phi0 
     integer :: methods_cases
     integer(kind = 8) :: Total_Phot_Num 
-    character*80 :: image_filename, Spentrum_filename, CrossSec_filename, &
-              CrossSec_filename_Seq, filenameH3Array!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    theta_obs = 1.D0  
-    tau = 400.D0 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+    character*80 :: image_filename  
+  
+    tau = 400.D0
+    mu0 = 0.2D0
+    phi0 = zero
     Total_Phot_Num = 2.D5
-    call mimick_of_ph_finity_zone_Emerge_IQ( Total_Phot_Num, tau )  
-    !call mimick_of_ph_Emerge_DiffuseReflec( Total_Phot_Num, tau )   
+
+    CALL Mimick_Photon_Diffuse_Transfer( Total_Phot_Num, tau, mu0, phi0 )      
 
     END PROGRAM main
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 

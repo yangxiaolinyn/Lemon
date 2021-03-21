@@ -21,6 +21,10 @@
           real(mcp) :: PolarArrayIQUVs30(1: 4)
           real(mcp) :: PolarArrayIQUVs60(1: 4)
           real(mcp) :: PolarArrayIQUVs80(1: 4)
+          real(mcp) :: Psi_Isc
+          real(mcp) :: Psi_Qsc
+          real(mcp) :: Psi_Usc
+          real(mcp) :: Psi_Vsc
       contains 
 !*******************************************************************************************************
       procedure, public :: Tompson_Scat_With_Polarized_Diffuse_Reflection   =>   &
@@ -64,8 +68,7 @@
       real(mcp) :: r, phip, smu, &
                    sinmu_tilde_p, sin_tilphi_p, cos_tilphi_p, N_temp, beta, &
                    A_const, B_const, C_const, phi_ini, N_normal, N_temp2, &
-                   cosphi_ini, sinphi_ini, cos2phi_ini, sin2phi_ini, smup, &
-                   mu2, mup2, mu, mup
+                   smup, mu2, mup2, mu, mup
 
       real(mcp) :: A1, B1, t1, t2, Norm_C, f1, f2, f3, f4, f5, F0, g1, g2, g3, g4, g5
       real(mcp) :: UlI, QlI, scat_phi, sinDphi, cosDphi, sin2Dphi, cos2Dphi
@@ -164,10 +167,10 @@
            !pb2 = dabs(g2) / f1
            !pb3 = dabs(g4) / f1
            !write(*, *)'mms55==', pb1, pb2, pb3 
-           if(pb1 * pb2 * pb3 < zero)then 
-               write(*, *)'mms55==', pb1, pb2, pb3, pb1 + pb2 + pb3 
-               stop
-           endif
+           !if(pb1 * pb2 * pb3 < zero)then 
+           !    write(*, *)'mms55==', pb1, pb2, pb3, pb1 + pb2 + pb3 
+           !    stop
+           !endif
       !endif
    
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -233,7 +236,7 @@
              QlI * ( PT(1, 1) - PT(1, 2) - PT(2, 1) + PT(2, 2) )  + &
              UlI * ( PT(1, 3) - PT(2, 3) ) * two ) / N_temp 
        !write(*, *)'tt1==',  f_Q, this%Psi_Q / this%Psi_I
-      this%Psi_Q = f_Q * this%Psi_I
+      this%Psi_Qsc = f_Q * this%Psi_I
            !write(*, *)'tt2==', this%Psi_Q,N_temp * this%Psi_I !  
       
       !this%Psi_U = ( - two * mup * smu * smup * SinDphi + &
@@ -245,12 +248,12 @@
       !f_U =  ( PT(3, 1) + QlI * PT(3, 2) + UlI * PT(3, 3) )  / N_temp 
       f_U =  ( PT(3, 1) + PT(3, 2) + QlI * ( PT(3, 1) - PT(3, 2) ) + UlI * PT(3, 3)*two )  / N_temp 
       !write(*, *)'tt2==',  f_U, this%Psi_U / this%Psi_I
-      this%Psi_U = f_U * this%Psi_I 
+      this%Psi_Usc = f_U * this%Psi_I 
        !write(*, *)'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
       !write(*, *)'tt4==', PT(3, 1) + PT(3, 2)!this%Psi_U / this%Psi_I , this%Psi_U
 
       f_V = ( mup * mu + smu * smup * cosDphi ) / N_temp * four
-      this%Psi_V = f_V * this%Psi_V
+      this%Psi_Vsc = f_V * this%Psi_V
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       !if( dabs(f_Q) > one .or. dabs(f_Q) > one)then
           !write(*, *)'mms11==', QlI, UlI, this%Psi_V, this%Psi_I, dsqrt(QlI**2 + UlI**2 + &
@@ -264,8 +267,17 @@
       this%cos2phi_ini = dcos(two*scat_phi)
       this%sin2phi_ini = dsin(two*scat_phi)
       this%Vector_of_Momentum_ini(3) = mu
+      if( isnan( this%Vector_of_Momentum_ini(3) ) )then
+          write(*, *)'5ScatterPhoton line 271: Scattered mu is NaN!', mu
+      endif
+
+      !this%Psi_I = this%Psi_I  ! Psi_I is unchanged!
+      this%Psi_Q = this%Psi_Qsc
+      this%Psi_U = this%Psi_Usc
+      this%Psi_V = this%Psi_Vsc
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
  
-      !*************************************************************************************************  
+!*************************************************************************************************  
       end Subroutine Tompson_Scat_With_Polarized_Diffuse_Reflection_Sub
 !*******************************************************************************************************
 

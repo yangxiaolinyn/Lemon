@@ -6,31 +6,7 @@
       type, public, extends(Photon_With_ScatDistance_FlatSP) :: Photons_Esti 
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
           real(mcp) :: v_L_v_i(1: vL_sc_up)  
-          real(mcp) :: nu_obs 
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          !real(mcp) :: PolarArrayd0(0: Num_PolDeg)
-          real(mcp) :: PolarArrayI0(0: Num_PolDeg)
-          real(mcp) :: PolarArrayQ0(0: Num_PolDeg)
-          real(mcp) :: PolarArrayU0(0: Num_PolDeg)
-          real(mcp) :: PolarArrayV0(0: Num_PolDeg)
-          real(mcp) :: PolarArrayIr0(0: Num_PolDeg)
-          real(mcp) :: PolarArrayIl0(0: Num_PolDeg)
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          !real(mcp) :: PolarArrayd90(0: Num_PolDeg)
-          real(mcp) :: PolarArrayI90(0: Num_PolDeg)
-          real(mcp) :: PolarArrayQ90(0: Num_PolDeg)
-          real(mcp) :: PolarArrayU90(0: Num_PolDeg)
-          real(mcp) :: PolarArrayV90(0: Num_PolDeg)
-          real(mcp) :: PolarArrayIr90(0: Num_PolDeg)
-          real(mcp) :: PolarArrayIl90(0: Num_PolDeg)
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          !real(mcp) :: PolarArrayd180(0: Num_PolDeg)
-          real(mcp) :: PolarArrayI180(0: Num_PolDeg)
-          real(mcp) :: PolarArrayQ180(0: Num_PolDeg)
-          real(mcp) :: PolarArrayU180(0: Num_PolDeg)
-          real(mcp) :: PolarArrayV180(0: Num_PolDeg)
-          real(mcp) :: PolarArrayIr180(0: Num_PolDeg)
-          real(mcp) :: PolarArrayIl180(0: Num_PolDeg)
+          real(mcp) :: nu_obs
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
           real(mcp) :: PolarArrayIQUV10(1: 4, 0: Num_phi) = zero
           real(mcp) :: PolarArrayIQUV30(1: 4, 0: Num_Phi) = zero
@@ -41,21 +17,14 @@
           real(mcp) :: PolarArrayIQUV90(1: 4, 0: Num_PolDeg) = zero
           real(mcp) :: PolarArrayIQUV180(1: 4, 0: Num_PolDeg) = zero
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          integer :: times_counter(1: 4) = 0
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+          !integer :: times_counter(1: 4) = 0 
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           real(mcp) :: d_theta, d_phi, d_tau
           logical :: first_time_recording
 
       contains 
 !******************************************************************************************************* 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-          procedure, public :: Calc_Phot_Informations_At_Observer_Flat_SPTM_Reflec   =>   &
-                               Calc_Phot_Informations_At_Observer_Flat_SPTM_Reflec_Sub 
-          procedure, public :: Calc_Phot_Informations_At_Observer_Diffuse_Reflec   =>   &
-                               Calc_Phot_Informations_At_Observer_Diffuse_Reflec_Sub 
-          procedure, public :: Calc_Phot_Inform_At_Observer_Diffuse_Reflec_phi   =>   &
-                               Calc_Phot_Inform_At_Observer_Diffuse_Reflec_phi_Sub
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
           procedure, public :: Calc_Phot_Inform_At_Observer_DiffRefl_phi_Estimat   =>   &
                                Calc_Phot_Inform_At_Observer_DiffRefl_phi_Estimat_Sub
           procedure, public :: Get_Psi_IQUV_for_Estimat_With_muphi_Geiven    =>    &
@@ -71,9 +40,6 @@
       end type Photons_Esti
   
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      private :: Calc_Phot_Informations_At_Observer_Flat_SPTM_Reflec_Sub
-      private :: Calc_Phot_Informations_At_Observer_Diffuse_Reflec_Sub
-      private :: Calc_Phot_Inform_At_Observer_Diffuse_Reflec_phi_Sub
       private :: Calc_Phot_Inform_At_Observer_DiffRefl_phi_Estimat_Sub
       private :: Get_Psi_IQUV_for_Estimat_With_muphi_Geiven_Sub
       private :: Calcu_Psi_IQUV_for_Estimat_With_muphi_Geiven_Sub
@@ -82,303 +48,6 @@
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
       contains   
-!*******************************************************************************************************
-      subroutine Calc_Phot_Informations_At_Observer_Flat_SPTM_Reflec_Sub(this)
-!*******************************************************************************************************
-      implicit none
-      class(Photons_Esti) :: this   
-      integer :: i, j, h, k, mu_i, N_low, N_low1, i_obs, i_phi, case_phi
-      real(mcp) :: temp_P_X_f, vector1(1: 3), f4(1: 3), Axis_x(1: 3), &
-                    Axis_y(1: 3), Axis_z(1: 3), cos_psi, Qpsi, Upsi, fx, fy, &
-                    Axis_z1(1: 3), phi_p, vLv  
-
-      this%d_theta = one / Num_PolDeg
-      this%d_phi =  twopi / Num_Phi 
-
-      if( this%InterSection_Cases == -1 .or. this%InterSection_Cases == -3 )then
-          return
-      else
-
-          phi_p = datan( dabs( this%Vector_of_Momentum_ini(2) / this%Vector_of_Momentum_ini(1) ) )
-          if( this%Vector_of_Momentum_ini(1) > zero .and. this%Vector_of_Momentum_ini(2) >= zero )then
-          else if( this%Vector_of_Momentum_ini(1) < zero .and. this%Vector_of_Momentum_ini(2) > zero )then
-              phi_p = pi - phi_p
-          else if( this%Vector_of_Momentum_ini(1) < zero .and. this%Vector_of_Momentum_ini(2) < zero )then
-              phi_p = pi + phi_p
-          else if( this%Vector_of_Momentum_ini(1) > zero .and. this%Vector_of_Momentum_ini(2) < zero )then
-              phi_p = twopi - phi_p
-          else if( this%Vector_of_Momentum_ini(1) == zero .and. this%Vector_of_Momentum_ini(2) > zero )then
-              phi_p = pi / two
-          else if( this%Vector_of_Momentum_ini(1) == zero .and. this%Vector_of_Momentum_ini(2) < zero )then
-              phi_p = pi * three / two
-          else if( this%Vector_of_Momentum_ini(1) > zero .and. this%Vector_of_Momentum_ini(2) == zero )then
-              phi_p = zero
-          else if( this%Vector_of_Momentum_ini(1) < zero .and. this%Vector_of_Momentum_ini(2) == zero )then
-              phi_p = pi 
-          endif
- 
-          i_phi = floor( phi_p / this%d_phi ) 
-   
-      !if( i_phi == 0 .or. i_phi == 1 .or. i_phi == Num_phi-1 )then
-      !    case_phi = 1
-      !    this%effect_number = this%effect_number + 1 
-      !else if( i_phi == Num_phi / 4 .or. abs( i_phi - Num_phi / 4 ) == 1 )then
-      !    case_phi = 2
-      !else if( i_phi == Num_phi * 3 / 4 .or. abs( i_phi - Num_phi * 3 / 4 ) == 1 )then
-      !    case_phi = 3
-      !else if( i_phi == Num_phi / 2 .or. abs( i_phi - Num_phi / 2 ) == 1 )then
-      !    case_phi = 4
-      !else
-      !    return
-      !endif 
-
-      if( i_phi == 0 )then
-          case_phi = 1
-          this%effect_number = this%effect_number + 1 
-      else if( i_phi == Num_phi / 4 )then
-          case_phi = 2 
-      else if( i_phi == Num_phi / 2 )then
-          case_phi = 4
-      else
-          return
-      endif 
-
-          i_obs = floor( dabs(this%Vector_of_Momentum_ini(3)) / this%d_theta )
-  
-          if(i_obs < 0)write(*, *)'ss===', i_obs, dabs(this%Vector_of_Momentum_ini(3)), &
-                     Dacos( dabs(this%Vector_of_Momentum_ini(3)) ), this%d_theta, &
-                      this%Vector_of_Momentum_ini(3), &
-                 Vector4D_Inner_Product_Mski( this%Phot4k_CtrCF_ini, this%f4_CF ), &
-                 Vector4D_Inner_Product_Mski( this%Phot4k_CtrCF_ini, this%Phot4k_CtrCF_ini ), &
-                 Vector4D_Inner_Product_Mski( this%f4_CF, this%f4_CF ), this%scatter_times
-
-          if( this%r_one_hvlmec2_one_cosE /= zero )this%w_ini = this%w_ini * this%r_one_hvlmec2_one_cosE 
-          vLv = this%w_ini * dexp( - this%Optical_Depth_scatter ) / dabs(this%Vector_of_Momentum_ini(3))
-
-          if( case_phi == 1 )then
-              this%PolarArrayI0( i_obs ) = this%PolarArrayI0( i_obs ) + vLv
-          else if( case_phi == 2 .or. case_phi == 3 )then 
-              this%PolarArrayI90( i_obs ) = this%PolarArrayI90( i_obs ) + vLv
-          else if( case_phi == 4 )then 
-              this%PolarArrayI180( i_obs ) = this%PolarArrayI180( i_obs ) + vLv
-          endif   
-  
-          if( this%delta_pd /= zero )then
-              !Axis_z1 = this%Phot4k_CtrCF_ini(2: 4) / dabs( this%Phot4k_CtrCF_ini(1) ) 
-              Axis_z = this%Phot4k_CtrCF_ini(2: 4) / Vector3D_Length( this%Phot4k_CtrCF_ini(2: 4) )
-              !write(*, *)'ff', Axis_z1 - Axis_z
-
-              if( .true. )then
-
-                  Axis_y(1) = zero
-                  Axis_y(2) = zero
-                  Axis_y(3) = one
-
-                  call this%Vector_Cross_Product( Axis_y, Axis_z, Axis_x )
-                  Axis_x = Axis_x / Vector3D_Length( Axis_x )
-                  call this%Vector_Cross_Product( Axis_z, Axis_x, Axis_y )
-
-              else
-
-                  Axis_x(1) = zero
-                  Axis_x(2) = zero
-                  Axis_x(3) = one
-
-                  call this%Vector_Cross_Product( Axis_z, Axis_x, Axis_y )
-                  Axis_y = Axis_y / Vector3D_Length( Axis_y )
-                  call this%Vector_Cross_Product( Axis_y, Axis_z, Axis_x )
-  
-              endif
-
-              f4 = this%f4_CF(2: 4) - this%f4_CF(1) / this%Phot4k_CtrCF_ini(1) * &
-                      this%Phot4k_CtrCF_ini(2: 4)  !! | f4 | = 1 
-
-              cos_psi = Vector3D_Inner_Product( f4, Axis_x )
-              fx = Vector3D_Inner_Product( f4, Axis_x )
-              fy = Vector3D_Inner_Product( f4, Axis_y )
-              if( fx > zero .and. fy > zero  )then
-                  Qpsi = this%delta_pd * ( two * cos_psi ** 2 - one )
-                  Upsi = this%delta_pd * two * dsqrt( dabs( one - cos_psi**2 ) ) * cos_psi
-                  h = 1
-              else if( fx < zero .and. fy > zero  )then
-                  Qpsi = this%delta_pd * ( two * cos_psi ** 2 - one )
-                  Upsi = this%delta_pd * two * dsqrt( dabs( one - cos_psi**2 ) ) * cos_psi
-                  h = 2
-              else if( fx < zero .and. fy < zero  )then
-                  Qpsi = this%delta_pd * ( two * cos_psi ** 2 - one )
-                  Upsi = this%delta_pd * two * dsqrt( dabs( one - cos_psi**2 ) ) * dabs( cos_psi )
-                  h = 3
-              else if( fx > zero .and. fy < zero  )then
-                  Qpsi = this%delta_pd * ( two * cos_psi ** 2 - one )
-                  Upsi = - this%delta_pd * two * dsqrt( dabs( one - cos_psi**2 ) ) * cos_psi
-                  h = 4
-              endif
-
-              if( case_phi == 1 )then
-                  this%PolarArrayQ0( i_obs ) = this%PolarArrayQ0( i_obs ) + Qpsi * vLv
-                  this%PolarArrayU0( i_obs ) = this%PolarArrayU0( i_obs ) + Upsi * vLv
-                  !this%PolarArrayV0( i_obs ) = this%PolarArrayV0( i_obs ) + this%V_sp * vLv
-              else if( case_phi == 2 )then
-                  this%PolarArrayQ90( i_obs ) = this%PolarArrayQ90( i_obs ) + Qpsi * vLv
-                  this%PolarArrayU90( i_obs ) = this%PolarArrayU90( i_obs ) + Upsi * vLv
-                  !this%PolarArrayV90( i_obs ) = this%PolarArrayV90( i_obs ) + this%V_sp * vLv
-              else if( case_phi == 3 )then
-                  this%PolarArrayQ90( i_obs ) = this%PolarArrayQ90( i_obs ) + Qpsi * vLv
-                  this%PolarArrayU90( i_obs ) = this%PolarArrayU90( i_obs ) - Upsi * vLv
-                  !this%PolarArrayV90( i_obs ) = this%PolarArrayV90( i_obs ) + this%V_sp * vLv
-              else if( case_phi == 4 )then
-                  this%PolarArrayQ180( i_obs ) = this%PolarArrayQ180( i_obs ) + Qpsi * vLv
-                  this%PolarArrayU180( i_obs ) = this%PolarArrayU180( i_obs ) + Upsi * vLv
-                  !this%PolarArrayV180( i_obs ) = this%PolarArrayV180( i_obs ) + this%V_sp * vLv
-              endif  
- 
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          !this%effect_number = this%effect_number + 1 
-
-          endif 
-      endif
-      return
-      end subroutine Calc_Phot_Informations_At_Observer_Flat_SPTM_Reflec_Sub
-
-!*******************************************************************************************************
-      subroutine Calc_Phot_Informations_At_Observer_Diffuse_Reflec_Sub(this)
-!*******************************************************************************************************
-      implicit none
-      class(Photons_Esti) :: this   
-      integer :: i, j, h, k, i_obs, i_phi, case_phi  
-      real(mcp) :: vLv
-
-      !this%d_theta = one / Num_PolDeg
-      !this%d_phi =  twopi / Num_Phi 
-      !write(*, *)'ffs=', one / Num_PolDeg, twopi / Num_Phi, this%d_theta, this%d_phi
-
-      if( this%InterSection_Cases == -1 .or. this%InterSection_Cases == -3 )then
-          return
-      else
-  
-          i_phi = floor( this%phi_ini / this%d_phi ) 
-    
-
-          if( i_phi == 0 .or. i_phi == Num_phi - 1 )then
-              case_phi = 1
-              this%effect_number = this%effect_number + 1 
-          else if( i_phi == Num_phi / 4 .or. i_phi == Num_phi / 4 - 1 )then
-              case_phi = 2 
-          else if( i_phi == 3 * Num_phi / 2 .or. i_phi == 3 * Num_phi / 2 - 1 )then
-              case_phi = 2 
-          else if( i_phi == Num_phi / 2 .or. i_phi == Num_phi / 2 - 1  )then
-              case_phi = 4
-          else
-              return
-          endif 
-
-          i_obs = floor( dabs(this%Vector_of_Momentum_ini(3)) / this%d_theta )
-  
-          if(i_obs < 0)write(*, *)'ss===', i_obs, dabs(this%Vector_of_Momentum_ini(3)), &
-                     Dacos( dabs(this%Vector_of_Momentum_ini(3)) ), this%d_theta, &
-                      this%Vector_of_Momentum_ini(3), &
-                 Vector4D_Inner_Product_Mski( this%Phot4k_CtrCF_ini, this%f4_CF ), &
-                 Vector4D_Inner_Product_Mski( this%Phot4k_CtrCF_ini, this%Phot4k_CtrCF_ini ), &
-                 Vector4D_Inner_Product_Mski( this%f4_CF, this%f4_CF ), this%scatter_times
-
-          !if( this%r_one_hvlmec2_one_cosE /= zero )this%w_ini = this%w_ini * this%r_one_hvlmec2_one_cosE 
-          vLv = dexp( - this%Optical_Depth_scatter ) / dabs(this%Vector_of_Momentum_ini(3))
-
-          !write(*, *)'ffs=', vLv, this%Psi_I, this%Psi_Q, this%Psi_U, this%Psi_V, &
-           !    dexp( - this%Optical_Depth_scatter ), dabs(this%Vector_of_Momentum_ini(3))
-          if( case_phi == 1 )then
-              this%PolarArrayI0( i_obs ) = this%PolarArrayI0( i_obs ) + this%Psi_I * vLv 
-              this%PolarArrayQ0( i_obs ) = this%PolarArrayQ0( i_obs ) + this%Psi_Q * vLv
-              this%PolarArrayU0( i_obs ) = this%PolarArrayU0( i_obs ) + this%Psi_U * vLv
-              this%PolarArrayV0( i_obs ) = this%PolarArrayV0( i_obs ) + this%Psi_V * vLv
-          else if( case_phi == 2 .or. case_phi == 3 )then 
-              this%PolarArrayI90( i_obs ) = this%PolarArrayI90( i_obs ) + this%Psi_I * vLv
-              this%PolarArrayQ90( i_obs ) = this%PolarArrayQ90( i_obs ) + this%Psi_Q * vLv
-              this%PolarArrayU90( i_obs ) = this%PolarArrayU90( i_obs ) + this%Psi_U * vLv
-              this%PolarArrayV90( i_obs ) = this%PolarArrayV90( i_obs ) + this%Psi_V * vLv
-          else if( case_phi == 4 )then 
-              this%PolarArrayI180( i_obs ) = this%PolarArrayI180( i_obs ) + this%Psi_I * vLv
-              this%PolarArrayQ180( i_obs ) = this%PolarArrayQ180( i_obs ) + this%Psi_Q * vLv
-              this%PolarArrayU180( i_obs ) = this%PolarArrayU180( i_obs ) + this%Psi_U * vLv
-              this%PolarArrayV180( i_obs ) = this%PolarArrayV180( i_obs ) + this%Psi_V * vLv
-          endif    
-          !this%effect_number = this%effect_number + 1  
-      endif
-      return
-      end subroutine Calc_Phot_Informations_At_Observer_Diffuse_Reflec_Sub
-
-  
-!*******************************************************************************************************
-      subroutine Calc_Phot_Inform_At_Observer_Diffuse_Reflec_phi_Sub(this)
-!*******************************************************************************************************
-      implicit none
-      class(Photons_Esti) :: this   
-      integer :: i, j, k, i_obs, i_phi, case_mu
-      real(mcp) :: i_mu  
-      real(mcp) :: vLv
-
-      !this%d_theta = one / Num_PolDeg
-      !this%d_phi =  twopi / Num_Phi 
-      !write(*, *)'ffs=', one / Num_PolDeg, twopi / Num_Phi, this%d_theta, this%d_phi
-
-      if( this%InterSection_Cases == -1 .or. this%InterSection_Cases == -3 )then
-          return
-      else
-
-          i_mu = floor( dabs(this%Vector_of_Momentum_ini(3)) / this%d_theta ) 
-
-          if( i_mu == 5 )then
-              case_mu = 1 
-              !this%times_counter(1) = this%times_counter(1) + 1
-          else if( i_mu == 30 )then
-              case_mu = 2 
-              !this%times_counter(2) = this%times_counter(2) + 1
-          else if( i_mu == 55 )then
-              case_mu = 3 
-              !this%times_counter(3) = this%times_counter(3) + 1
-          else if( i_mu == 85 )then
-              case_mu = 4
-              !this%times_counter(4) = this%times_counter(4) + 1
-          else
-              return
-          endif 
-
-          i_phi = floor( this%phi_ini / this%d_phi ) 
-    
-          vLv = dexp( - this%Optical_Depth_scatter ) / dabs(this%Vector_of_Momentum_ini(3))
-
-          write(*, *)'ffs=', vLv, this%Psi_I, this%Psi_Q, this%Psi_U, this%Psi_V, &
-              dexp( - this%Optical_Depth_scatter ), dabs(this%Vector_of_Momentum_ini(3))
-          if( case_mu == 1 )then
-              this%PolarArrayIQUV10(1, i_phi ) = this%PolarArrayIQUV10(1, i_phi ) + this%Psi_I * vLv 
-              this%PolarArrayIQUV10(2, i_phi ) = this%PolarArrayIQUV10(2, i_phi ) + this%Psi_Q * vLv
-              this%PolarArrayIQUV10(3, i_phi ) = this%PolarArrayIQUV10(3, i_phi ) + this%Psi_U * vLv
-              this%PolarArrayIQUV10(4, i_phi ) = this%PolarArrayIQUV10(4, i_phi ) + this%Psi_V * vLv
-          else if( case_mu == 2 )then 
-              this%PolarArrayIQUV30(1, i_phi ) = this%PolarArrayIQUV30(1, i_phi ) + this%Psi_I * vLv 
-              this%PolarArrayIQUV30(2, i_phi ) = this%PolarArrayIQUV30(2, i_phi ) + this%Psi_Q * vLv
-              this%PolarArrayIQUV30(3, i_phi ) = this%PolarArrayIQUV30(3, i_phi ) + this%Psi_U * vLv
-              this%PolarArrayIQUV30(4, i_phi ) = this%PolarArrayIQUV30(4, i_phi ) + this%Psi_V * vLv
-          else if( case_mu == 3 )then 
-              this%PolarArrayIQUV60(1, i_phi ) = this%PolarArrayIQUV60(1, i_phi ) + this%Psi_I * vLv 
-              this%PolarArrayIQUV60(2, i_phi ) = this%PolarArrayIQUV60(2, i_phi ) + this%Psi_Q * vLv
-              this%PolarArrayIQUV60(3, i_phi ) = this%PolarArrayIQUV60(3, i_phi ) + this%Psi_U * vLv
-              this%PolarArrayIQUV60(4, i_phi ) = this%PolarArrayIQUV60(4, i_phi ) + this%Psi_V * vLv
-          else if( case_mu == 4 )then 
-              this%PolarArrayIQUV80(1, i_phi ) = this%PolarArrayIQUV80(1, i_phi ) + this%Psi_I * vLv 
-              this%PolarArrayIQUV80(2, i_phi ) = this%PolarArrayIQUV80(2, i_phi ) + this%Psi_Q * vLv
-              this%PolarArrayIQUV80(3, i_phi ) = this%PolarArrayIQUV80(3, i_phi ) + this%Psi_U * vLv
-              this%PolarArrayIQUV80(4, i_phi ) = this%PolarArrayIQUV80(4, i_phi ) + this%Psi_V * vLv
-          endif    
-          !this%effect_number = this%effect_number + 1  
-      endif
-      return
-      end subroutine Calc_Phot_Inform_At_Observer_Diffuse_Reflec_phi_Sub
-
-!*******************************************************************************************************
-
-  
 !*******************************************************************************************************
       subroutine Calc_Phot_Inform_At_Observer_DiffRefl_phi_Estimat_Sub(this, mu_i)
 !*******************************************************************************************************
@@ -465,24 +134,24 @@
   
       phi_esti = this%phi_estimat( phi_i )
       do i_mu = 0, Num_PolDeg
-          call this%Calcu_Psi_IQUV_for_Estimat_With_muphi_Geiven( this%mu_estimates( i_mu ), &
-                                                              phi_esti ) 
+          call this%Calcu_Psi_IQUV_for_Estimat_With_muphi_Geiven( &
+                          this%mu_estimates( i_mu ), phi_esti ) 
           vLv = dexp( - this%z_tau / this%mu_estimates(i_mu) ) / this%mu_estimates(i_mu)
 
           !write(*, *)'tt3==', this%f_IQUV_estimat, vLv, this%Optical_Depth_scatter 
           if(phi_i == 1)then
               this%PolarArrayIQUV0(1: 4, i_mu ) = this%PolarArrayIQUV0(1: 4, i_mu ) + &
-                                                 this%f_IQUV_estimat(1: 4) * vLv  
+                                                  this%f_IQUV_estimat(1: 4) * vLv  
           else if(phi_i == 2)then
               this%PolarArrayIQUV90(1: 4, i_mu ) = this%PolarArrayIQUV90(1: 4, i_mu ) + &
-                                                 this%f_IQUV_estimat(1: 4) * vLv 
-          !write(*, *)'tt3==', this%f_IQUV_estimat, vLv!, this%Optical_Depth_scatter  
+                                                   this%f_IQUV_estimat(1: 4) * vLv 
+              !write(*, *)'tt3==', this%f_IQUV_estimat, vLv!, this%Optical_Depth_scatter  
           !else if(phi_i == 3)then
           !    this%PolarArrayIQUV60(1: 4, i_mu ) = this%PolarArrayIQUV60(1: 4, i_mu ) + &
           !                                       this%f_IQUV_estimat(1: 4) * vLv   
           else if(phi_i == 3)then
               this%PolarArrayIQUV180(1: 4, i_mu ) = this%PolarArrayIQUV180(1: 4, i_mu ) + &
-                                                 this%f_IQUV_estimat(1: 4) * vLv 
+                                                    this%f_IQUV_estimat(1: 4) * vLv 
           endif  
       enddo
       return

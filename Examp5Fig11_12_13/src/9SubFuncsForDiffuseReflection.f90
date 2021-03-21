@@ -97,10 +97,11 @@
 
 
 !**************************************************************************************
-    SUBROUTINE mimick_of_ph_finity_zone_Emerge_IQ( Total_Phot_Num, tau )
+    SUBROUTINE Mimick_Photon_Diffuse_Transfer( Total_Phot_Num, &
+                        tau, mu0, phi0 )
 !************************************************************************************** 
     implicit none
-    real(mcp), intent(inout) :: tau
+    real(mcp), intent(inout) :: tau, mu0, phi0
     real(mcp) :: E, E_low, E_up  
     integer(kind = 8) :: Num_Photons
     integer(kind = 8), intent(in) :: Total_Phot_Num 
@@ -141,7 +142,7 @@
     call InitRandom( myid )
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    CALL phot%Set_initial_parameter_values( Emitter, tau ) 
+    CALL phot%Set_initial_parameter_values( tau, mu0, phi0 ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     If( myid == np - 1 )then
         call Calculate_The_Diffuse_Reflection_of_Chandra( Phot )
@@ -152,27 +153,22 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
         Num_Photons = Num_Photons + 1 
         phot%scatter_times = 0   
-        CALL phot%Emitter_A_Photon( Emitter )
-        CALL phot%Transmit_Data_And_Parameters_From_Emitter2Photon( Emitter )
-        CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-        CALL phot%FIRST_SCATTERING_OF_PHOT_ELCE( sphot )
-  !write(*,*)'****************************************************************************'
+        CALL phot%Emitter_A_Photon( ) 
+        CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( ) 
+        CALL phot%Photon_Electron_Scattering( )  
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Scattering_loop: Do
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-            phot%scatter_times = phot%scatter_times + 1
-            !write(*,*)'ss2===', phot%scatter_times, phot%p_scattering!, phot%E_ini, phot%nu_up*h_ev/1.D6 
-            CALL phot%Set_InI_Conditions_For_Next_Scattering( sphot )   
-            CALL phot%Determine_Next_Scattering_Site( sphot )
+            phot%scatter_times = phot%scatter_times + 1   
+            CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( ) 
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
             !if( phot%Optical_Depth_scatter >= 1.D2 )exit
-             !if( phot%I_IQ / phot%w_ini0 <= 1.D-6 )exit
-              if(   phot%Psi_I <= 1.D-4 .or. phot%z_tau > 200.D0  )exit
+            !if( phot%I_IQ / phot%w_ini0 <= 1.D-6 )exit
+            if(   phot%Psi_I <= 1.D-4 .or. phot%z_tau > 200.D0  )exit
             !if( phot%scatter_times > 100 )exit
             !if( phot%z_tau > 50.D0 .or. dabs(phot%I_IQ) <= 1.D-5) exit
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            CALL phot%Photon_Electron_Scattering( sphot ) 
+            CALL phot%Photon_Electron_Scattering( ) 
             !if(phot%scatter_times > 10)stop
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         END DO Scattering_loop
@@ -210,10 +206,7 @@
           call MPI_SEND( phot%PolarArrayIQUV180, send_num, MPI_DOUBLE_PRECISION, np-1, &
                         send_tag, MPI_COMM_WORLD, ierr)
           write(*, *)'Processor ', myid, ' has send PolarArrayU to Processor:', np-1
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       else 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -246,18 +239,9 @@
           endif  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           write(*,*)'There are', phot%effect_number, 'of total', Total_Phot_Num, 'photons',&
-                        'arrive at the plate of observer!!' 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          !do i = 0, Num_PolDeg
-              !phot%PolarArrayd( i ) = DSQRT( phot%PolarArrayQ(i)**2 + phot%PolarArrayU(i)**2 &
-              !                               ) / phot%PolarArrayI(i)
-          !enddo 
+                        'arrive at the plate of observer!!'  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          open(unit=9, file='./spectrum/IQUV0_180_mu0=08_nozeroQUV.txt', status="replace") 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          !open(unit=19, file='./spectrum/IQUV180_mu0=08_nozeroQUV.txt', status="replace") 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+          open(unit=9, file='./spectrum/IQUV0_180_mu0=08_nozeroQUV.txt', status="replace")  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
           open(unit=10, file='./spectrum/IQUV90_mu0=08_nozeroQUV.txt', status="replace") 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -280,7 +264,7 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     call MPI_FINALIZE ( ierr ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    END SUBROUTINE mimick_of_ph_finity_zone_Emerge_IQ 
+    END SUBROUTINE Mimick_Photon_Diffuse_Transfer
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     END MODULE Method_Of_FLST_ThomScat_Emerge_IQ
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   

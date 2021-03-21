@@ -11,8 +11,7 @@
           integer(kind=8) :: effect_number
           integer(kind=8) :: scatter_times
           logical :: mymethod
-          real(mcp) :: NormalA
-          real(mcp) :: w_ini0
+          real(mcp) :: NormalA 
           real(mcp) :: n_e_in
           real(mcp) :: n_e_out
           real(mcp) :: n_e
@@ -66,8 +65,8 @@
       implicit none
       class(Photon_With_ScatDistance_FlatSP) :: this 
       real(mcp) :: p, p1, p_max, func1_tau_max_value, rp, rtp 
-      real(mcp) :: temp,temp2, Sigma_atP, dp
-      real(mcp) :: r1,r2, rprobability, r3, tempA
+      real(mcp) :: temp,temp2, dp
+      real(mcp) :: r1, r2, r3
       real(mcp) :: sign_pr, Temp_log
       real(mcp) :: p_out1, Sigma_I, tau1, eta
       integer(kind=8) :: i, path_cases
@@ -132,7 +131,7 @@
       implicit none
       class(Photon_With_ScatDistance_FlatSP) :: this 
       real(mcp) :: p, p1, p_max, func1_tau_max_value, rp, rtp 
-      real(mcp) :: temp,temp2, Sigma_atP, dp
+      real(mcp) :: temp,temp2, dp
       real(mcp) :: r1,r2, rprobability, r3, tempA, Temp_log
       real(mcp) :: sign_pr, p_out 
       real(mcp) :: p_out1, Sigma_I, tau1, eta
