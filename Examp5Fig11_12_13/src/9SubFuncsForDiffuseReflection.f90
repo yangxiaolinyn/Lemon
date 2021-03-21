@@ -29,11 +29,11 @@
           phi = zero
           100 FORMAT(' ', 4F20.13) 
           200 FORMAT(' ', 4F20.13) 
-          open(unit=9, file='./spectrum/Irluv.txt', status="replace") 
-          open(unit=10, file='./spectrum/Iquv.txt', status="replace") 
+          open(unit=9, file='./spectrum/Irluv.dat', status="replace") 
+          open(unit=10, file='./spectrum/Iquv.dat', status="replace") 
           !open(unit=11, file='./spectrum/Irluv.txt', status="replace") 
-          open(unit=17, file='./spectrum/Irluv90.txt', status="replace")
-          open(unit=18, file='./spectrum/Iquv90.txt', status="replace")
+          open(unit=17, file='./spectrum/Irluv90.dat', status="replace")
+          open(unit=18, file='./spectrum/Iquv90.dat', status="replace")
           !open(unit=19, file='./spectrum/Irluv90.txt', status="replace") 
           do i = 0, 100
               mu = dcos( (100.D0 - i) * 90.D0 / 100.D0 * pi / 180.D0 )
