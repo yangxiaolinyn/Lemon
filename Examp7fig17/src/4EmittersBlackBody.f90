@@ -51,7 +51,7 @@
       class(Photon_Emitter) :: this    
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
   
-      this%z_tau = zero 
+      this%z_tau = this%tau_max
       this%w_ini_em = one
       this%w_ini0 = one 
 
@@ -79,7 +79,7 @@
       this%Psi_Q = this%Psi_Q0
       this%Psi_U = this%Psi_U0
       this%Psi_V = this%Psi_V0
-
+ 
       RETURN
       END SUBROUTINE Emitter_A_Photon_Sub
 
