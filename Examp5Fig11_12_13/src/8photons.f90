@@ -22,12 +22,12 @@
 
       contains   
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Set_initial_parameter_values_Sub( this, tau, mu0, phi0 )
+      SUBROUTINE Set_initial_parameter_values_Sub( this, tau, mu0, phi0, I0, Q0, U0, V0 )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       IMPLICIT NONE  
       class(Photons) :: this   
       !TYPE(Photon_Emitter), INTENT(INOUT) :: Emitter 
-      REAL(mcp), INTENT(INOUT) :: tau, mu0, phi0
+      REAL(mcp), INTENT(IN) :: tau, mu0, phi0, I0, Q0, U0, V0
       integer :: i 
  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -64,10 +64,10 @@
       enddo
       this%mu_estimates( 0 ) = 1.D-3
  
-      this%Psi_I0 = one
-      this%Psi_Q0 = one / 4.D0
-      this%Psi_U0 = one / 4.D0
-      this%Psi_V0 = one
+      this%Psi_I0 = I0
+      this%Psi_Q0 = Q0
+      this%Psi_U0 = U0
+      this%Psi_V0 = V0
    
       RETURN
       END SUBROUTINE Set_initial_parameter_values_Sub

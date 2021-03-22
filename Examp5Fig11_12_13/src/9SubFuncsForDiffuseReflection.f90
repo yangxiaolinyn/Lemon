@@ -9,18 +9,19 @@
 
       CONTAINS
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Calculate_The_Diffuse_Reflection_of_Chandra( Phot )
+      SUBROUTINE Calculate_The_Diffuse_Reflection_of_Chandra( Phot, I0, Q0, U0, V0 )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       IMPLICIT NONE  
-      TYPE(Photons), INTENT(INOUT) :: Phot 
+      TYPE(Photons), INTENT(INOUT) :: Phot
+      REAL(mcp), INTENT(IN) :: I0, Q0, U0, V0 
       INTEGER :: i, j
       REAL(mcp) :: mu, mu0, phi, phi0, I_r, I_l, U, V, IQUV_in(1: 3), IQU(1: 3), &
                    Irluv_in(1: 3), Irluv(1: 3)
       real(mcp), dimension(1:3, 1:3) :: QS_Matrix, QS_Matrix_rluv
  
-          IQUV_in(1) = one
-          IQUV_in(2) = one / four
-          IQUV_in(3) = one / four
+          IQUV_in(1) = I0
+          IQUV_in(2) = Q0
+          IQUV_in(3) = U0
           Irluv_in(1) = (IQUV_in(1) + IQUV_in(2)) / two
           Irluv_in(2) = (IQUV_in(1) - IQUV_in(2)) / two
           Irluv_in(3) = IQUV_in(3)
@@ -96,11 +97,11 @@
 
 
 !**************************************************************************************
-    SUBROUTINE Mimick_Photon_Diffuse_Transfer( Total_Phot_Num, &
-                        tau, mu0, phi0, MCResultsFNphi0180, MCResultsFNphi90 )
+    SUBROUTINE Mimick_Photon_Diffuse_Transfer( Total_Phot_Num, tau, mu0, phi0, &
+                        I0, Q0, U0, V0, MCResultsFNphi0180, MCResultsFNphi90 )
 !************************************************************************************** 
     implicit none
-    real(mcp), intent(inout) :: tau, mu0, phi0
+    real(mcp), intent(inout) :: tau, mu0, phi0, I0, Q0, U0, V0
     character*80, intent(in) :: MCResultsFNphi0180, MCResultsFNphi90
     real(mcp) :: E, E_low, E_up  
     integer(kind = 8) :: Num_Photons
@@ -134,11 +135,11 @@
     endif 
     call InitRandom( myid )
 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    CALL phot%Set_initial_parameter_values( tau, mu0, phi0 ) 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    CALL phot%Set_initial_parameter_values( tau, mu0, phi0, I0, Q0, U0, V0 ) 
+!~~~~~~Calculate the semi-analytical results of Chandrasekha~~~~~~~~~~~~~~~~~~~~~
     If( myid == np - 1 )then
-        call Calculate_The_Diffuse_Reflection_of_Chandra( Phot )
+        call Calculate_The_Diffuse_Reflection_of_Chandra( Phot, I0, Q0, U0, V0 )
     endif
     Num_Photons = 0   
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 

@@ -5,7 +5,7 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
       pi1=3.141592653589793 / 2.   
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
-      readfile, infile = './Iquv.txt', Irluv_I, Irluv_q, Irluv_u, Irluv_v, nf
+      readfile, infile = './Iquv.dat', Irluv_I, Irluv_q, Irluv_u, Irluv_v, nf
 
       Irlu_theta0_180 = fltarr(nf)
       for i=0, nf/2-1 do begin
@@ -15,7 +15,7 @@
           Irlu_theta0_180(i + nf/2) =  - i * 90.0 / (nf/2.-1.)
       endfor
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-      readfile, infile = './Iquv90.txt', Irluv_I90, Irluv_q90, Irluv_u90, Irluv_v90, nf
+      readfile, infile = './Iquv90.dat', Irluv_I90, Irluv_q90, Irluv_u90, Irluv_v90, nf
 
       Irlu_theta_90 = fltarr(nf)
       for i=0,100 do begin
