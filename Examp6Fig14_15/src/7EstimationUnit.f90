@@ -8,10 +8,10 @@
           real(mcp) :: v_L_v_i(1: vL_sc_up)  
           real(mcp) :: nu_obs
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          real(mcp) :: PolarArrayIQUV10(1: 4, 0: Num_phi) = zero
-          real(mcp) :: PolarArrayIQUV30(1: 4, 0: Num_Phi) = zero
-          real(mcp) :: PolarArrayIQUV60(1: 4, 0: Num_Phi) = zero
-          real(mcp) :: PolarArrayIQUV80(1: 4, 0: Num_Phi) = zero
+          !real(mcp) :: PolarArrayIQUV10(1: 4, 0: Num_phi) = zero
+          !real(mcp) :: PolarArrayIQUV30(1: 4, 0: Num_Phi) = zero
+          !real(mcp) :: PolarArrayIQUV60(1: 4, 0: Num_Phi) = zero
+          !real(mcp) :: PolarArrayIQUV80(1: 4, 0: Num_Phi) = zero
           real(mcp), allocatable :: PolArrayIQUV_Phi(:, :, :)
           integer :: N_mu_esti
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

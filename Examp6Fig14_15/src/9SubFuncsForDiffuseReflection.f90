@@ -127,7 +127,7 @@
             write(unit = *, fmt = *)'***** The', Num_Photons,'th Photons have been scattered', &
                                   phot%scatter_times, &
                          'times and Escapted from the region !!!!!!!'      
-            write(unit = *, fmt = *)'***** My Duty Photon Number is: ',myid, mydutyphot,  Num_PolDeg   
+            write(unit = *, fmt = *)'***** My Duty Photon Number is: ',myid, mydutyphot 
             write(unit = *, fmt = *)'*****  tau === ', phot%z_tau, phot%Psi_I
             write(unit = *, fmt = *)'*************************************************************************'
         endif
@@ -135,7 +135,7 @@
     Enddo  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       If ( myid /= np-1 ) then  
-          send_num = (Num_PolDeg + 1) * (Num_mu_esti + 1) * 4
+          send_num = (Num_Phi + 1) * Num_mu_esti * 4
           send_tag = 1  
           call MPI_SEND( phot%PolArrayIQUV_Phi, send_num, MPI_DOUBLE_PRECISION, np-1, &
                         send_tag, MPI_COMM_WORLD, ierr)
@@ -145,7 +145,7 @@
           if (np-2 >= 0) then
               do RECV_SOURCE = 0, np-2  
 
-                  recv_num = (Num_PolDeg + 1) * (Num_mu_esti + 1) * 4 
+                  recv_num = (Num_Phi + 1) * Num_mu_esti * 4 
                   call MPI_RECV( IQUV_Recv, recv_num, MPI_DOUBLE_PRECISION, RECV_SOURCE, &
                                 1, MPI_COMM_WORLD, status, ierr) 
                   write(*,*)'master Processor ', myid,' Receives I data from Processor:', RECV_SOURCE    
@@ -156,7 +156,7 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
           open(unit=9, file = MCResultsFNphi, status="replace")  
           do i = 1, phot%N_mu_esti
-              do j = 0, Num_PolDeg 
+              do j = 0, Num_phi
                   write(unit = 9, fmt = 100)phot%PolArrayIQUV_Phi(1: 4, i, j)
               enddo
           enddo

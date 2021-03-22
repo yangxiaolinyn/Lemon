@@ -13,7 +13,7 @@
                    ! As z_tau > tau, the sequence is terminated!
     mu0 = - 0.8D0  ! Notice that mu0 must be negative !!!
     phi0 = zero    ! the phi angle of incident beam.
-    Total_Phot_Num = 1.D5
+    Total_Phot_Num = 2.D5
     !~~~~~~~~~~~~The Stokes Parameters of incident beam!~~~~~~~~~~~~~~~~~~~~~~ 
     I0 = one
     Q0 = one / 4.D0

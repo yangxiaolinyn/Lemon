@@ -4,7 +4,7 @@
     integer, parameter :: N_sigma = 2000 
     integer, parameter :: vL_sc_up = 1000
     integer, parameter :: Num_PolDeg = 50
-    integer, parameter :: Num_Phi = 50
+    integer, parameter :: Num_Phi = 30
     integer, parameter :: Num_J_tau_z = 1
     integer, parameter :: Num_J_tau_the = 1
     integer, parameter :: Num_J_tau_phi = 1
