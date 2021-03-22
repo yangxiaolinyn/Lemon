@@ -49,11 +49,11 @@
 
 
 !**************************************************************************************
-    SUBROUTINE Mimick_Photon_Diffuse_Transfer( Total_Phot_Num, tau, mu0, phi0, &
+    SUBROUTINE Mimick_Photon_Diffuse_Transfer( Total_Phot_Num, tau, epsilon_crit, mu0, phi0, &
            I0, Q0, U0, V0, mu_esti, Num_mu_esti, MCResultsFNphi, ChandraFNphi )
 !************************************************************************************** 
     implicit none
-    real(mcp), intent(inout) :: tau, mu0, phi0, I0, Q0, U0, V0, mu_esti(1: Num_mu_esti)
+    real(mcp), intent(inout) :: tau, epsilon_crit, mu0, phi0, I0, Q0, U0, V0, mu_esti(1: Num_mu_esti)
     integer, intent(inout) :: Num_mu_esti
     character*80, intent(in) :: MCResultsFNphi, ChandraFNphi
     real(mcp) :: E, E_low, E_up  
@@ -110,7 +110,7 @@
             !write(unit = *, fmt = *)'******* ', phot%scatter_times,  &
             !         phot%Psi_I, phot%z_tau
             CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( ) 
-            if( phot%Psi_I <= 1.D-4 .or. phot%z_tau > tau )exit
+            if( phot%Psi_I <= epsilon_crit .or. phot%z_tau > tau )exit
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
             !if( phot%Optical_Depth_scatter >= 1.D2 )exit
             !if( phot%I_IQ / phot%w_ini0 <= 1.D-6 )exit

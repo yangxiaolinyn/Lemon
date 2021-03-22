@@ -3,7 +3,7 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     use Method_Of_FLST_ThomScat_Emerge_IQ  
     implicit none
-    real(mcp) :: theta_obs, tau, mu0, phi0, I0, Q0, U0, V0
+    real(mcp) :: theta_obs, tau, epsilon_crit, mu0, phi0, I0, Q0, U0, V0
     real(mcp) :: mu_esti(1: 4)
     integer :: Num_mu_esti
     integer(kind = 8) :: Total_Phot_Num 
@@ -11,6 +11,7 @@
   
     tau = 200.D0   ! tau is a critical value to terminate the scattering sequence, i.e., 
                    ! As z_tau > tau, the sequence is terminated!
+    epsilon_crit = 1.D-4   ! The threshold value to terminate the scattering sequence.
     mu0 = - 0.8D0  ! Notice that mu0 must be negative !!!
     phi0 = zero    ! the phi angle of incident beam.
     Total_Phot_Num = 2.D5
@@ -33,7 +34,7 @@
     MCResultsFNphi = trim('./spectrum/IQUVphi_mu0=')//trim(adjustl(mu0s))//trim('.dat')
     ChandraFNphi = trim('./spectrum/ChandraIQUV_phi_mu0=')//trim(adjustl(mu0s))//trim('.dat') 
 
-    CALL Mimick_Photon_Diffuse_Transfer( Total_Phot_Num, tau, mu0, &
+    CALL Mimick_Photon_Diffuse_Transfer( Total_Phot_Num, tau, epsilon_crit, mu0, &
                   phi0, I0, Q0, U0, V0, mu_esti, Num_mu_esti, &
                   MCResultsFNphi, ChandraFNphi )      
 
