@@ -7,12 +7,12 @@
     real(mcp) :: mu_esti(1: 4), phi_esti(1: 1)
     integer :: Num_mu_esti, Num_phi_esti
     integer(kind = 8) :: Total_Phot_Num 
-    character*80 :: image_filename, mu0s, MCResultsFNphi, ChandraFNphi
+    character*80 :: phi_obs, mu0s, MCResultsFNphi, ChandraFNphi
   
-    tau = 0.2D0 ! The total optical depth of the plane-parallel atmosphere from the up 
+    tau = 0.20D0 ! The total optical depth of the plane-parallel atmosphere from the up 
                 ! boundary to the bottom boundary.
-    epsilon_crit = 1.D-4   ! The threshold value to terminate the scattering sequence.
-    mu0 = 0.8D0  ! Notice that mu0 must be negative !!!
+    epsilon_crit = 1.D-25   ! The threshold value to terminate the scattering sequence.
+    mu0 = 0.1D0  ! Notice that mu0 must be negative !!!
     phi0 = zero    ! the phi angle of incident beam.
     Total_Phot_Num = 2.D5
     !~~~~~~~~~~~~The Stokes Parameters of incident beam!~~~~~~~~~~~~~~~~~~~~~~ 
@@ -38,7 +38,9 @@
     !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     write(mu0s, "(f8.4)")mu0
-    MCResultsFNphi = trim('./spectrum/IQUVphi_mu0=')//trim(adjustl(mu0s))//trim('.dat')
+    write(phi_obs, "(f8.4)")phi_esti(1)
+    MCResultsFNphi = trim('./spectrum/IQUVphi_mu0=')//trim(adjustl(mu0s))&
+                     //trim('_phi0=')//trim(adjustl(phi_obs))//trim('.dat')
     ChandraFNphi = trim('./spectrum/ChandraIQUV_phi_mu0=')//trim(adjustl(mu0s))//trim('.dat') 
 
     CALL Mimick_Photon_Diffuse_Transfer( Total_Phot_Num, tau, epsilon_crit, mu0, &

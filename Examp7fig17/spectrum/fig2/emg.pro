@@ -4,11 +4,11 @@
  
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      rdfile, infile = './IQUVphi_mu0=0.1000_phi0=0.0000.dat', mu1, nf
-      rdfile, infile = './IQUVphi_mu0=0.2000_phi0=0.0000.dat', mu2, nf
-      rdfile, infile = './IQUVphi_mu0=0.4000_phi0=0.0000.dat', mu4, nf
-      rdfile, infile = './IQUVphi_mu0=0.5000_phi0=0.0000.dat', mu5, nf
-      rdfile, infile = './IQUVphi_mu0=0.8000_phi0=0.0000.dat', mu8, nf
+      rdfile, infile = './IQUVphi_mu0=0.1000_phi0=1.5708.dat', mu1, nf
+      rdfile, infile = './IQUVphi_mu0=0.2000_phi0=1.5708.dat', mu2, nf
+      rdfile, infile = './IQUVphi_mu0=0.4000_phi0=1.5708.dat', mu4, nf
+      rdfile, infile = './IQUVphi_mu0=0.5000_phi0=1.5708.dat', mu5, nf
+      rdfile, infile = './IQUVphi_mu0=0.8000_phi0=1.5708.dat', mu8, nf
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       ns = nf / 2
@@ -84,19 +84,19 @@
           ;x2 = x1 + xlen  
           IF i EQ 0 THEN BEGIN
               ylow = 0
-              yup  = 20
+              yup  = 7
           endif  
           IF i EQ 1 THEN BEGIN 
-              ylow = -2
-              yup  = 5
+              ylow = -1
+              yup  = 6
           endif  
           IF i EQ 2 THEN BEGIN 
               ylow = -1
               yup  = 4
           endif  
           IF i EQ 3 THEN BEGIN 
-              ylow = -1
-              yup  = 9
+              ylow = -0
+              yup  = 6
           endif    
  
           ;posup=[x1, ygap_d + (m-i-1)*ylen + ygap * (m-i-1), x2, ygap_d + (m-i)*ylen + ygap * (m-i-1) ] 
@@ -109,18 +109,19 @@
  
          ;axis,xaxis=0,xticks=6,xminor=4,xrange=[xlow,xup],xstyle=1,$;font=-1,$;,xtickname=replicate(' ',6),$;,
           ;charsize=1,xtitle=textoidl('\theta');,xthick=tickth,color=colors
-         nt = 1000 * 5.99 / 6
+         ;nt = 1000 * 5.99 / 6
 
           IF i EQ 0 THEN BEGIN
               y00 = 0.4
-              axis,yaxis=0,ytitle=textoidl('I'),yticks=5,yminor=4, $
+              axis,yaxis=0,ytitle=textoidl('I'),yticks=7,yminor=5, $
                 yrange=[ylow,yup],ystyle=1, charsize=1.3
-              axis,yaxis=1,ytickname=replicate(' ',30),yticks=(yup-ylow),yminor=2
-              axis,xaxis=1,xticks=6,xminor=2,xtickname=replicate(' ',15) 
+              axis,yaxis=1,ytickname=replicate(' ',30),yticks=7,yminor=5
+              axis,xaxis=1,xticks=6,xminor=5,xtickname=replicate(' ',15) 
               ;axis,xaxis=0,xticks=6,xminor=2,xtickname=replicate(' ',15) 
-              axis,xaxis=0,xticks=6,xminor=4,xrange=[xlow,xup],xstyle=1,$ 
+              axis,xaxis=0,xticks=6,xminor=5,xrange=[xlow,xup],xstyle=1,$ 
               charsize=1.3,xtitle=textoidl('\theta')
               ;,xthick=tickth,color=colorsfont=-1,$;,xtickname=replicate(' ',6),$;,
+              Total_Num = max( mu8(0, *) )
               oplot,  theta, mu1(0, *)/ Total_Num + 8 * y00 , $
                                 thick=3, color=black, linestyle=6;,psym=-4 
 
@@ -229,7 +230,7 @@
           endif   
           IF i EQ 3 THEN BEGIN
               ;Total_Num = 4.*10.^5
-              ;Total_Num = max(mu1(2, *))
+               Total_Num = max(mu1(3, *))
               mi = 3
               axis,yaxis=0,ytitle=textoidl('V'),yticks=(yup-ylow)/pdel,yminor=2,$
                             yrange=[ylow,yup],ystyle=1
@@ -271,13 +272,13 @@
 
       end
 
+
 FUNCTION CIRCLE, xcenter, ycenter, radius
 points = (2 * !PI / 99.0) * FIndGen(100)
 x = xcenter + radius * Cos(points)
 y = ycenter + radius * Sin(points)
 RETURN, Transpose([[x],[y]])
 END
-
 
 PRO pointfind, mus = mus, xarr = xarr, x0
  

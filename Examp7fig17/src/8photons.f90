@@ -62,6 +62,7 @@
       do i = 0, Num_mu
           this%mu_estimat( i ) = this%d_theta * i
       enddo
+      this%mu_estimat( 0 ) = this%d_theta * 0.1
       !this%mu_estimat(1: Num_mu_esti) = mu_esti
       !this%N_mu_esti = Num_mu_esti
 
