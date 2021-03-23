@@ -113,9 +113,9 @@
 
           IF i EQ 0 THEN BEGIN
               y00 = 0.4
-              axis,yaxis=0,ytitle=textoidl('I'),yticks=5,yminor=4, $
+              axis,yaxis=0,ytitle=textoidl('I'),yticks=4,yminor=5, $
                 yrange=[ylow,yup],ystyle=1, charsize=1.3
-              axis,yaxis=1,ytickname=replicate(' ',30),yticks=(yup-ylow),yminor=2
+              axis,yaxis=1,ytickname=replicate(' ',30),yticks=4,yminor=5
               axis,xaxis=1,xticks=6,xminor=2,xtickname=replicate(' ',15) 
               ;axis,xaxis=0,xticks=6,xminor=2,xtickname=replicate(' ',15) 
               axis,xaxis=0,xticks=6,xminor=4,xrange=[xlow,xup],xstyle=1,$ 

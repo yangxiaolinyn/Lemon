@@ -95,7 +95,7 @@
               yup  = 4
           endif  
           IF i EQ 3 THEN BEGIN 
-              ylow = -0
+              ylow = -1
               yup  = 6
           endif    
  
