@@ -11,7 +11,7 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
     filenameH3Array = './data/H3Array.dat' 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    methods_cases = 5
+    methods_cases = 1
     E1_scat = 1.D-7 ! In unit of MeV. E1_scat, E2_scat define the energy range 
     E2_scat = 1.D1  ! of scattering. The total scattering coefficient: Sigma_a(T_e, E_p) also
                     ! define on this interval, i.e., E_p \in (E1_scat, E2_scat). E_p is the
@@ -77,9 +77,7 @@
                       trim('tau=')//trim(adjustl(Ta))//trim('.dat') !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ _DiffuseReflec
-    !Total_Phot_Num = 1.2D8
-    !call mimick_of_ph_FST_Slab_BoundReflc(Total_Phot_Num, tau, T_bb, T_elec, CrossSec_filename) 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     call mimick_of_ph_Slab_BoundReflc( Total_Phot_Num, tau, T_bb, &
                       T_elec, E1_scat, E2_scat, y_obs1, y_obs2, &
                       mu_esti, sin_esti, Num_mu_esti, &

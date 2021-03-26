@@ -14,17 +14,21 @@
                                Determine_P_Of_Scatt_Site_And_Quantities_At_p_sub
           procedure, public :: Set_InI_Conditions_For_Next_Scattering    =>    &
                                Set_InI_Conditions_For_Next_Scattering_Sub
-          procedure, public :: FIRST_SCATTERING_OF_PHOT_ELCE   =>    FIRST_SCATTERING_OF_PHOT_ELCE_Sub
-          procedure, public :: Photon_Electron_Scattering   =>   Photon_Electron_Scattering_Sub 
+          procedure, public :: Set_InI_Conditions_For_Next_Scattering2    =>    &
+                               Set_InI_Conditions_For_Next_Scattering2_Sub 
+          procedure, public :: Photon_Electron_Scattering   =>   &
+                               Photon_Electron_Scattering_Sub 
+          procedure, public :: Photon_Electron_Scattering2   =>   &
+                               Photon_Electron_Scattering2_Sub 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       end type Photon_FlatSP
    
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       private :: Set_Initial_Values_For_Photon_Parameters_Sub
       private :: Determine_P_Of_Scatt_Site_And_Quantities_At_p_sub
-      private :: Set_InI_Conditions_For_Next_Scattering_Sub
-      private :: FIRST_SCATTERING_OF_PHOT_ELCE_Sub
+      private :: Set_InI_Conditions_For_Next_Scattering2_Sub 
       private :: Photon_Electron_Scattering_Sub 
+      private :: Photon_Electron_Scattering2_Sub 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
  
       contains     
@@ -97,32 +101,17 @@
       class(Photon_FlatSP) :: this  
        
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      CALL this%get_Phot4k_CtrCF_CovCF()   
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-      !this%Vector_of_Momentum_ini = this%Vector_of_Momentum 
-      this%Phot4k_CtrCF_ini = this%Phot4k_CtrCF  
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      this%E_ini = DABS( this%Phot4k_CtrCF(1) ) 
-      !write(*, *)'f1 = ', this%E_ini
-      this%Sigma_a_E_ini = this%sigma_fn( this%E_ini )! * this%n_e1 
-      this%ne_times_Sigma_a = this%Sigma_a_E_ini * this%n_e1 
-      !write(*, *)'f1333 = ', this%Sigma_KN_E_ini, this%E_ini
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      this%w_ini = this%w_ini_em 
-      this%w_ini0 = this%w_ini_em
-      this%Q_sp = zero
-      this%U_sp = zero
-      this%V_sp = zero
-      this%delta_pd = zero
-      this%Psi_I = one
-      this%Psi_Q = zero
-      this%Psi_U = zero
-      this%Psi_V = zero
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      
+      CALL this%get_Phot4k_CtrCF_CovCF()     
+
+      this%Sigma_a_E_ini = this%sigma_fn( this%E_ini )
+      this%ne_times_Sigma_a = this%Sigma_a_E_ini * this%n_e1        
       !call this%get_J_emissivity_for_estimation()
+
       call this%get_J_emissivity_for_estimation_Phiarr()
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       END SUBROUTINE Generate_A_Photon_Sub
+
+
 
 !************************************************************************************
       SUBROUTINE Determine_P_Of_Scatt_Site_And_Quantities_At_p_sub( this ) 
@@ -130,65 +119,77 @@
       IMPLICIT NONE
       class(Photon_FlatSP) :: this  
    
-      this%z_tau = this%Get_scatter_distance_BoundReflec( )    
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      this%w_ini = this%w_ini * this%NormalA! * dexp( - this%CROS_absorption )
+      this%z_tau = this%Get_scatter_distance( )    
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      this%w_ini = this%w_ini * this%NormalA 
       this%Phot4k_CtrCF_At_p = this%Phot4k_CtrCF_ini   
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      
       RETURN
       END SUBROUTINE Determine_P_Of_Scatt_Site_And_Quantities_At_p_sub
-
-
+ 
 
 !************************************************************************************
-      SUBROUTINE FIRST_SCATTERING_OF_PHOT_ELCE_Sub( this, sphot )
+      SUBROUTINE Photon_Electron_Scattering2_Sub( this )
 !************************************************************************************
       IMPLICIT NONE
-      class(Photon_FlatSP) :: this
-      TYPE(ScatPhoton_KN), INTENT(INOUT) :: sphot
-      real(mcp) :: Sigma_COH, Sigma_INCOH, P_Rayl, P_Comp, P_fluor, xi_1, vLv
+      class(Photon_FlatSP) :: this 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
-      sphot%Phot4k_CtrCF = this%Phot4k_CtrCF_At_p 
-      sphot%delta_pd = this%delta_pd
-      sphot%f4_CF    = this%f4_CF 
+      this%Phot4k_CtrCF = this%Phot4k_CtrCF_At_p  
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      CALL sphot%Set_Photon_Tetrad_In_CF()
+      CALL this%Set_Photon_Tetrad_In_CF()
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       !CALL sphot%Get_gama_mu_phi_Of_Scat_Elec( T_e )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      CALL sphot%Get_gama_mu_phi_Of_Scatter_Electron_HXM( this%T_e ) 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      CALL sphot%Set_Elec_Tetrad_In_CF() 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      CALL sphot%Set_Phot4k_In_Elec_CF()  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      this%Phot4k_In_Elec_CF = sphot%Phot4k_In_Elec_CF
-      this%Elec_Phot_mu = sphot%Elec_Phot_mu
-      this%Elec_Phot_sin = sphot%Elec_Phot_sin
-      this%Elec_gama = sphot%Elec_gama
-      this%Elec_V = sphot%Elec_V
-      this%Matrix_Of_Tetrad_Of_ElecAxis = sphot%Matrix_Of_Tetrad_Of_ElecAxis
-      this%Matrix_Of_Tetrad_Of_PhotAxis = sphot%Matrix_Of_Tetrad_Of_PhotAxis    
+      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      CALL this%Get_gama_mu_phi_Of_Scatter_Electron_HXM( this%T_e ) 
+      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      CALL this%Set_Elec_Tetrad_In_CF() 
+      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      CALL this%Set_Phot4k_In_Elec_CF()  
+      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
+      !this%Phot4k_In_Elec_CF = sphot%Phot4k_In_Elec_CF
+      !this%Elec_Phot_mu = sphot%Elec_Phot_mu
+      !this%Elec_Phot_sin = sphot%Elec_Phot_sin
+      !this%Elec_gama = sphot%Elec_gama
+      !this%Elec_V = sphot%Elec_V
+      !this%Matrix_Of_Tetrad_Of_ElecAxis = sphot%Matrix_Of_Tetrad_Of_ElecAxis
+      !this%Matrix_Of_Tetrad_Of_PhotAxis = sphot%Matrix_Of_Tetrad_Of_PhotAxis    
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       CALL this%Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation() 
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      !write(*, *)'f1 = ', sphot%delta_pd
-      CALL sphot%Compton_Scattering_With_Zero_QU()   
+      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+      CALL this%Compton_Scattering_With_Zero_QU()   
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      END SUBROUTINE FIRST_SCATTERING_OF_PHOT_ELCE_Sub
+      END SUBROUTINE Photon_Electron_Scattering2_Sub
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
  
+
+!************************************************************************************
+      SUBROUTINE Set_InI_Conditions_For_Next_Scattering2_Sub( this )
+!************************************************************************************
+      IMPLICIT NONE
+      class(Photon_FlatSP) :: this  
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      this%Phot4k_CtrCF_ini = this%Scattered_Phot4k_CF 
+      this%Vector_of_Momentum_ini(1:3) = this%Phot4k_CtrCF_ini(2:4) / &
+                                   dabs( this%Phot4k_CtrCF_ini(1) )
+      if( isnan( this%Vector_of_Momentum_ini(3) ) )write(*, *)'mmsf=', this%Phot4k_CtrCF_ini
+
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+      this%E_ini = DABS( this%Phot4k_CtrCF_ini(1) )   
+      this%Sigma_a_E_ini = this%sigma_fn( this%E_ini ) 
+      this%ne_times_Sigma_a = this%Sigma_a_E_ini * this%n_e1    
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      END SUBROUTINE Set_InI_Conditions_For_Next_Scattering2_Sub
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
 
 !************************************************************************************
       SUBROUTINE Set_InI_Conditions_For_Next_Scattering_Sub( this, sphot )
 !************************************************************************************
       IMPLICIT NONE
       class(Photon_FlatSP) :: this 
-      TYPE(ScatPhoton_KN), INTENT(INOUT) :: sphot
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+      TYPE(ScatPhoton_KN), INTENT(INOUT) :: sphot 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       this%Phot4k_CtrCF_ini = sphot%Scattered_Phot4k_CF 
       this%Vector_of_Momentum_ini(1:3) = this%Phot4k_CtrCF_ini(2:4) / dabs( this%Phot4k_CtrCF_ini(1) )
@@ -214,7 +215,7 @@
       IMPLICIT NONE
       class(Photon_FlatSP) :: this 
       TYPE(ScatPhoton_KN), INTENT(INOUT) :: sphot
-      real(mcp) :: Sigma_COH, Sigma_INCOH, P_Rayl, P_Comp, P_fluor, xi_1
+      !real(mcp) :: Sigma_COH, Sigma_INCOH, P_Rayl, P_Comp, P_fluor, xi_1
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -227,37 +228,21 @@
       CALL sphot%Get_gama_mu_phi_Of_Scatter_Electron_HXM( this%T_e )
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       CALL sphot%Set_Elec_Tetrad_In_CF()
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      CALL sphot%Set_Phot4k_In_Elec_CF()
-      !CALL sphot%Set_f4_In_Elec_CF()
-      !CALL sphot%Set_Phot_f4_Tetrad_In_Elec_CF()  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      this%Phot4k_In_Elec_CF = sphot%Phot4k_In_Elec_CF
-      !this%f4_In_Elec_CF = sphot%f4_In_Elec_CF
-      !this%Phot_f4_AxisX = sphot%Phot_f4_AxisX
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      CALL sphot%Set_Phot4k_In_Elec_CF() 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      this%Phot4k_In_Elec_CF = sphot%Phot4k_In_Elec_CF 
       this%Elec_Phot_mu = sphot%Elec_Phot_mu
       this%Elec_Phot_sin = sphot%Elec_Phot_sin
       this%Elec_gama = sphot%Elec_gama
       this%Elec_V = sphot%Elec_V
       this%Matrix_Of_Tetrad_Of_ElecAxis = sphot%Matrix_Of_Tetrad_Of_ElecAxis
-      this%Matrix_Of_Tetrad_Of_PhotAxis = sphot%Matrix_Of_Tetrad_Of_PhotAxis
-      !this%Matrix_Of_Tetrad_Of_Phot_f4_Axis = sphot%Matrix_Of_Tetrad_Of_Phot_f4_Axis
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      CALL this%Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation() 
-      !CALL this%Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation_withpol(1)  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      CALL sphot%Compton_Scattering_With_Zero_QU()
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !CALL this%Get_K_P1_P2_Scat_Kernel_InECF_for_Esti_withpol_medium2(1)  
-      !CALL this%Get_K_P1_P2_Scat_Kernel_InECF_for_Esti_withpol_medium2(2) 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      !if( sphot%delta_pd /= zero )then 
-      !    CALL sphot%Static_Compton_Scattering_With_Polarization() 
-      !else  
-      !    CALL sphot%Compton_Scattering_With_Zero_QU() 
-      !endif
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+      this%Matrix_Of_Tetrad_Of_PhotAxis = sphot%Matrix_Of_Tetrad_Of_PhotAxis 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      CALL this%Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation()
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      CALL sphot%Compton_Scattering_With_Zero_QU()  
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       END SUBROUTINE Photon_Electron_Scattering_Sub
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 

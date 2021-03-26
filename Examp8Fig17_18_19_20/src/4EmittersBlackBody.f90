@@ -5,6 +5,7 @@
 
       type, public, extends(Basic_Variables_And_Methods_Of_Particle) :: Photon_Emitter_BB 
           real(mcp) :: w_ini_em
+          real(mcp) :: w_ini0
           real(mcp) :: T_s
           real(mcp) :: max_nu
           real(mcp) :: E_low1
@@ -96,6 +97,8 @@
       index_nu = this%y_em1 + this%dy_em * ranmar()
  
       v = 10.D0 **( index_nu ) * nu2MeV 
+      this%E_ini = v
+
       this%Phot4k_CtrCF_ini(1) = v 
       cos_theta = ranmar()
       sin_theta = dsqrt( one - cos_theta**2 )
@@ -113,6 +116,9 @@
 
       this%w_ini_em = ( v / this%T_s )**3 / ( dexp( v / this%T_s ) - one ) * &
                       (cos_theta + two * cos_theta**2)
+
+      this%w_ini = this%w_ini_em 
+      this%w_ini0 = this%w_ini_em
 
       this%z_tau = this%z_max  
       

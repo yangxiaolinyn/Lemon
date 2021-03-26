@@ -1,48 +1,22 @@
       module ScatDistance_FlatSP
       use ScatterPhoton_KN 
-      use CrossSection 
-      !use PhotoElectron
-      !use CrossSection 
+      use CrossSection  
       implicit none 
 
+!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
       type, public, extends(ScatPhoton_KN) :: Photon_With_ScatDistance_FlatSP
-!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-!* The BL coordinates of the photon at p, which determines the BL coordinates  *
-!* by YNOGK functions: r(p), mucos(p), phi(p), t(p), sigma(p)                  *
-!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  
-          real(mcp), dimension(0:N_sigma) :: sigmaaTeE_85
-          real(mcp), dimension(0:N_sigma) :: sigmaaTeE_230
-          real(mcp), dimension(0:N_sigma) :: sigmaaTeE_50
-          real(mcp), dimension(0:N_sigma) :: sigmaaTeE_400
-          real(mcp), dimension(0:N_sigma) :: sigmaaTeE
+!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   
+          real(mcp), dimension(0:N_sigma) :: sigmaaTeE_400 
           real(mcp), dimension(0:N_sigma) :: sigmaaTeE_FST
           integer(kind=8) :: effect_number
           integer(kind=8) :: scatter_times
-          logical :: mymethod
-          real(mcp) :: NormalA
-          real(mcp) :: w_ini0
-          real(mcp) :: n_e_in
-          real(mcp) :: n_e_out
+          !logical :: mymethod
+          real(mcp) :: NormalA 
           real(mcp) :: n_e
-          real(mcp) :: n_e0
-          real(mcp) :: r_times_p
-          real(mcp) :: T_e    
-          real(mcp) :: Important_Sampling_Const
-          logical :: test_it = .FALSE.
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          !real(mcp), dimension(0:100) :: delta_pds(0:100)
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
-          real(mcp) :: A_normal
-          real(mcp) :: Sigma_Max
-          !real(mcp) :: p_out
-          !real(mcp) :: p_boundary1
-          !real(mcp) :: p_boundary2
-          !real(mcp) :: p_boundary3
-          !real(mcp) :: p_maxs
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          logical :: fall2BHs, escapteds
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+          real(mcp) :: n_e0 
+          real(mcp) :: T_e     
+          logical :: test_it = .FALSE.   
+          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
           real(mcp) :: Optical_Depth_scatter 
           integer :: cases, InterSection_Cases 
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,16 +24,12 @@
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       contains 
-!*******************************************************************************************************   
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+!**********************************************************************************   
           procedure, public :: Set_Cross_Section   =>   Set_Cross_Section_sub
           procedure, public :: sigma_fn
           procedure, public :: sigma_KNs
-          procedure, public :: Get_scatter_distance_BoundReflec
-          procedure, public :: Get_scatter_distance_BoundReflec1
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          procedure, public :: Get_scatter_distance
+          procedure, public :: Get_scatter_distance_BoundReflec1 
       end type Photon_With_ScatDistance_FlatSP
  
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -68,7 +38,7 @@
  
       contains   
 !*******************************************************************************************************
-      real(mcp) function Get_scatter_distance_BoundReflec( this )
+      real(mcp) function Get_scatter_distance( this )
 !*******************************************************************************************************
       implicit none
       class(Photon_With_ScatDistance_FlatSP) :: this
@@ -84,7 +54,7 @@
           r1 = ranmar()
           delta_z = dlog( one - r1 * this%NormalA ) * this%Vector_of_Momentum_ini(3) / &
                        this%ne_times_Sigma_a
-          Get_scatter_distance_BoundReflec = this%z_tau + delta_z
+          Get_scatter_distance = this%z_tau + delta_z
           !if( this%E_ini <= 1.D-2 )then
           !    this%CROS_absorption = dabs( delta_z ) * this%n_e1 * PhotoElect_CSect( this%E_ini )
           !else
@@ -98,7 +68,7 @@
           !eta = - dlog( one - r1 * this%NormalA ) 
           delta_z = dlog( one - r1 * this%NormalA ) * this%Vector_of_Momentum_ini(3) / &
                        this%ne_times_Sigma_a
-          Get_scatter_distance_BoundReflec = this%z_tau + delta_z
+          Get_scatter_distance = this%z_tau + delta_z
           !if( this%E_ini <= 1.D-2 )then
           !    this%CROS_absorption = dabs( delta_z ) * this%n_e1 * PhotoElect_CSect( this%E_ini )
           !else
@@ -107,33 +77,33 @@
       endif
       !write(*,*)'sdf==', p_out1, this%NormalA, this%z_max, this%z_tau
      
-      if( isnan(Get_scatter_distance_BoundReflec) ) then
-           write(*,*)'ends=', this%medium_case, Get_scatter_distance_BoundReflec, r1, this%NormalA,  &
+      if( isnan( Get_scatter_distance ) ) then
+           write(*,*)'ends=', this%medium_case, Get_scatter_distance, r1, this%NormalA,  &
              this%InterSection_Cases, p_out1, this%z_tau, this%Vector_of_Momentum_ini
            stop
       endif 
   
       if( this%test_it )then
-          write(*,*)'sdf2==', r1, this%NormalA, Get_scatter_distance_BoundReflec, p_out1
+          write(*,*)'sdf2==', r1, this%NormalA, Get_scatter_distance, p_out1
       endif
       if(p_out1 < zero )then
-          write(*,*)'sdf123==',Get_scatter_distance_BoundReflec, this%InterSection_Cases, p_out1, this%z_ini,&
+          write(*,*)'sdf123==',Get_scatter_distance, this%InterSection_Cases, p_out1, this%z_ini,&
            this%Vector_of_Momentum_ini(3), this%NormalA, this%medium_case
           stop
        endif 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      If (Get_scatter_distance_BoundReflec < zero) then
-          !write(*,*)'sdf==',Get_scatter_distance_BoundReflec, p_out1 , this%Z_max, this%z_ini, &
+      If (Get_scatter_distance < zero) then
+          !write(*,*)'sdf==',Get_scatter_distance, p_out1 , this%Z_max, this%z_ini, &
           !    this%Vector_of_Momentum_ini(3), this%InterSection_Cases
           !stop
       endif
-      If (Get_scatter_distance_BoundReflec == zero) then
-          write(*,*)'endsf=', this%medium_case, Get_scatter_distance_BoundReflec, r1, this%NormalA,  &
+      If (Get_scatter_distance == zero) then
+          write(*,*)'endsf=', this%medium_case, Get_scatter_distance, r1, this%NormalA,  &
              this%InterSection_Cases, p_out1, this%z_tau, this%Vector_of_Momentum_ini
           stop
       endif
       return 
-      end function Get_scatter_distance_BoundReflec
+      end function Get_scatter_distance
 !******************************************************************************************************* 
 
 

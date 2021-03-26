@@ -4,8 +4,7 @@
       USE constants
       USE RandUtils
       USE PhotonEmitterBB
-      USE Photons_FlatSP
-      !USE MPI
+      USE Photons_FlatSP 
       IMPLICIT NONE 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -55,11 +54,11 @@
         mydutyphot = Total_Phot_Num / np
     endif 
  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     CALL phot%Set_Initial_Values_For_Photon_Parameters( T_elec, T_bb, &
                 tau, E1_scat, E2_scat, y_obs1, y_obs2, mu_esti, sin_esti, &
                 Num_mu_esti, CrossSec_filename )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     Num_Photons = 0
     !sphot%mu_estimat = phot%mu_estimat
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -68,15 +67,15 @@
         Num_Photons = Num_Photons + 1 
         phot%scatter_times = 0
         CALL phot%Generate_A_Photon()   
-        CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p()
-        CALL phot%FIRST_SCATTERING_OF_PHOT_ELCE( sphot )  
+        CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p()  
+        CALL phot%Photon_Electron_Scattering2( ) 
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Scattering_loop: Do
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
             phot%scatter_times = phot%scatter_times + 1 
             if( phot%w_ini / phot%w_ini0 <= 1.D-40 .or. phot%scatter_times >= 5 )exit
             !CALL Set_InI_Conditions_For_Next_Scattering( phot, sphot )   
-            CALL phot%Set_InI_Conditions_For_Next_Scattering( sphot )   
+            CALL phot%Set_InI_Conditions_For_Next_Scattering2( )   
             !CALL Determine_Next_Scattering_Site( phot, sphot ) 
             !write(*,fmt=*)'ssff222===', phot%Phot4k_CtrCF_ini(1),  
             CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p() 
@@ -86,7 +85,7 @@
             !if( phot%scatter_times >= 20 )exit  
             !if(   phot%Psi_I <= 1.D-1 )exit 
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            CALL phot%Photon_Electron_Scattering( sphot ) 
+            CALL phot%Photon_Electron_Scattering2( ) 
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         END DO Scattering_loop
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -102,7 +101,7 @@
         endif
         If( Num_Photons > mydutyphot )EXIT 
     Enddo  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       If ( myid /= np-1 ) then  
           send_num  = ( vL_sc_up + 1 ) * 4 * 7 * Num_mu
           send_tag = 1  
@@ -145,12 +144,12 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
           close(unit=13)    
       endif   
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
     call MPI_FINALIZE ( ierr ) 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     END SUBROUTINE mimick_of_ph_Slab_BoundReflc
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     END MODULE Method_Of_FLST_DiffuseReflec
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
     

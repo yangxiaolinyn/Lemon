@@ -1,6 +1,5 @@
       module ModuleForCompScatEsti 
-      use ScatDistance_FlatSP
-      !use PhotoElectron
+      use ScatDistance_FlatSP 
       use PhotonEmitterBB 
       implicit none 
 
@@ -468,9 +467,9 @@
       real(mcp) :: vLv, v_esti, J_esti, Sigam_a, nu
        
       do mu_i = 1, this%num_mu_esti
-        do i_phi = 0, 0!Num_phi 
+        do i_phi = 0, 0
               nu = this%y_em1 + this%dy_em * ranmar()
-              v_esti = 10.D0**( nu ) * h_ev * 1.D-6
+              v_esti = 10.D0**( nu ) * nu2MeV !h_ev * 1.D-6
               Sigam_a = this%Sigma_fn(v_esti) * this%n_e1
 
               if(this%mu_estimates(mu_i) > zero)then
@@ -480,11 +479,10 @@
                   vLv = - dexp( (this%z_max - this%z_tau) * Sigam_a / this%mu_estimates(mu_i) ) / &
                            this%mu_estimates(mu_i) * Sigam_a * zero
               endif
-
-              !write(*, *)'ffs=', mu_i, this%mu_estimates(mu_i), this%z_tau * Sigam_a / this%mu_estimates(mu_i)
+ 
               J_esti = ( v_esti / this%T_s )**3 / ( dexp( v_esti / this%T_s ) - one ) * &
                    ( this%mu_estimates(mu_i) + two * this%mu_estimates(mu_i)**2 ) * &
-                     this%P_mu_normal! * this%P_nu_normal
+                     this%P_mu_normal ! * this%P_nu_normal
     
               i_1 = floor( ( dlog10(v_esti) - this%log10_Tbb - this%y1 ) / (this%dy/two) )
               if(mod(i_1, 2)==0)then
@@ -521,7 +519,7 @@
       this%cos_phi_esti(i_phi) = dcos( phi_temp )
       this%sin_phi_esti(i_phi) = dsin( phi_temp )
       do mu_i = 1, this%num_mu_esti
-        do i_phi = 0, 0! Num_phi
+        do i_phi = 0, 0 
           this%Phot3k_CF_esti(1) = this%smu_estimates(mu_i) * this%cos_phi_esti(i_phi)
           this%Phot3k_CF_esti(2) = this%smu_estimates(mu_i) * this%sin_phi_esti(i_phi)
           this%Phot3k_CF_esti(3) = this%mu_estimates(mu_i) 
@@ -530,24 +528,18 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           this%Phot3k_ECF_ini(1: 3) = this%Phot4k_In_Elec_CF(2: 4) / dabs( this%Phot4k_In_Elec_CF(1) )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          factor = one - this%Phot3k_EF_esti(3) * this%Elec_v
-          !this%Phot3k_ECF_ini(1) = zero
-          !this%Phot3k_ECF_ini(2) = -this%Elec_Phot_sin / this%Elec_gama / factor
-          !this%Phot3k_ECF_ini(3) = (this%Elec_Phot_mu - this%Elec_v) / factor 
-          !Cos_Theta = this%Phot3k_ECF_ini(1) * this%Phot3k_ECF_esti(1) + this%Phot3k_ECF_ini(2) * &
-          !            this%Phot3k_ECF_esti(2) + this%Phot3k_ECF_ini(3) * this%Phot3k_ECF_esti(3) 
+          factor = one - this%Phot3k_EF_esti(3) * this%Elec_v  
           Cos_Theta = Vector3D_Inner_Product( this%Phot3k_ECF_ini, this%Phot3k_ECF_esti )
           Sin_Theta2 = one - Cos_Theta**2
           nup_vs_nu = one / ( one + dabs( this%Phot4k_In_Elec_CF(1) ) / mec2 * (one - Cos_Theta) )
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
           chi = nup_vs_nu + one / nup_vs_nu - Sin_Theta2
-          this%Q_sp_scat = - Sin_Theta2 / chi
-          this%U_sp_scat = zero
+          !this%Q_sp_scat = - Sin_Theta2 / chi
+          !this%U_sp_scat = zero
           !two * this%Cos_Theta_Scat * this%delta_pd * DSIN( two*phip )/N_temp
-          this%delta_pd_scat = dabs( this%Q_sp_scat )
+          !this%delta_pd_scat = dabs( this%Q_sp_scat )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          !write(*, *)'s1=', KN_CrossSection_ECF 
           epsi = ( two * this%E_ini / mec2 ) * this%Elec_gama * &
                          ( one - this%Elec_V * this%Elec_Phot_mu )
           if ( epsi > 8.19D-4 ) then
@@ -556,73 +548,41 @@
           else 
               SigmaKN = one - epsi
           end if 
-          KN_CrossSection_ECF = half_re2 * chi * (nup_vs_nu / this%Elec_gama / factor)**2 / SigmaKN
-          !write(*, *)'s1=', epsi, this%Phot4k_In_Elec_CF(1) * two / mec2, KN_CrossSection_ECF
+          KN_CrossSection_ECF = half_re2 * chi * (nup_vs_nu / &
+                          this%Elec_gama / factor)**2 / SigmaKN 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
           E_temp = dabs( this%Phot4k_In_Elec_CF(1) ) * nup_vs_nu
-          this%E_esti_vs_mu_phi = this%Elec_gama * E_temp * ( one + this%Elec_v * this%Phot3k_ECF_esti(3) )
-          !write(*, *)'ffs=', this%E_esti_vs_mu_phi, this%E_array_esti(0), this%E_array_esti(vL_sc_up) 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          !mu_ep = this%Phot3k_EF_esti(3)
-          !smu_ep = dsqrt( one - this%Phot3k_EF_esti(3)**2 )
-          !sin_phi_ep = - this%Phot3k_EF_esti(2) / smu_ep !
-          !write(*, *)'s1=',smu_ep, dsqrt(this%Phot3k_EF_esti(1)**2 + this%Phot3k_EF_esti(2)**2)
-          !mu_psi = this%Elec_Phot_mu * mu_ep + smu_ep * this%Elec_Phot_sin * sin_phi_ep
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          !factor1 = one - this%Elec_Phot_mu * this%Elec_v
-          !factor2 = one - this%Elec_v * mu_ep
-          !nup_vs_nu = factor1 / (factor2 + this%E_ini / (this%Elec_gama*mec2) * (one - mu_psi) )
-          !this%E_esti_vs_mu_phi = this%E_ini * nup_vs_nu
-
-          !epsip = two * this%E_esti_vs_mu_phi / mec2 * factor2 * this%Elec_gama
-          !epsi = two * this%E_ini / mec2 * factor1 * this%Elec_gama
-
-          !chi1 = epsip / epsi + epsi / epsip + four * (one - epsi/epsip) / epsi + &
-          !                                    four * (one - epsi/epsip)**2 / epsi**2
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          !KN_CrossSection = three / 16.D0 / pi * chi1 * (nup_vs_nu / this%Elec_gama / factor1)**2
-          !write(*, *)'s2=',  this%Phot4k_CtrCF(1), this%E_ini
+          this%E_esti_vs_mu_phi = this%Elec_gama * E_temp * ( one + &
+                             this%Elec_v * this%Phot3k_ECF_esti(3) )
+          !write(*, *)'ffs=', this%E_esti_vs_mu_phi, this%E_array_esti(0)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           Sigma_E1 = this%sigma_fn( this%E_esti_vs_mu_phi ) * this%n_e1  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           if(this%mu_estimates(mu_i) > zero)then
-              Lv = this%w_ini * dexp( - this%z_tau * Sigma_E1 / this%mu_estimates(mu_i) ) / &
+              vLv = this%w_ini * dexp( - this%z_tau * Sigma_E1 / this%mu_estimates(mu_i) ) / &
                    this%mu_estimates(mu_i) * KN_CrossSection_ECF !* this%ne_times_Sigma_a!* Sigma_E1 
           else
-              Lv = - this%w_ini * dexp( (this%z_max - this%z_tau) * Sigma_E1 / this%mu_estimates(mu_i) ) / &
-                     this%mu_estimates(mu_i) * KN_CrossSection_ECF !* Sigma_E1 
+              vLv = - this%w_ini * dexp( (this%z_max - this%z_tau) * &
+                              Sigma_E1 / this%mu_estimates(mu_i) ) / &
+                      this%mu_estimates(mu_i) * KN_CrossSection_ECF !* Sigma_E1 
           endif
-          vLv = Lv !* dabs( this%E_esti_vs_mu_phi )
+          !vLv = Lv !* dabs( this%E_esti_vs_mu_phi )
           i_1 = floor( ( dlog10(this%E_esti_vs_mu_phi) - this%log10_Tbb - this%y1 ) / (this%dy/two) )
           if(mod(i_1, 2)==0)then
               i_E = i_1 / 2
           else
               i_E = (i_1 + 1) / 2
           endif 
-          if( i_E > vL_sc_up .or. i_E < 0 )cycle
-          !stimes = this%scatter_times +1 
+          if( i_E > vL_sc_up .or. i_E < 0 )cycle 
 
-          !write(*, *)'s2=',  i_E, this%E_esti_vs_mu_phi, this%cos_phi_esti(i_phi)
-          !if(stimes == 0)stop
+          !write(*, *)'s2=',  i_E, this%E_esti_vs_mu_phi, this%cos_phi_esti(i_phi) 
           this%PolArrIQUV(1, 6, mu_i, i_E) = this%PolArrIQUV(1, 6, mu_i, i_E) + vLv 
 
           if(stimes <= 5)then
               this%PolArrIQUV(1, stimes, mu_i, i_E) = this%PolArrIQUV(1, stimes, mu_i, i_E) + vLv
-          endif
-          !this%PolArrIQUVpmu11(1, i_E) = this%PolArrIQUVpmu11(1, i_E) + Lv
-          !this%PolArrImu11(stimes, i_E) = this%PolArrImu11(stimes, i_E) + vLv
-          !this%PolArrImu11(6, i_E) = this%PolArrImu11(6, i_E) + vLv
-          !this%v_L_v_i_mu011(i_E) = this%v_L_v_i_mu011(i_E) + vLv * DABS( this%E_esti_vs_mu_phi )
-
-          !if( this%delta_pd_scat /= zero )then
-          !    call this%Get_PolaVector_And_IQU_InCF_for_Estimation1(Qpsi, Upsi)
-          !    this%PolArrIQUVpmu11(2, i_E) = this%PolArrIQUVpmu11(2, i_E) + Lv * Qpsi !2 represents Q
-          !    this%PolArrIQUVpmu11(3, i_E) = this%PolArrIQUVpmu11(3, i_E) + Lv * Upsi !3 represents U
-          !endif 
-
-        enddo
-        !write(*, *)'#######################################' 
+          endif   
+        enddo 
       enddo  
       return
       end subroutine Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation_Sub
