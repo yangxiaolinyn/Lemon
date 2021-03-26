@@ -1,9 +1,9 @@
       module ScatterPhoton_KN
-      !use Photon_RaylScat
-      use Basic_Variables_And_Methods 
+      use PhotonEmitterBB
+      !use Basic_Variables_And_Methods 
       implicit none 
 
-      type, public, extends(Basic_Variables_And_Methods_Of_Particle) :: ScatPhoton_KN
+      type, public, extends(Photon_Emitter_BB) :: ScatPhoton_KN
           real(mcp), dimension(1:3) :: PhotAxisX
           real(mcp), dimension(1:3) :: PhotAxisY
           real(mcp), dimension(1:3) :: PhotAxisZ

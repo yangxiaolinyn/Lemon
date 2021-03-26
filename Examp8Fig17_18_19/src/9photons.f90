@@ -32,51 +32,38 @@
 
 !*******************************************************************************************************
       subroutine Set_Initial_Values_For_Photon_Parameters_Sub( this, T_elec, T_bb, tau, &
-                            Emitter, CrossSec_filename, methods_cases )
+                     E1_scat, E2_scat, y_obs1, y_obs2, mu_esti, sin_esti, &
+                     Num_mu_esti, CrossSec_filename )
 !*******************************************************************************************************
       implicit none
       class(Photon_FlatSP) :: this
-      TYPE(Photon_Emitter_BB), intent(inout) :: Emitter 
-      real(mcp), intent(in) :: T_elec, T_bb, tau
-      integer, intent(in) :: methods_cases
+      !TYPE(Photon_Emitter_BB), intent(inout) :: Emitter 
+      real(mcp), intent(in) :: T_elec, T_bb, tau, E1_scat, E2_scat, y_obs1, &
+                       y_obs2, mu_esti(1: 4), sin_esti(1: 4)
+      integer, intent(in) :: Num_mu_esti
       character*80, intent(inout) :: CrossSec_filename
       integer :: i, ierr
       real(mcp) :: dy
 
-!~~~~~~~~~~~~~~~~~~~~Emitte a photon and take its parameters as initial values~~~~~~~~~~~~~~~~~~~~~~~~~~
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-!| Set Initial conditions for the Emitter
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !this%n_e = 1.D19
-      Emitter%tau_max = tau
-      !Emitter%Z_max = tau / Sigma_T / phot%n_e  
-      Emitter%T_s = T_bb !1.D-6 * 10.D0
-      CALL Emitter%Set_Emin_Emax()   
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!| Set Initial conditions for the Photon                     !
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !E_low = !Emitter%E_low1 !1.D-5
-      !E_up = !Emitter%E_up1 !1.D1 
-      !this%nu_low = Emitter%nu_low
-      !this%nu_up = Emitter%nu_up
-      this%ln_nu1 = Emitter%ln_nu1
-      this%ln_nu2 = Emitter%ln_nu2
-      this%logE_low = DLOG10(1.D-6)
-      this%logE_up = DLOG10(1.D1) 
-      this%T_e = T_elec !0.11D0 * mec2
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!~  Emitte a photon and take its parameters as initial values ~~ 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
       this%T_s = T_bb
+      CALL this%Set_Emin_Emax() 
+  
+      this%logE_low = DLOG10( E1_scat )
+      this%logE_up = DLOG10( E2_scat )
+      this%T_e = T_elec
       this%log10_Tbb = dlog10( T_bb )
-      !write(*, fmt="(' ', 'mest=', 2ES16.7)")DLOG10(Emitter%E_low1), DLOG10(Emitter%E_up1)
-      
-      this%tau_max = tau 
+ 
+      this%tau_max = tau
       this%n_e1 = 1.D20
-      !this%n_e2 = 1.D27
       this%ne_times_SigmaT = this%n_e1 * Sigma_T
       this%z_max = tau / this%ne_times_SigmaT
       this%effect_number = 0
-      !write(*, *)'fsd', tau, this%ne_times_SigmaT, this%z_max
+      !write(*, *)'fsd', tau, this%ne_times_SigmaT, this%z_max, tau / Sigma_T
       !stop
-      this%CrossSectFileName = CrossSec_filename !'./data/SigmaArrayFST11.dat'
+      this%CrossSectFileName = CrossSec_filename 
 
       this%dindexE = ( this%logE_up - this%logE_low )/dfloat(N_sigma)
       CALL MPI_BARRIER( MPI_COMM_WORLD, ierr )
@@ -85,95 +72,44 @@
       endif
       CALL MPI_BARRIER( MPI_COMM_WORLD, ierr )
       CALL MPI_BCAST( this%sigmaaTeE_FST, N_sigma + 1, MPI_DOUBLE_PRECISION, &
-                        this%num_np-1, MPI_COMM_WORLD, ierr ) 
-      !CALL Set_psi_phi_chi_zera_array() 
-      !CALL PhotoElect_1H_COH_INCOH_CSect()
-      !CALL Set_PhotoElect_CS_array()
-     
+                        this%num_np-1, MPI_COMM_WORLD, ierr )   
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !this%mu_esti(1) = 0.49D0
-      !this%smu_esti(1) = dsqrt(one - this%mu_esti(1)**2)
-      !this%mu_esti(2) = 0.65D0
-      !this%smu_esti(2) = dsqrt(one - this%mu_esti(2)**2)
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      this%y1 = -1.D0
-      this%y2 = 5.D0
-      this%dy = ( this%y2 - this%y1 ) / vL_sc_up
-      do i = 0, vL_sc_up
-          this%E_array_esti(i) = T_bb * 10.D0**(this%y1 + this%dy * i)
-      enddo
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      dy = one / Num_mu
-      !do i = 0, Num_mu 
-      if( methods_cases == 1 .or. methods_cases == 2 .or. methods_cases == 3 )then
-          this%num_mu_esti = 3
-          this%mu_estimates(1) = 0.1D0 
-          this%mu_estimates(2) = 0.5D0 
-          this%mu_estimates(3) = 0.9D0 
-          this%smu_estimates(1: 3) = dsqrt(one - this%mu_estimates(1: 3)**2)
-      else
-          this%num_mu_esti = 4
-          this%mu_estimates(1) = 1.D0
-          this%mu_estimates(2) = 0.5D0
-          this%mu_estimates(3) = 0.1D0
-          this%mu_estimates(4) = -0.5D0
-          this%smu_estimates(1: 4) = dsqrt(one - this%mu_estimates(1: 4)**2)
-      endif
-      !enddo 
-      dy = twopi / Num_phi
-      do i = 0, Num_phi
-          this%phi_estimates(i) = dy * i
-          this%sin_phi_esti(i) = dsin(this%phi_estimates(i))
-          this%cos_phi_esti(i) = dcos(this%phi_estimates(i))
-          !write(*, *)'f1 = ', dy, this%phi_estimates(i), this%sin_phi_esti(i)
-      enddo 
-      this%P_mu_normal = one / twopi !6.D0 / 7.D0 
-      this%P_nu_normal = one / ( Emitter%ln_nu2 - Emitter%ln_nu1 )
-      
-      !write(*, *)'f2 = ', one / ( Emitter%ln_nu2 - Emitter%ln_nu1 ), Emitter%ln_nu2, Emitter%ln_nu1, &
-      !    dlog10(Emitter%E_up1 / T_bb), dlog10( Emitter%E_low1 / T_bb )
-      !stop
-      !dy = twopi / N_esti_phi
-      !do i = 0, N_esti_phi
-      !    this%phi_esti(i) = dy * i
-      !    this%sin_phi_esti(i) = dsin(this%phi_esti(i))
-      !    this%cos_phi_esti(i) = dcos(this%phi_esti(i))
-      !enddo 
-      !this%v_L_v_i_mu011 = zero
-      !this%v_L_v_i_mu050 = zero  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      this%y1 = y_obs1
+      this%y2 = y_obs2
+      this%dy = ( this%y2 - this%y1 ) / vL_sc_up 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      this%num_mu_esti = Num_mu_esti
+      this%mu_estimates(1: Num_mu_esti) = mu_esti
+      this%smu_estimates(1: Num_mu_esti) = sin_esti
+ 
+!~~~~~~~~~Normalization factor~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      this%P_mu_normal = one / twopi 
+      this%P_nu_normal = one / this%dy_em
+  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       end subroutine Set_Initial_Values_For_Photon_Parameters_Sub
 
 
 !*******************************************************************************************************
-      subroutine Generate_A_Photon_Sub( this, Emitter )
+      subroutine Generate_A_Photon_Sub( this )
 !*******************************************************************************************************
       implicit none
-      class(Photon_FlatSP) :: this
-      TYPE(Photon_Emitter_BB), intent(inout) :: Emitter  
-      
-      
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      CALL Emitter%get_Phot4k_CtrCF_CovCF_BoundReflec() 
-      !Emitter%Vector_of_Momentum(1:3) = Emitter%Phot4k_CtrCF(2:4) / Emitter%Phot4k_CtrCF(1)
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      class(Photon_FlatSP) :: this  
+       
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      CALL this%get_Phot4k_CtrCF_CovCF()   
+      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+      !this%Vector_of_Momentum_ini = this%Vector_of_Momentum 
+      this%Phot4k_CtrCF_ini = this%Phot4k_CtrCF  
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      this%z_tau = this%z_max
-      !this%medium_case = Emitter%medium_case
-      this%Vector_of_Momentum_ini = Emitter%Vector_of_Momentum
-      !this%Vector_of_position_ini = Emitter%Vector_of_position
-      this%Phot4k_CtrCF_ini = Emitter%Phot4k_CtrCF  
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      this%E_ini = DABS( Emitter%Phot4k_CtrCF(1) ) 
+      this%E_ini = DABS( this%Phot4k_CtrCF(1) ) 
       !write(*, *)'f1 = ', this%E_ini
       this%Sigma_a_E_ini = this%sigma_fn( this%E_ini )! * this%n_e1 
       this%ne_times_Sigma_a = this%Sigma_a_E_ini * this%n_e1 
       !write(*, *)'f1333 = ', this%Sigma_KN_E_ini, this%E_ini
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      this%w_ini = Emitter%w_ini_em 
-      this%w_ini0 = Emitter%w_ini_em
+      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      this%w_ini = this%w_ini_em 
+      this%w_ini0 = this%w_ini_em
       this%Q_sp = zero
       this%U_sp = zero
       this%V_sp = zero

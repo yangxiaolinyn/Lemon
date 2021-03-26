@@ -9,12 +9,10 @@
 !* The BL coordinates of the photon at p, which determines the BL coordinates  *
 !* by YNOGK functions: r(p), mucos(p), phi(p), t(p), sigma(p)                  *
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^     
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          real(mcp) :: nu_low
-          real(mcp) :: nu_up
-          real(mcp) :: ln_nu1
-          real(mcp) :: ln_nu2 
-          real(mcp) :: T_s   
+          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+          !real(mcp) :: ln_nu1
+          !real(mcp) :: ln_nu2 
+          !real(mcp) :: T_s   
           real(mcp) :: PolArrIQUVpmu11(1: 5, 0: vL_sc_up) = zero
           real(mcp) :: PolArrIQUVpmu50(1: 5, 0: vL_sc_up) = zero
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -470,9 +468,8 @@
       real(mcp) :: vLv, v_esti, J_esti, Sigam_a, nu
        
       do mu_i = 1, this%num_mu_esti
-        do i_phi = 0, 0!Num_phi
-              !v_esti = this%E_array_esti(i_E)
-              nu = this%ln_nu1 + ( this%ln_nu2 - this%ln_nu1 ) * ranmar()
+        do i_phi = 0, 0!Num_phi 
+              nu = this%y_em1 + this%dy_em * ranmar()
               v_esti = 10.D0**( nu ) * h_ev * 1.D-6
               Sigam_a = this%Sigma_fn(v_esti) * this%n_e1
 
