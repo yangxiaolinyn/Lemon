@@ -12,13 +12,13 @@
 !**************************************************************************************
     SUBROUTINE mimick_of_ph_Slab_BoundReflc( Total_Phot_Num, tau, T_bb, T_elec, &
                E1_scat, E2_scat, y_obs1, y_obs2, mu_esti, sin_esti, Num_mu_esti, &
-               CrossSec_filename, Savefilename )
+               TerminateTime, Terminate_Tolerence, CrossSec_filename, Savefilename )
 !************************************************************************************** 
     implicit none 
     real(mcp), intent(in) :: tau, T_bb, T_elec, E1_scat, E2_scat, y_obs1, &
-                      y_obs2, mu_esti(1: 4), sin_esti(1: 4)
+                      y_obs2, mu_esti(1: 4), sin_esti(1: 4), Terminate_Tolerence
     integer(kind = 8), intent(in) :: Total_Phot_Num
-    integer, intent(in) :: Num_mu_esti
+    integer, intent(in) :: Num_mu_esti, TerminateTime
     character*80, intent(inout) :: CrossSec_filename, Savefilename
     real(mcp) :: E, E_low, E_up  
     integer(kind = 8) :: Num_Photons 
@@ -73,7 +73,8 @@
         Scattering_loop: Do
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
             phot%scatter_times = phot%scatter_times + 1 
-            if( phot%w_ini / phot%w_ini0 <= 1.D-40 .or. phot%scatter_times >= 5 )exit
+            if( phot%w_ini / phot%w_ini0 <= Terminate_Tolerence .or. &
+                phot%scatter_times >= TerminateTime )exit
             !CALL Set_InI_Conditions_For_Next_Scattering( phot, sphot )   
             CALL phot%Set_InI_Conditions_For_Next_Scattering2( )   
             !CALL Determine_Next_Scattering_Site( phot, sphot ) 
@@ -92,12 +93,11 @@
         !write(*,*)'******',phot%scatter_times, phot%medium_case
   
         If ( mod(Num_Photons, 50000)==0 .and. myid == np-1 ) then 
-            write(unit = *, fmt = *)'*********************************************************' 
+            write(unit = *, fmt = *)'*******************************************************************' 
             write(unit = *, fmt = *)'***** The', Num_Photons,'th Photons have been scattered', &
                                   phot%scatter_times, &
                          'times and Escapted from the region !!!!!!!'      
-            write(unit = *, fmt = *)'***** My Duty Photon Number is: ', myid, mydutyphot 
-            write(unit = *, fmt = *)'****************************************************** '
+            write(unit = *, fmt = *)'***** My Duty Photon Number is: ', myid, mydutyphot  
         endif
         If( Num_Photons > mydutyphot )EXIT 
     Enddo  

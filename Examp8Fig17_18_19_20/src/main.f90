@@ -3,10 +3,11 @@
     implicit none
     real(mcp) :: tau, T_bb, T_elec
     real(mcp) :: E1_scat, E2_scat, y_obs1, y_obs2
-    real(mcp) :: mu_esti(1: 4), sin_esti(1: 4)
-    integer :: methods_cases, Num_mu_esti
+    real(mcp) :: mu_esti(1: 4), sin_esti(1: 4), Terminate_Tolerence
+    integer :: methods_cases, Num_mu_esti, TerminateTime
     integer(kind = 8) :: Total_Phot_Num 
-    character*80 :: Savefilename, CrossSec_filename, filenameH3Array, Te, Ta, E1, E2
+    character*80 :: Savefilename, CrossSec_filename, &
+                       filenameH3Array, Te, Ta, E1, E2
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
     filenameH3Array = './data/H3Array.dat' 
@@ -18,7 +19,11 @@
                     ! photon energy.
     y_obs1 = -1.D0  ! where \nu_obs = 10^{y_obs}, or y_obs = log10( \nu_obs )
     y_obs2 = 5.D0   ! where y_obs1 and y_obs2 determine the range of observational frequency. 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    TerminateTime = 5 ! The Number of scattering times to terminate the scattering sequence.
+    Terminate_Tolerence = 1.D-40 ! The Tolerence value to terminate the scattering sequence.
+                 ! And Terminate_Tolerence = w / w_ini, w_ini and w are the initial weight and 
+                 ! weight, and w will decrease as scattering sequence increase.
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     if(methods_cases == 1)then
 !~~~~~~~Initial parameters for Fig.17 of our paper ~~~~~~~~~~~~~~~~~~~~~~~~~ 
         tau = 0.15D0            ! Optical depth of the atmosphere.
@@ -65,7 +70,7 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-    Total_Phot_Num = 1.D9
+    Total_Phot_Num = 5.D8
     write(Te, "(ES10.3)")T_elec
     write(Ta, "(ES10.3)")tau
     write(E1, "(ES10.3)")E1_scat
@@ -81,6 +86,7 @@
     call mimick_of_ph_Slab_BoundReflc( Total_Phot_Num, tau, T_bb, &
                       T_elec, E1_scat, E2_scat, y_obs1, y_obs2, &
                       mu_esti, sin_esti, Num_mu_esti, &
+                      TerminateTime, Terminate_Tolerence, &
                       CrossSec_filename, Savefilename )
 
     END PROGRAM main
