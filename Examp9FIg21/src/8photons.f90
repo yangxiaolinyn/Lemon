@@ -2,41 +2,9 @@
       use EstimationsModule
       implicit none 
 
+!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       type, public, extends(PhotonEstimate) :: Photon_FlatSP
-!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
-!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
-          real(mcp) :: v_L_v_i(1: vL_sc_up)  
-          real(mcp) :: nu_low
-          real(mcp) :: nu_up
-          real(mcp) :: ln_nu1
-          real(mcp) :: ln_nu2
-          real(mcp) :: T_s  
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          real(mcp) :: PolarArrayIQUV10(1: 4, 0: Num_phi) = zero
-          real(mcp) :: PolarArrayIQUV30(1: 4, 0: Num_Phi) = zero
-          real(mcp) :: PolarArrayIQUV60(1: 4, 0: Num_Phi) = zero
-          real(mcp) :: PolarArrayIQUV80(1: 4, 0: Num_Phi) = zero
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          real(mcp) :: PolarArrayIQUV0(1: 4, 0: Num_mu) = zero
-          real(mcp) :: PolarArrayIQUV90(1: 4, 0: Num_mu) = zero
-          real(mcp) :: PolarArrayIQUV180(1: 4, 0: Num_mu) = zero
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          !real(mcp) :: PolarArraydmu11(1: vL_sc_up)
-          real(mcp) :: PolArrIQUVpmu11(1: 5, 0: vL_sc_up) = zero
-          real(mcp) :: PolArrIQUVpmu50(1: 5, 0: vL_sc_up) = zero
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          real(mcp) :: PolArrImu11(0: 6, 0: vL_sc_up) = zero 
-          real(mcp) :: PolArrImu50(0: 6, 0: vL_sc_up) = zero  
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          !real(mcp) :: v_L_v_i_mu011(0: vL_sc_up) = zero 
-          !real(mcp) :: v_L_v_i_mu050(0: vL_sc_up) = zero  
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          real(mcp) :: d_theta, d_phi, d_tau
-          logical :: first_time_recording
+!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   
 
       contains 
 !**************************************************************************************** 

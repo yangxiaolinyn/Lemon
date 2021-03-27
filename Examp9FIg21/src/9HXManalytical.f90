@@ -1,8 +1,9 @@
       module HXManalyticalresults
-      use Basic_Variables_And_Methods 
+      !use Basic_Variables_And_Methods
+      use PhotonEmitterBB
       implicit none
       
-      type, public, extends(Basic_Variables_And_Methods_Of_Particle) :: Hxmformulae
+      type, public, extends(Photon_Emitter_BB) :: Hxmformulae
       contains 
       procedure, public :: Hxm_alaytical_results  =>  Hxm_alaytical_results_Sub
       procedure, public :: Sigma_alpha => Sigma_alpha_Sub

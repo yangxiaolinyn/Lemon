@@ -15,8 +15,7 @@
           real(mcp) :: nu_low
           real(mcp) :: nu_up
           real(mcp) :: ln_nu1
-          real(mcp) :: ln_nu2
-          real(mcp) :: dnu 
+          real(mcp) :: ln_nu2 
 
       contains   
           procedure, public :: max_plankexp    =>  max_plankexp_fn
