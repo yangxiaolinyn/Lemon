@@ -65,12 +65,11 @@
       contains     
    
 !*******************************************************************************************************
-      subroutine Set_Initial_Values_For_Photon_Parameters_Sub( this, T_elec, T_bb, tau, &
-                             CrossSec_filename )
+      subroutine Set_Initial_Values_For_Photon_Parameters_Sub( this, &
+                     T_elec, T_bb, tau, CrossSec_filename )
 !*******************************************************************************************************
       implicit none
-      class(Photon_FlatSP) :: this
-      !TYPE(Photon_Emitter_BB), intent(inout) :: Emitter 
+      class(Photon_FlatSP) :: this 
       real(mcp), intent(in) :: T_elec, T_bb, tau
       character*80, intent(inout) :: CrossSec_filename
       integer :: i
