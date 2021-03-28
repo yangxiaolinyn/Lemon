@@ -7,8 +7,8 @@
     real(mcp) :: mu_esti(1: 4), sin_esti(1: 4), Terminate_Tolerence
     integer :: methods_cases, TerminateTime, Num_mu_esti
     integer(kind = 8) :: Total_Phot_Num 
-    character*80 :: Savefilename, CrossSec_filename, &
-                   Spentrum_filename, filenameH3Array, Te, Ta, E1, E2
+    character*80 :: CrossSec_filename, Spentrum_filename, &
+                    filenameH3Array, Te, Ta, E1, E2
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
     call InitRandom() 
@@ -32,16 +32,16 @@
         tau = 0.05D0 
         T_bb = 10.D0 * 1.D-6    ! In unit of MeV
         T_elec = 352.D0 * 1.D-3 !0.11D0 * mec2   ! In unit of MeV
-        CrossSec_filename = './data/SigmaArrayT_e=352kev.txt' 
-        Spentrum_filename = './spectrum/IQUV352_8.txt'
+        !CrossSec_filename = './data/SigmaArrayT_e=352kev.txt' 
+        !Spentrum_filename = './spectrum/IQUV352_8.txt'
         Total_Phot_Num = 1.0D9
         mu_esti(1) = 0.11D0  
     elseif(methods_cases == 2)then
         tau = 0.5D0 
         T_bb = 10.D0 * 1.D-6     ! In unit of MeV
         T_elec = 56.D0 * 1.D-3 !352.D0 * 1.D-3 !0.11D0 * mec2   ! In unit of MeV
-        CrossSec_filename = './data/SigmaArrayT_e=56kev1.txt' 
-        Spentrum_filename = './spectrum/IQUV56_8.txt'
+        !CrossSec_filename = './data/SigmaArrayT_e=56kev1.txt' 
+        !Spentrum_filename = './spectrum/IQUV56_8.txt'
         Total_Phot_Num = 5.0D8
         mu_esti(1) = 0.5D0  
     endif
@@ -57,7 +57,7 @@
     CrossSec_filename = trim('./data/SigArrTe=')//trim(adjustl(Te))//&
                trim('tau=')//trim(adjustl(Ta))//trim('E1=')//&
                trim(adjustl(E1))//trim('E2=')//trim(adjustl(E2))//trim('.dat') !
-    Savefilename = trim('./spectrum/dataTe=')//trim(adjustl(Te))//&
+    Spentrum_filename = trim('./spectrum/dataTe=')//trim(adjustl(Te))//&
                       trim('tau=')//trim(adjustl(Ta))//trim('.dat') !
  
     call mimick_of_ph_Slab_BoundReflc( Total_Phot_Num, tau, T_bb, T_elec, &
