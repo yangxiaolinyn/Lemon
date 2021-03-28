@@ -71,12 +71,12 @@ OBJS =  $(OUT_DIR)/ConstantsUnit.o \
         $(OUT_DIR)/2SubroutineFunctions.o \
         $(OUT_DIR)/3BasicVariablesAndMethods.o \
         $(OUT_DIR)/4EmittersBlackBody.o \
+        $(OUT_DIR)/HXManalytical.o \
         $(OUT_DIR)/5CrossSection.o \
-        $(OUT_DIR)/9HXManalytical.o \
         $(OUT_DIR)/6SPhotonKNScatter.o \
-        $(OUT_DIR)/6ScatterDistance.o \
-        $(OUT_DIR)/7Estimationmodule.o \
-        $(OUT_DIR)/8photons.o \
+        $(OUT_DIR)/7ScatterDistance.o \
+        $(OUT_DIR)/8Estimationmodule.o \
+        $(OUT_DIR)/9photons.o \
         $(OUT_DIR)/10SubFunc_Diffuse_Reflection_phi.o \
         $(OUT_DIR)/main.o
  

@@ -1,6 +1,5 @@
       module ScatterPhoton_KN
-      use HXManalyticalresults
-      !use ScatterPhoton
+      use HXManalyticalresults 
       implicit none 
 
       type, public, extends(Hxmformulae) :: ScatPhoton_KN

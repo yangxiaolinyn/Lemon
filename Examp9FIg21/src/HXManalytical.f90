@@ -5,18 +5,18 @@
       
       type, public, extends(Photon_Emitter_BB) :: Hxmformulae
       contains 
-      procedure, public :: Hxm_alaytical_results  =>  Hxm_alaytical_results_Sub
+      procedure, public :: Hxm_analytical_results  =>  Hxm_analytical_results_Sub
       procedure, public :: Sigma_alpha => Sigma_alpha_Sub
 
       end type Hxmformulae
 !******************************************************************************************************* 
-      private :: Hxm_alaytical_results_Sub
+      private :: Hxm_analytical_results_Sub
       private :: Sigma_alpha_Sub
 !*******************************************************************************************************
 
       contains
 !*******************************************************************************************************
-      subroutine Hxm_alaytical_results_Sub( this, E0, E, mu2, g1Emu2 )
+      subroutine Hxm_analytical_results_Sub( this, E0, E, mu2, g1Emu2 )
 !*******************************************************************************************************
       implicit none
       class(Hxmformulae) :: this
@@ -79,7 +79,7 @@
       !write(*, *)'fss= ', cass, coschi0, sinchi0, b, sig2, sig1, mu2 , sinmu , sinmu2
       g1Emu2 = f_r / E0 * Imumu2
       return
-      end subroutine Hxm_alaytical_results_Sub
+      end subroutine Hxm_analytical_results_Sub
 
 
 !*******************************************************************************************************

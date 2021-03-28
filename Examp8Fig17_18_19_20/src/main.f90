@@ -77,7 +77,7 @@
     write(E2, "(ES10.3)")E2_scat
     CrossSec_filename = trim('./data/SigArrTe=')//trim(adjustl(Te))//&
                trim('tau=')//trim(adjustl(Ta))//trim('E1=')//&
-               trim(adjustl(E1))//trim('E2')//trim(adjustl(E2))//trim('.dat') !
+               trim(adjustl(E1))//trim('E2=')//trim(adjustl(E2))//trim('.dat') !
     Savefilename = trim('./spectrum/dataTe=')//trim(adjustl(Te))//&
                       trim('tau=')//trim(adjustl(Ta))//trim('.dat') !
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
