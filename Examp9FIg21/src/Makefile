@@ -97,14 +97,13 @@ $(OUT_DIR)/4EmittersBlackBody.o: $(OUT_DIR)/3BasicVariablesAndMethods.o
 #$(OUT_DIR)/Chandra_Diffuse_Reflection.o: $(OUT_DIR)/3BasicVariablesAndMethods.o
 #$(OUT_DIR)/6ScatterPhotons.o: $(OUT_DIR)/Chandra_Diffuse_Reflection.o
 $(OUT_DIR)/6SPhotonKNScatter.o: $(OUT_DIR)/3BasicVariablesAndMethods.o
-$(OUT_DIR)/6ScatterDistance.o: $(OUT_DIR)/6SPhotonKNScatter.o
-$(OUT_DIR)/7Photons.o: $(OUT_DIR)/6ScatterDistance.o $(OUT_DIR)/4EmittersBlackBody.o 
-$(OUT_DIR)/8SubFunc_ThomScat_Diffuse_Reflection.o: $(OUT_DIR)/6ScatterDistance.o \
-			 $(OUT_DIR)/7Photons.o 
-$(OUT_DIR)/8SubFunc_Diffuse_Reflection_phi.o: $(OUT_DIR)/6ScatterDistance.o \
-			 $(OUT_DIR)/7Photons.o
-$(OUT_DIR)/main.o: $(OUT_DIR)/8SubFunc_ThomScat_Diffuse_Reflection.o \
-                   $(OUT_DIR)/8SubFunc_Diffuse_Reflection_phi.o
+$(OUT_DIR)/7ScatterDistance.o: $(OUT_DIR)/6SPhotonKNScatter.o
+$(OUT_DIR)/9Photons.o: $(OUT_DIR)/7ScatterDistance.o $(OUT_DIR)/4EmittersBlackBody.o 
+#$(OUT_DIR)/8SubFunc_ThomScat_Diffuse_Reflection.o: $(OUT_DIR)/6ScatterDistance.o \
+#			 $(OUT_DIR)/7Photons.o 
+$(OUT_DIR)/10SubFunc_Diffuse_Reflection_phi.o: $(OUT_DIR)/7ScatterDistance.o \
+			 $(OUT_DIR)/9Photons.o
+$(OUT_DIR)/main.o: $(OUT_DIR)/10SubFunc_Diffuse_Reflection_phi.o
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  

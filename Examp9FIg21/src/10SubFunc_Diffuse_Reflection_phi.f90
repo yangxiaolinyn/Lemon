@@ -3,8 +3,7 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       USE constants
       USE RandUtils 
-      USE Photons_FlatSP
-      USE MPI
+      USE Photons_FlatSP 
       IMPLICIT NONE 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -49,6 +48,8 @@
         mydutyphot = Total_Phot_Num / np
     endif 
 
+    phot%myid = myid
+    phot%num_np = np 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CALL phot%Set_Initial_Values_For_Photon_Parameters( T_elec, &
                           T_bb, tau, E1_scat, E2_scat, mu_estis, CrossSec_filename )
@@ -78,10 +79,9 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
         Num_Photons = Num_Photons + 1 
         phot%scatter_times = 0   
-        CALL phot%Generate_A_Photon( Emitter )   
+        CALL phot%Generate_A_Photon( Emitter )    
         CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )    
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-        !CALL phot%FIRST_SCATTERING_OF_PHOT_ELCE( )  
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
         CALL phot%Photon_Electron_Scattering( )  
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
         Scattering_loop: Do
@@ -89,8 +89,7 @@
             phot%scatter_times = phot%scatter_times + 1 
             if( phot%scatter_times >= 2 )exit   
             CALL phot%Set_InI_Conditions_For_Next_Scattering( )    
-            !write(*,fmt="(' ', A8, 3ES15.5, I5)")'ssff222===', &
-            !          mec2 * 10.8D0, phot%w_ini, phot%scatter_times
+            !write(*, *)'times2 = ', phot%scatter_times
             CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )  
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
             CALL phot%Photon_Electron_Scattering( )  
@@ -135,11 +134,11 @@
           write(*,*)'There are', phot%effect_number, 'of total', Total_Phot_Num, 'photons',&
                         'arrive at the plate of observer!!'  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          open(unit= 9, file='./spectrum/Imu0.txt', status="replace")   
-          open(unit=10, file='./spectrum/Imu1.txt', status="replace")  
-          open(unit=11, file='./spectrum/Imu2.txt', status="replace")  
-          open(unit=12, file='./spectrum/Imu3.txt', status="replace") 
-          open(unit=13, file='./spectrum/Imu6.txt', status="replace")    
+          open(unit= 9, file='./spectrum/Imu0.dat', status="replace")   
+          open(unit=10, file='./spectrum/Imu1.dat', status="replace")  
+          open(unit=11, file='./spectrum/Imu2.dat', status="replace")  
+          open(unit=12, file='./spectrum/Imu3.dat', status="replace") 
+          open(unit=13, file='./spectrum/Imu6.dat', status="replace")    
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
           do j = 0, vL_sc_up
               write(unit = 9, fmt = 200)phot%PolArrImu(1: 8, 0,  j)  

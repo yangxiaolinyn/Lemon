@@ -1,5 +1,6 @@
       module Photons_FlatSP
       use EstimationsModule
+      USE MPI
       implicit none 
 
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -40,20 +41,16 @@
       class(Photon_FlatSP) :: this 
       real(mcp), intent(in) :: T_elec, T_bb, tau, E1_scat, E2_scat, mu_estis(1: 8)
       character*80, intent(inout) :: CrossSec_filename
-      integer :: i
+      integer :: i, ierr
       real(mcp) :: dy
 
 !~~~~~~~~~Emitte a photon and take its parameters as initial values~~~~~~~~~~~~  
       this%tau_max = tau  
       this%T_e = T_elec 
-      this%T_s = T_bb
-      !CALL Emitter%Set_Emin_Emax() 
-      !this%nu_low = Emitter%nu_low
-      !this%nu_up = Emitter%nu_up
-      !this%ln_nu1 = Emitter%ln_nu1
-      !this%ln_nu2 = Emitter%ln_nu2
+      this%T_s = T_bb 
       this%logE_low = DLOG10( E1_scat )
       this%logE_up = DLOG10( E2_scat )
+      this%dindexE = ( this%logE_up - this%logE_low )/dfloat(N_sigma)
  
       this%n_e = 1.D16
       this%tau_max = tau / sigma_T / this%n_e
@@ -61,7 +58,18 @@
       
       this%CrossSectFileName = CrossSec_filename
  
-      CALL this%Set_Cross_Section_3Te() 
+      !CALL this%Set_Cross_Section_3Te() 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      !this%CrossSectFileName = CrossSec_filename 
+
+      !CALL MPI_BARRIER( MPI_COMM_WORLD, ierr )
+      !if( this%myid == this%num_np-1 )then
+      !    CALL this%Set_Cross_Section()
+      !endif
+      !CALL MPI_BARRIER( MPI_COMM_WORLD, ierr )
+      !CALL MPI_BCAST( this%sigmaaTeE_FST, N_sigma + 1, MPI_DOUBLE_PRECISION, &
+      !                  this%num_np-1, MPI_COMM_WORLD, ierr )   
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       this%mu_esti(1: 8) = mu_estis(1: 8)
       this%smu_esti(1: 8) = dsqrt(one - this%mu_esti(1: 8)**2)
@@ -113,6 +121,7 @@
       class(Photon_FlatSP) :: this  
    
       this%z_tau = this%Get_scatter_distance_BoundReflec( )    
+      !write(*, *)'ffss=', this%z_tau 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       this%w_ini = this%w_ini * this%NormalA  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 

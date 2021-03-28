@@ -8,12 +8,8 @@
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 !* The BL coordinates of the photon at p, which determines the BL coordinates  *
 !* by YNOGK functions: r(p), mucos(p), phi(p), t(p), sigma(p)                  *
-!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  
-          real(mcp), dimension(0:N_sigma) :: sigmaaTeE_85
-          real(mcp), dimension(0:N_sigma) :: sigmaaTeE_230
-          real(mcp), dimension(0:N_sigma) :: sigmaaTeE_50
-          real(mcp), dimension(0:N_sigma) :: sigmaaTeE_400
-          real(mcp), dimension(0:N_sigma) :: sigmaaTeE
+!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   
+          real(mcp), dimension(0:N_sigma) :: sigmaaTeE_400 
           real(mcp), dimension(0:N_sigma) :: sigmaaTeE_FST
           integer(kind=8) :: effect_number
           integer(kind=8) :: scatter_times
@@ -53,7 +49,7 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
           procedure, public :: Get_scatter_distance_tau
-          procedure, public :: Set_Cross_Section_3Te   =>   Set_Cross_Section_3Te_sub
+          procedure, public :: Set_Cross_Section   =>   Set_Cross_Section_sub
           procedure, public :: sigma_fn
           procedure, public :: Get_scatter_distance_BoundReflec
           procedure, public :: sigma_KN
@@ -62,7 +58,7 @@
       end type Photon_With_ScatDistance_FlatSP
  
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      private :: Set_Cross_Section_3Te_sub
+      private :: Set_Cross_Section_sub
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
       contains 
@@ -72,8 +68,7 @@
       real(mcp) function Get_scatter_distance_BoundReflec( this )
 !*******************************************************************************************************
       implicit none
-      class(Photon_With_ScatDistance_FlatSP) :: this
-      !real(mcp), intent(in) :: T_e1 
+      class(Photon_With_ScatDistance_FlatSP) :: this 
       real(mcp) :: p, p1, p_max, func1_tau_max_value, rp, rtp  
       real(mcp) :: r1,r2, rprobability, r3, tempA 
       real(mcp) :: p_out1, Sigma_I, tau1, eta
@@ -93,19 +88,19 @@
 
       else if( this%Vector_of_Momentum_ini(3) < zero )then
 
-          p_out1 = - ( this%tau_max - this%z_tau ) / this%Vector_of_Momentum_ini(3) * this%sigma_KNs
+          !p_out1 = - ( this%tau_max - this%z_tau ) / this%Vector_of_Momentum_ini(3) * this%sigma_KNs
           this%InterSection_Cases = - 1
-          this%Optical_Depth_scatter = p_out1 
-          this%NormalA = one - dexp( - p_out1 )
-          r1 = ranmar()
-          !Get_scatter_distance_BoundReflec = - dlog( one - r1 * this%NormalA ) 
-          Get_scatter_distance_BoundReflec = this%z_tau - dlog( one - r1 * this%NormalA ) * &
+          !this%Optical_Depth_scatter = p_out1 
+          !this%NormalA = one - dexp( - p_out1 )
+          this%NormalA = one !- dexp( - p_out1 )
+          r1 = ranmar() 
+          Get_scatter_distance_BoundReflec = this%z_tau + dlog( one - r1 * this%NormalA ) * &
                                      this%Vector_of_Momentum_ini(3) / this%sigma_KNs
-          !write(*, *)'ffss=', this%z_tau, Get_scatter_distance_BoundReflec
+          !write(*, *)'ffss11111=', this%z_tau, Get_scatter_distance_BoundReflec
       else if( this%Vector_of_Momentum_ini(3) == zero )then
 
           p_out1 = 1.D100
-          this%InterSection_Cases = - 1
+          this%InterSection_Cases = - 2
           this%Optical_Depth_scatter = p_out1 
           this%NormalA = one 
           r1 = ranmar()
@@ -121,11 +116,11 @@
       endif 
   
       if( this%test_it )then
-          write(*,*)'sdf2==', r1, this%NormalA, Get_scatter_distance_BoundReflec, p_out1, Sigma_I 
+          write(*,*)'sdf2==', r1, this%NormalA, Get_scatter_distance_BoundReflec, p_out1 
       endif
       if(p_out1 < zero )then
-          write(*,*)'sdf12==',Get_scatter_distance_BoundReflec, this%InterSection_Cases, p_out1, this%z_ini,&
-           this%Vector_of_Momentum_ini(3), Sigma_I
+          write(*,*)'sdf12==',Get_scatter_distance_BoundReflec, this%InterSection_Cases, &
+             p_out1, this%z_tau, this%Vector_of_Momentum_ini(3), this%sigma_KNs
        endif 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       If (Get_scatter_distance_BoundReflec < zero) then
@@ -212,7 +207,7 @@
 !*******************************************************************************************************
       
 !*******************************************************************************************************
-      subroutine Set_Cross_Section_3Te_sub(this)
+      subroutine Set_Cross_Section_sub(this)
 !*******************************************************************************************************
       implicit none
       class(Photon_With_ScatDistance_FlatSP) :: this
@@ -258,7 +253,7 @@
           close(unit=19)
       endif
       close(unit=18)      
-      end subroutine Set_Cross_Section_3Te_sub
+      end subroutine Set_Cross_Section_sub
 
 !*******************************************************************************************************
       function sigma_fn(this, T_e, Ephoton, p)
@@ -293,20 +288,12 @@
       endif 
 
       Ei = 10**( this%logE_low + this%dindexE * i )
-      Ei1 = 10**( this%logE_low + this%dindexE * (i + 1) )
-      If ( T_e == 4.D0 * mec2 ) then  
-          sigma_fn = ( this%sigmaaTeE_400(i + 1) - this%sigmaaTeE_400(i) ) / &
-                 ( Ei1 - Ei ) * (Ep - Ei) + this%sigmaaTeE_400(i)  
-      Else If (T_e == 85.D-3) then 
-          sigma_fn = ( this%sigmaaTeE_85(i + 1) - this%sigmaaTeE_85(i) ) / &
-                 ( Ei1 - Ei ) * (Ep - Ei) + this%sigmaaTeE_85(i)  
-      Else If (T_e == 230.D-3) then 
-          sigma_fn = ( this%sigmaaTeE_230(i + 1) - this%sigmaaTeE_230(i) ) / &
-                 ( Ei1 - Ei ) * (Ep - Ei) + this%sigmaaTeE_230(i)  
-      Else If (T_e == this%T_e) then 
-          sigma_fn = ( this%sigmaaTeE_FST(i + 1) - this%sigmaaTeE_FST(i) ) / &
+      Ei1 = 10**( this%logE_low + this%dindexE * (i + 1) ) 
+ 
+
+      sigma_fn = ( this%sigmaaTeE_FST(i + 1) - this%sigmaaTeE_FST(i) ) / &
                  ( Ei1 - Ei ) * (Ep - Ei) + this%sigmaaTeE_FST(i)  
-      Endif
+ 
       !sigma_fn = ( sigmaaTeE(i + 1) - sigmaaTeE(i) ) / &
       !           ( Ei1 - Ei ) * (Ep - Ei) + sigmaaTeE(i)  
       end function sigma_fn

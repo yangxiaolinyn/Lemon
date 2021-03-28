@@ -11,12 +11,10 @@
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
     call InitRandom() 
-    filenameH3Array = './data/H3Array.dat'
-    !CrossSec_filename = './data/SigmaArrayT_e=56kev.txt'  
+    filenameH3Array = './data/H3Array.dat'  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     tau = 1.05D100 
-    T_bb = 10.D0 * 1.D-6     ! In unit of MeV
-    T_elec = 352.D0 * 1.D-3    
+    !T_bb = 10.D0 * 1.D-6     ! In unit of MeV    
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     E1_scat = 1.D-7 ! In unit of MeV. E1_scat, E2_scat define the energy range 
     E2_scat = 1.D1  ! of scattering. The total scattering coefficient: Sigma_a(T_e, E_p) also
@@ -41,7 +39,7 @@
     !Savefilename = trim('./spectrum/dataTe=')//trim(adjustl(Te))//trim('.dat')
     Hxm_analyticResult = './spectrum/HxmImu1.dat'
 
-    Total_Phot_Num = 1.D9 
+    Total_Phot_Num = 2.D8
     call mimick_of_ph_Slab_BoundReflc( Total_Phot_Num, tau, T_bb, &
                     T_elec, E1_scat, E2_scat, mu_estis, CrossSec_filename, &
                     Hxm_analyticResult )
