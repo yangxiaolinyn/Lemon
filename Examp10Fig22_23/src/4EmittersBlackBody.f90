@@ -1,11 +1,13 @@
       module PhotonEmitterBB
       use Basic_Variables_And_Methods
       implicit none 
+      real(mcp), parameter :: nu2MeV = h_ev * 1.D-6
 
       type, public, extends(Basic_Variables_And_Methods_Of_Particle) :: Photon_Emitter_BB
           real(mcp) :: R_in
           real(mcp) :: R_out
           real(mcp) :: w_ini_em
+          real(mcp) :: w_ini0
           real(mcp) :: T_s
           real(mcp) :: max_nu
           real(mcp) :: E_low1
@@ -168,22 +170,25 @@
  
       index_nu = this%y_em1 + this%dy_em * ranmar()
  
-      v = 10.D0 **( index_nu ) * h_ev * 1.D-6
-      this%Phot4k_CtrCF(1) = v 
+      v = 10.D0 **( index_nu ) * nu2MeV !h_ev * 1.D-6
+      this%Phot4k_CtrCF_ini(1) = v 
+      this%E_ini = v
       cos_theta = ranmar()
       sin_theta = dsqrt( one - cos_theta**2 )
       phi = twopi * ranmar()
       sin_phi = dsin( phi )
       cos_phi = dcos( phi )
 
-      this%Vector_of_Momentum(1) = sin_theta * cos_phi
-      this%Vector_of_Momentum(2) = sin_theta * sin_phi
-      this%Vector_of_Momentum(3) = cos_theta 
-      this%Phot4k_CtrCF(2: 4) = this%Phot4k_CtrCF(1) * this%Vector_of_Momentum(1:3)
+      this%Vector_of_Momentum_ini(1) = sin_theta * cos_phi
+      this%Vector_of_Momentum_ini(2) = sin_theta * sin_phi
+      this%Vector_of_Momentum_ini(3) = cos_theta 
+      this%Phot4k_CtrCF_ini(2: 4) = this%Phot4k_CtrCF_ini(1) * this%Vector_of_Momentum_ini(1:3)
 
       this%Phot4k_CovCF = this%Phot4k_CtrCF 
 
       this%w_ini_em = ( v / this%T_s )**3 / ( dexp( v / this%T_s ) - one ) 
+      this%w_ini = this%w_ini_em 
+      this%w_ini0 = this%w_ini_em
 
       this%z_tau = this%z_max 
 

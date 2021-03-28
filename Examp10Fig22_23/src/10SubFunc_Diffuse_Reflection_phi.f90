@@ -18,15 +18,16 @@
     implicit none 
     real(mcp), intent(in) :: tau, T_bb, T_elec, E1_scat, E2_scat, y_obs1, &
                       y_obs2, mu_esti(1: 4), sin_esti(1: 4), Terminate_Tolerence
-      integer, intent(in) :: Num_mu_esti
+    integer, intent(in) :: Num_mu_esti
     integer(kind = 8), intent(in) :: Total_Phot_Num 
     character*80, intent(inout) :: CrossSec_filename, Spentrum_filename
     real(mcp) :: E, E_low, E_up  
     integer(kind = 8) :: Num_Photons 
-    type(Photon_Emitter_BB) :: Emitter
+    !type(Photon_Emitter_BB) :: Emitter
     type(Photon_FlatSP) :: phot
-    type(ScatPhoton_KN) :: sphot
-    integer :: send_num, recv_num, send_tag, RECV_SOURCE, status(MPI_STATUS_SIZE), send_num2, recv_num2, &
+    !type(ScatPhoton_KN) :: sphot
+    integer :: send_num, recv_num, send_tag, RECV_SOURCE, &
+               status(MPI_STATUS_SIZE), send_num2, recv_num2, &
                times_scat
     real(mcp) :: IQUV_Recv(1: 4, 0: 6, 1: Num_mu, 0: vL_sc_up)
     real(mcp) :: aa, bb, w1, x
@@ -54,13 +55,13 @@
 
     phot%myid = myid
     phot%num_np = np
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     CALL phot%Set_Initial_Values_For_Photon_Parameters( T_elec, T_bb, tau, &
                       E1_scat, E2_scat, y_obs1, y_obs2, mu_esti, sin_esti, &
                       Num_mu_esti, CrossSec_filename )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     Num_Photons = 0   
-    sphot%mu_estimat = phot%mu_estimat
+    !sphot%mu_estimat = phot%mu_estimat
   
     w100(0) = one 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -70,43 +71,33 @@
         phot%scatter_times = 0  
         times_scat = 0 
 
-        CALL phot%Generate_A_Photon( Emitter )    
-        CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p()
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
-        !CALL phot%FIRST_SCATTERING_OF_PHOT_ELCE( sphot )
-        CALL phot%Photon_Electron_Scattering( sphot )
+        CALL phot%Generate_A_Photon( )    
+        CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+        CALL phot%Photon_Electron_Scattering( )
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Scattering_loop: Do
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
             phot%scatter_times = phot%scatter_times + 1  
-            CALL phot%Set_InI_Conditions_For_Next_Scattering( sphot )  
-            !write(*,fmt=*)'ssff222===', phot%Phot4k_CtrCF_ini(1)
-            CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p() 
-            !if( phot%Phot4k_CtrCF_ini(1) > mec2 * 1.D0)exit 
-            if( phot%w_ini / phot%w_ini0 <= Terminate_Tolerence )exit
-            !if(phot%Vector_Stokes4_CF(1) < 1.D-30)exit
-            !write(*,fmt=*)'ssff===', phot%w_ini / phot%w_ini0, phot%Vector_Stokes4_CF(1)
+            CALL phot%Set_InI_Conditions_For_Next_Scattering( )   
+            CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )  
+            if( phot%w_ini / phot%w_ini0 <= Terminate_Tolerence )exit 
+            !write(*,fmt=*)'ssff===', phot%w_ini / phot%w_ini0 
             !phot%scatter_times, times_scat, phot%w_ini, phot%w_ini0
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
-            !if( phot%scatter_times >= 20 )exit  
-            !if( phot%Psi_I <= 1.D-1 )exit  
+            !if( phot%scatter_times >= 20 )exit   
             !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if( phot%z_tau < phot%z_max )then
-                CALL phot%Photon_Electron_Scattering( sphot )
+                CALL phot%Photon_Electron_Scattering( )
                 if( isnan( phot%Vector_Stokes4_CF(1) ) )then
-                    write(*, *)'mmsf1=', phot%scatter_times, phot%Vector_Stokes4_CF, phot%z_tau, phot%z_max
+                    write(*, *)'mmsf1=', phot%scatter_times, &
+                                phot%Vector_Stokes4_CF, phot%z_tau, phot%z_max
                     stop
-                endif
-                !CALL phot%Photon_Electron_Scattering( sphot ) 
+                endif 
                 !write(*,*)'ssff111===',  phot%scatter_times
-            else
-                !times_scat = times_scat + 1
-                !if(times_scat == 2)exit
-                !write(*,fmt=*)'ssff111===',  phot%scatter_times, phot%Phot4k_CtrCF_ini(1),  phot%w_ini
-                phot%z_tau = phot%z_max
-                !phot%scatter_times = -1
-                !CALL Photon_Reflection_From_BoundaryPlane( phot, sphot )
-                CALL phot%IQUV_Reflection_From_BoundaryPlane_Phi( sphot ) 
+            else 
+                phot%z_tau = phot%z_max  
+                CALL phot%IQUV_Reflection_From_BoundaryPlane_Phi( )  
                 !write(*,*)'ssff222===',  phot%scatter_times, sphot%Vector_Stokes4_CF_Scat
                 if( isnan( phot%Vector_Stokes4_CF(1) ) )then
                     write(*, *)'mmsf2=', phot%scatter_times, phot%Vector_Stokes4_CF
@@ -115,8 +106,7 @@
             endif 
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         END DO Scattering_loop
-        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        !write(*,*)'************************************* *****',phot%scatter_times, phot%medium_case
+        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
   
        If( myid == np-1 )then
         If ( mod(Num_Photons, 50000)==0 ) then 

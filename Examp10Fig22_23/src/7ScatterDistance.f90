@@ -18,7 +18,6 @@
           integer(kind=8) :: scatter_times
           logical :: mymethod
           real(mcp) :: NormalA
-          real(mcp) :: w_ini0
           real(mcp) :: n_e_in
           real(mcp) :: n_e_out
           real(mcp) :: n_e

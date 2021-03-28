@@ -125,49 +125,36 @@
       subroutine get_J_emissivity_for_estimation_Phiarr_Sub( this )
 !*******************************************************************************************************
       implicit none
-      class(Photon_ForEstimation) :: this
-      !integer, intent(in) :: mu_i 
+      class(Photon_ForEstimation) :: this 
       integer :: i_E, mu_i, i_phi
       real(mcp) :: vLv, v_esti, J_esti, Sigam_a, nu
-       
-
-      !v_esti = this%E_array_esti(i_E)
+        
       nu = this%y_em1 + this%dy_em * ranmar()
-      v_esti = 10.D0**( nu ) * h_ev * 1.D-6
+      v_esti = 10.D0**( nu ) * nu2MeV !h_ev * 1.D-6
       Sigam_a = this%Sigma_fn(v_esti) * this%n_e1
 
       do mu_i = 1, Num_mu
-        do i_phi = 0, Num_phi - 1
-              !v_esti = this%E_array_esti(i_E)
-              !nu = this%ln_nu1 + ( this%ln_nu2 - this%ln_nu1 ) * ranmar()
-              !v_esti = 10.D0**( nu ) * h_ev * 1.D-6
-              !Sigam_a = this%Sigma_fn(v_esti) * this%n_e1
-
-
+        do i_phi = 0, Num_phi - 1 
+ 
               if(this%mu_estimates(mu_i) > zero)then
                   vLv = dexp( - this%z_tau * Sigam_a / this%mu_estimates(mu_i) ) / &
-                           this%mu_estimates(mu_i)! * Sigam_a
+                           this%mu_estimates(mu_i) 
               else
                   vLv = - dexp( (this%z_max - this%z_tau) * Sigam_a / this%mu_estimates(mu_i) ) / &
-                           this%mu_estimates(mu_i)! * Sigam_a
+                           this%mu_estimates(mu_i) 
               endif
-
-              !write(*, *)'ffs=', mu_i, this%mu_estimates(mu_i), this%z_tau * Sigam_a / this%mu_estimates(mu_i)
-              !J_esti = ( v_esti / this%T_s )**3 / ( dexp( v_esti / this%T_s ) - one ) * &
-              ! !    ( this%mu_estimates(mu_i) + two * this%mu_estimates(mu_i)**2 ) * &
-               !      this%P_mu_normal! * this%P_nu_normal
-
+ 
               J_esti = ( v_esti / this%T_s )**3 / ( dexp( v_esti / this%T_s ) - one ) * &
-                        this%P_mu_normal! * this%P_nu_normal
+                        this%P_mu_normal 
     
               call this%Get_Observed_Energy_Bin_index_i( v_esti, i_E )
  
               if( i_E > vL_sc_up .or. i_E < 0 )cycle
 
               this%PolArrIQUV(1, 0, mu_i, i_E) = this%PolArrIQUV(1, 0, mu_i, i_E) + &
-                               w100(i_phi) * J_esti * vLv! * v_esti
+                               w100(i_phi) * J_esti * vLv 
               this%PolArrIQUV(1, 6, mu_i, i_E) = this%PolArrIQUV(1, 6, mu_i, i_E) + &
-                               w100(i_phi) * J_esti * vLv! * v_esti 
+                               w100(i_phi) * J_esti * vLv 
           enddo 
       enddo 
       return
@@ -924,12 +911,12 @@
 
 
 !************************************************************************************
-      SUBROUTINE IQUV_Reflection_From_BoundaryPlane_Phi_Sub( this, sphot )
+      SUBROUTINE IQUV_Reflection_From_BoundaryPlane_Phi_Sub( this )
 !************************************************************************************
       IMPLICIT NONE
       class(Photon_ForEstimation) :: this 
       !TYPE(Photon_Estimation), INTENT(INOUT) :: phot
-      TYPE(ScatPhoton_KN), INTENT(INOUT) :: sphot
+      !TYPE(ScatPhoton_KN), INTENT(INOUT) :: sphot
       REAL(mcp) :: vLv, I_reflec, Q_reflec, U_reflec, V_reflec, f4(1: 3), &
                 fx, fy, Qpsi, Upsi, Axis_x(1: 3), Axis_y(1: 3), Axis_z(1: 3), &
                 Flru(1: 3), reflected_Ilru(1: 3), mu, mu0, phi, phi0, sinmu, &
@@ -1044,8 +1031,8 @@
           call this%Vector_Cross_Product( Axis_y, Axis_z, Axis_x )
   
           !this%w_ini = ( reflected_Ilru(1) + reflected_Ilru(2) )! * mu0 * mu / ( mu0 + mu )
-          sphot%f4_scat_CF(1) = zero
-          sphot%f4_scat_CF(2: 4) = Axis_x 
+          this%f4_scat_CF(1) = zero
+          this%f4_scat_CF(2: 4) = Axis_x 
 
               call this%Get_Observed_Stokes_Parameters( ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -1091,24 +1078,28 @@
       !reflected_Ilru = reflected_Ilru / four / mu
       !reflected_Ilru = reflected_Ilru * mu0
  
-      sphot%Vector_Stokes4_ECF_scat(1) = reflected_Ilru(1) + reflected_Ilru(2)
-      sphot%Vector_Stokes4_ECF_scat(2) = reflected_Ilru(1) - reflected_Ilru(2)
-      sphot%Vector_Stokes4_ECF_scat(3) = reflected_Ilru(3)
-      !sphot%Vector_Stokes4_ECF_scat = sphot%Vector_Stokes4_ECF_scat * twopi
-      !sphot%delta_pd_scat = dsqrt( sphot%Q_sp_scat**2 + sphot%U_sp_scat**2 ) / &
+      this%Vector_Stokes4_ECF_scat(1) = reflected_Ilru(1) + reflected_Ilru(2)
+      this%Vector_Stokes4_ECF_scat(2) = reflected_Ilru(1) - reflected_Ilru(2)
+      this%Vector_Stokes4_ECF_scat(3) = reflected_Ilru(3)
+      !this%Vector_Stokes4_ECF_scat = this%Vector_Stokes4_ECF_scat * twopi
+      !this%delta_pd_scat = dsqrt( this%Q_sp_scat**2 + this%U_sp_scat**2 ) / &
       !                        ( reflected_Ilru(1) + reflected_Ilru(2) )
                               
-      !if( isnan(sphot%delta_pd_scat) )then
-          ! write(*, *)'ss=f==,',  sphot%Vector_Stokes4_ECF_scat, this%w_ini
+      !if( isnan(this%delta_pd_scat) )then
+          ! write(*, *)'ss=f==,',  this%Vector_Stokes4_ECF_scat, this%w_ini
       !endif                        
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      sphot%Scattered_Phot4k_CF(1) = this%Phot4k_CtrCF_ini(1) ! / &
+      this%Scattered_Phot4k_CF(1) = this%Phot4k_CtrCF_ini(1) ! / &
                 !( one + three * this%Phot4k_CtrCF_ini(1) / mec2) !Schnittman ApJ 2013, eq (54).
-      sphot%Scattered_Phot4k_CF(2) = sphot%Scattered_Phot4k_CF(1) * sinmu * DCOS(phi)
-      sphot%Scattered_Phot4k_CF(3) = sphot%Scattered_Phot4k_CF(1) * sinmu * DSIN(phi)
-      sphot%Scattered_Phot4k_CF(4) = sphot%Scattered_Phot4k_CF(1) * mu
+      Axis_z(1) = sinmu * DCOS(phi)
+      Axis_z(2) = sinmu * DSIN(phi)
+      Axis_z(3) = mu
+      this%Scattered_Phot4k_CF(2: 4) = this%Scattered_Phot4k_CF(1) * Axis_z
+      !this%Scattered_Phot4k_CF(2) = this%Scattered_Phot4k_CF(1) * sinmu * DCOS(phi)
+      !this%Scattered_Phot4k_CF(3) = this%Scattered_Phot4k_CF(1) * sinmu * DSIN(phi)
+      !this%Scattered_Phot4k_CF(4) = this%Scattered_Phot4k_CF(1) * mu
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      Axis_z = sphot%Scattered_Phot4k_CF(2: 4) / sphot%Scattered_Phot4k_CF(1)
+      !Axis_z = this%Scattered_Phot4k_CF(2: 4) / this%Scattered_Phot4k_CF(1)
 
       Axis_x(1) = zero
       Axis_x(2) = zero
@@ -1119,11 +1110,11 @@
       call this%Vector_Cross_Product( Axis_y, Axis_z, Axis_x )
   
       !this%w_ini = ( reflected_Ilru(1) + reflected_Ilru(2) )! * mu0 * mu / ( mu0 + mu )
-      sphot%f4_scat_CF(1) = zero
-      sphot%f4_scat_CF(2: 4) = Axis_x 
+      this%f4_scat_CF(1) = zero
+      this%f4_scat_CF(2: 4) = Axis_x 
       !this%w_ini = this%w_ini * dexp( - this%Optical_Depth_scatter )
       !this%w_ini = ( reflected_Ilru(1) + reflected_Ilru(2) )! * mu0 * mu / ( mu0 + mu )
-      !sphot%r_one_hvlmec2_one_cosE = zero
+      !this%r_one_hvlmec2_one_cosE = zero
        !write(*, *)'ffs=', reflected_Ilru(1),  reflected_Ilru(2), this%Vector_Stokes4_ECF_scat(1)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  

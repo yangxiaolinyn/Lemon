@@ -35,7 +35,7 @@
         CrossSec_filename = './data/SigmaArrayT_e=352kev.txt' 
         Spentrum_filename = './spectrum/IQUV352_8.txt'
         Total_Phot_Num = 1.0D9
-        mu_esti(1) = 0.1D0  
+        mu_esti(1) = 0.11D0  
     elseif(methods_cases == 2)then
         tau = 0.5D0 
         T_bb = 10.D0 * 1.D-6     ! In unit of MeV
@@ -43,7 +43,7 @@
         CrossSec_filename = './data/SigmaArrayT_e=56kev1.txt' 
         Spentrum_filename = './spectrum/IQUV56_8.txt'
         Total_Phot_Num = 5.0D8
-        mu_esti(1) = 0.1D0  
+        mu_esti(1) = 0.5D0  
     endif
     Num_mu_esti = 1
     sin_esti = dsqrt( one - mu_esti**2 )
