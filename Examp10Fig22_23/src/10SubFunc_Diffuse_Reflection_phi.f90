@@ -130,6 +130,7 @@
           call MPI_SEND( phot%PolArrIQUV, send_num, MPI_DOUBLE_PRECISION, np-1, &
                         send_tag, MPI_COMM_WORLD, ierr)
           write(*, *)'Processor ', myid, ' has send PolarArrayI to Processor:', np-1   
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       else  
           if (np-2 >= 0) then
               do RECV_SOURCE = 0, np-2  

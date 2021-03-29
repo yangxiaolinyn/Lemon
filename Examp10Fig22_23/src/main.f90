@@ -32,12 +32,12 @@
         tau = 0.05D0 
         T_bb = 10.D0 * 1.D-6    ! In unit of MeV
         T_elec = 352.D0 * 1.D-3 ! In unit of MeV 
-        Total_Phot_Num = 1.0D8
+        Total_Phot_Num = 1.0D5
     elseif(methods_cases == 2)then
         tau = 0.5D0 
         T_bb = 10.D0 * 1.D-6     ! In unit of MeV
         T_elec = 56.D0 * 1.D-3   ! In unit of MeV 
-        Total_Phot_Num = 5.0D8
+        Total_Phot_Num = 1.0D8
     endif
     Num_mu_esti = 2
     mu_esti(1) = 0.11D0 

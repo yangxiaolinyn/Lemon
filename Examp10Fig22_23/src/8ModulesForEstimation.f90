@@ -154,9 +154,9 @@
               if( i_E > vL_sc_up .or. i_E < 0 )cycle
 
               this%PolArrIQUV(1, 0, mu_i, i_E) = this%PolArrIQUV(1, 0, mu_i, i_E) + &
-                               w100(i_phi) * J_esti * vLv 
+                               J_esti * vLv 
               this%PolArrIQUV(1, 6, mu_i, i_E) = this%PolArrIQUV(1, 6, mu_i, i_E) + &
-                               w100(i_phi) * J_esti * vLv 
+                               J_esti * vLv 
           enddo 
       enddo 
       return
@@ -455,27 +455,28 @@
           !write(*, fmt=*)'ffssssff=', this%Vector_Stokes4_ECF_scat
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
           this%PolArrIQUV(1, 6, mu_i, i_E) = this%PolArrIQUV(1, 6, mu_i, i_E) + &
-                                            w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(1)
+                                             vLv * this%Vector_Stokes4_ECF_scat(1)
 
           if(scat_times <= 4)then
               this%PolArrIQUV(1, scat_times, mu_i, i_E) = this%PolArrIQUV(1, scat_times, mu_i, i_E) + &
-                                            w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(1)
+                                             vLv * this%Vector_Stokes4_ECF_scat(1)
           else
               this%PolArrIQUV(1, 5, mu_i, i_E) = this%PolArrIQUV(1, 5, mu_i, i_E) + &
-                                            w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(1)
+                                             vLv * this%Vector_Stokes4_ECF_scat(1)
           endif 
 
+          !write(*, fmt=*)'ffssssff=', this%PolArrIQUV(1, 6, mu_i, i_E), 
           !if( this%delta_pd_scat /= zero )then 
               !call this%Get_PolaVector_And_IQU_InCF_for_Estimation(Cos_Theta, Sin_Theta, &
               !                            sinphi, cosphi, Qpsi, Upsi)
               call this%Get_Observed_Stokes_Parameters( ) 
 
               this%PolArrIQUV(2, 6, mu_i, i_E) = this%PolArrIQUV(2, 6, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(2)
+                                 vLv * this%Vector_Stokes4_ECF_scat(2)
               this%PolArrIQUV(3, 6, mu_i, i_E) = this%PolArrIQUV(3, 6, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(3) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(3) 
               this%PolArrIQUV(4, 6, mu_i, i_E) = this%PolArrIQUV(4, 6, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(4) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(4) 
             !write(*, *)'fs=', this%PolArrIQUV(4, 6, mu_i, i_E), vLv, F33, this%Vector_Stokes4_ECF(4) 
           !endif  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -1019,15 +1020,15 @@
           scat_times = this%scatter_times ! + 1
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
           this%PolArrIQUV(1, 6, mu_i, i_E) = this%PolArrIQUV(1, 6, mu_i, i_E) + &
-                                            w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(1)
+                                           vLv * this%Vector_Stokes4_ECF_scat(1)
 
           if(scat_times <= 4)then
-              !write(*, *)'ffs=', scat_times, i_E, w100(i_phi), vLv, this%Vector_Stokes4_ECF_scat(1)
+              !write(*, *)'ffs=', scat_times, i_E,  vLv, this%Vector_Stokes4_ECF_scat(1)
               this%PolArrIQUV(1, scat_times, mu_i, i_E) = this%PolArrIQUV(1, scat_times, mu_i, i_E) + &
-                                            w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(1)
+                                           vLv * this%Vector_Stokes4_ECF_scat(1)
           else
               this%PolArrIQUV(1, 5, mu_i, i_E) = this%PolArrIQUV(1, 5, mu_i, i_E) + &
-                                            w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(1)
+                                           vLv * this%Vector_Stokes4_ECF_scat(1)
           endif 
  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -1051,11 +1052,11 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
               this%PolArrIQUV(2, 6, mu_i, i_E) = this%PolArrIQUV(2, 6, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(2)
+                                 vLv * this%Vector_Stokes4_ECF_scat(2)
               this%PolArrIQUV(3, 6, mu_i, i_E) = this%PolArrIQUV(3, 6, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(3) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(3) 
               this%PolArrIQUV(4, 6, mu_i, i_E) = this%PolArrIQUV(4, 6, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(4) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(4) 
 
 
               !write(*, *)'ffs=', scat_times
@@ -1063,19 +1064,19 @@
           if(scat_times <= 4)then
 
               this%PolArrIQUV(2, scat_times, mu_i, i_E) = this%PolArrIQUV(2, scat_times, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(2)
+                                 vLv * this%Vector_Stokes4_ECF_scat(2)
               this%PolArrIQUV(3, scat_times, mu_i, i_E) = this%PolArrIQUV(3, scat_times, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(3) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(3) 
               this%PolArrIQUV(4, scat_times, mu_i, i_E) = this%PolArrIQUV(4, scat_times, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(4) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(4) 
            else
 
               this%PolArrIQUV(2, 5, mu_i, i_E) = this%PolArrIQUV(2, 5, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(2)
+                                 vLv * this%Vector_Stokes4_ECF_scat(2)
               this%PolArrIQUV(3, 5, mu_i, i_E) = this%PolArrIQUV(3, 5, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(3) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(3) 
               this%PolArrIQUV(4, 5, mu_i, i_E) = this%PolArrIQUV(4, 5, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(4) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(4) 
            endif
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
         enddo
@@ -1273,15 +1274,15 @@
           scat_times = this%scatter_times ! + 1
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
           this%PolArrIQUV(1, 6, mu_i, i_E) = this%PolArrIQUV(1, 6, mu_i, i_E) + &
-                                            w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(1)
+                                            vLv * this%Vector_Stokes4_ECF_scat(1)
 
           if(scat_times <= 4)then
-              !write(*, *)'ffs=', scat_times, i_E, w100(i_phi), vLv, this%Vector_Stokes4_ECF_scat(1)
+              !write(*, *)'ffs=', scat_times, i_E, vLv, this%Vector_Stokes4_ECF_scat(1)
               this%PolArrIQUV(1, scat_times, mu_i, i_E) = this%PolArrIQUV(1, scat_times, mu_i, i_E) + &
-                                            w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(1)
+                                           vLv * this%Vector_Stokes4_ECF_scat(1)
           else
               this%PolArrIQUV(1, 5, mu_i, i_E) = this%PolArrIQUV(1, 5, mu_i, i_E) + &
-                                            w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(1)
+                                           vLv * this%Vector_Stokes4_ECF_scat(1)
           endif 
  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -1305,11 +1306,11 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
               this%PolArrIQUV(2, 6, mu_i, i_E) = this%PolArrIQUV(2, 6, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(2)
+                                 vLv * this%Vector_Stokes4_ECF_scat(2)
               this%PolArrIQUV(3, 6, mu_i, i_E) = this%PolArrIQUV(3, 6, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(3) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(3) 
               this%PolArrIQUV(4, 6, mu_i, i_E) = this%PolArrIQUV(4, 6, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(4) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(4) 
 
 
               !write(*, *)'ffs=', scat_times
@@ -1317,19 +1318,19 @@
           if(scat_times <= 4)then
 
               this%PolArrIQUV(2, scat_times, mu_i, i_E) = this%PolArrIQUV(2, scat_times, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(2)
+                                 vLv * this%Vector_Stokes4_ECF_scat(2)
               this%PolArrIQUV(3, scat_times, mu_i, i_E) = this%PolArrIQUV(3, scat_times, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(3) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(3) 
               this%PolArrIQUV(4, scat_times, mu_i, i_E) = this%PolArrIQUV(4, scat_times, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(4) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(4) 
            else
 
               this%PolArrIQUV(2, 5, mu_i, i_E) = this%PolArrIQUV(2, 5, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(2)
+                                 vLv * this%Vector_Stokes4_ECF_scat(2)
               this%PolArrIQUV(3, 5, mu_i, i_E) = this%PolArrIQUV(3, 5, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(3) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(3) 
               this%PolArrIQUV(4, 5, mu_i, i_E) = this%PolArrIQUV(4, 5, mu_i, i_E) + &
-                                 w100(i_phi) * vLv * this%Vector_Stokes4_ECF_scat(4) 
+                                 vLv * this%Vector_Stokes4_ECF_scat(4) 
            endif
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
         enddo

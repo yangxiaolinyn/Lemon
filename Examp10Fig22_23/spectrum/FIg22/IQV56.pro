@@ -14,8 +14,8 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
       ;rfiles, infile = './IQUV_1.txt',I0, I1, I2, I3, ns
       ;rdfile, infile = './IQUV352.txt', mu = 3, times = 4, IQUV_1, ns
-      rdfile, infile = './dataTe=3.520E-01tau=5.000E-02.dat', n_iquv = 4, $
-                       mu = 2, num_scatter = 7, IQUV_1, n
+      rdfile, infile = './dataTe=5.600E-02tau=5.000E-01.dat', n_iquv = 4, $
+                          mu = 2, num_scatter = 7, IQUV_1, n
       ;rdfile, infile = './IQUV_1.txt', mu = 3, times = 4, IQUV_1, ns
       ;rfiles, infile = './I_Theta=05_2.txt',I10, I11, I12, I13, ns
       ;rfiles, infile = './I_Theta=10_1.txt',I20, I21, I22, I23, ns
@@ -51,7 +51,7 @@
       l=16 & xxss=l*(ratio) & yyss=l
       ;xoff=(LL-xxss)/2.,yoff=(3*LL/2.-yyss)/2.,
       !p.font = 0
-      device,filename='./fig352_3.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
+      device,filename='./fig56_1.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
       /color,xoff=(2-xxss)/2.0,yoff=(2-yyss)/2.,$
       set_font='Times-Roman';, /tt_font
 
@@ -59,9 +59,9 @@
       RRR=bytscl(findgen(256))
       GGG=bytscl(findgen(256))
       BBB=bytscl(findgen(256))
-      RRR[243:255]=[0,255,0  ,0  ,0  ,255,255,200,0  ,0  ,200,200,0  ]
-      GGG[243:255]=[0,0  ,255,0  ,255,0  ,255,0  ,200,0  ,200,0  ,200]
-      BBB[243:255]=[0,0  ,0  ,255,255,255,0  ,0  ,0  ,200,0  ,200,200]
+      RRR[242:255]=[255, 0,255,0  ,0  ,0  ,255,255,200,0  ,0  ,200,200,0  ]
+      GGG[242:255]=[255, 0,0  ,255,0  ,255,0  ,255,0  ,200,0  ,200,0  ,200]
+      BBB[242:255]=[255, 0,0  ,0  ,255,255,255,0  ,0  ,0  ,200,0  ,200,200]
       ;245=green,243=black,244=red,251=yellow,246=blue,253=cyan,254=magenta,255=white
       TVLCT,RRR,GGG,BBB
       blue = 246
@@ -71,6 +71,7 @@
       yellow = 247
       cyan = 253
       magenta = 254
+      white = 242
  
       xgap1=0.1
       xgap2=0.01
@@ -128,14 +129,16 @@
               yup  = 1
           endif   
           IF (i EQ 1) and (j EQ 0) THEN BEGIN    
-              n_ytick = 4
               ylow = -0.05
-              yup  =0.15
+              yup  =0.25
+              xtks = 6
+              xtksm = 5
           endif    
           IF (i EQ 1) and (j EQ 1) THEN BEGIN    
               ylow = -0.05
-              yup  =0.15
-              n_ytick = 4
+              yup  =0.25
+              xtks = 6
+              xtksm = 5
           endif    
    
           posup=[xl_arr[j], yd_arr[n_y-1-i] , xr_arr[j], yu_arr[n_y-1-i] ] 
@@ -145,7 +148,7 @@
           IF (i EQ 0) and (j EQ 0) THEN BEGIN 
               ;ylow = -5
               ;yup  = 1
-              axis,yaxis=0,ytitle=textoidl('Log(\nuF_\nu)'),$
+              axis,yaxis=0,ytitle=textoidl('log(\nuF_\nu)'),$
                         yticks=(yup-ylow),yminor=5, $
                 yrange=[ylow,yup],ystyle=1, charsize=1.1
               axis,yaxis=1,ytickname=replicate(' ',12),yticks=(yup-ylow),yminor=5
@@ -160,22 +163,22 @@
               max_I =  max( 10.^2 ) 
               max_I2 =  max( 2. ) 
               i_thi = 3
-              oplot, lg10E, alog10( IQUV_1[0, i_mu, 6, *] / max( IQUV_1[0, i_mu, 6, *] ) ), $
-                        thick=i_thi, color=blue, linestyle=6;,psym=-4   
+              oplot, lg10E, alog10( IQUV_1[0, 0, 6, *] / max( IQUV_1[0, 0, 6, *] ) ), $
+                        thick=i_thi, color=blue, linestyle=6;,psym=-4  
 
-              oplot, lg10E, alog10( IQUV_1[0, i_mu, 0, *] / max( IQUV_1[0, i_mu, 6, *] ) ), $
+              oplot, lg10E, alog10( IQUV_1[0, 0, 0, *] / max( IQUV_1[0, 0, 6, *] ) ), $
                         thick=i_thi, color=red, linestyle=6;,psym=-4 
 
-              oplot, lg10E, alog10( IQUV_1[0, i_mu, 1, *] / max( IQUV_1[0, i_mu, 6, *] ) ), $
+              oplot, lg10E, alog10( IQUV_1[0, 0, 1, *] / max( IQUV_1[0, 0, 6, *] ) ), $
                         thick=i_thi, color=green, linestyle=1;,psym=-4  
 
-              oplot, lg10E, alog10( IQUV_1[0, i_mu, 2, *] / max( IQUV_1[0, i_mu, 6, *] ) ), $
+              oplot, lg10E, alog10( IQUV_1[0, 0, 2, *] / max( IQUV_1[0, 0, 6, *] ) ), $
                         thick=i_thi, color=cyan, linestyle=2;,psym=-4 
 
-              oplot, lg10E, alog10( IQUV_1[0, i_mu, 3, *] / max( IQUV_1[0, i_mu, 6, *] ) ), $
+              oplot, lg10E, alog10( IQUV_1[0, 0, 3, *] / max( IQUV_1[0, 0, 6, *] ) ), $
                         thick=i_thi, color=248, linestyle=3;,psym=-4 
 
-              oplot, lg10E, alog10( IQUV_1[0, i_mu, 4, *] / max( IQUV_1[0, i_mu, 6, *] ) ), $
+              oplot, lg10E, alog10( IQUV_1[0, 0, 4, *] / max( IQUV_1[0, 0, 6, *] ) ), $
                         thick=i_thi, color=247, linestyle=4;,psym=-4 
 
               ;KED2,  lg10E, IQUV_1[0, 0, *],  I_kde, 0.00011
@@ -184,12 +187,12 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
              n_arr = 2
              charac_arr = sindgen(n_arr);" S(1,1,0,0), S(1,0,1,0), S(1,0,0,1) "
-             charac_arr(0) = textoidl('\mu_{obs} = 0.11   \tau = 0.05')
-             charac_arr(1) = textoidl('T_{bb} = 10 eV    T_e = 352 keV')
+             charac_arr(0) = textoidl('\mu_{obs} = 0.11   \tau = 0.50')
+             charac_arr(1) = textoidl('T_{bb} = 10 eV    T_e = 56 keV')
              ;charac_arr(0) = textoidl(' \mu = 0.1')
              ;charac_arr(3) = textoidl(' S_{in} = (1, 0, 0, 1)')
              ;charac_arr(3) = textoidl('S_{in}=(1,1/2,1/2,1/\sqrt{2})')
-             dy = 1.
+             dy = 1. 
              y_bias = dy * 0.2
              cha_size = 1.2
              x0 = -3
@@ -197,15 +200,15 @@
              length = 0.
              colors = indgen(n_arr)
              ;colors(2) = white
-             colors(1) = green
-             colors(0) = green
+             colors(1) = white
+             colors(0) = white
              ;colors(3) = green
              line_thick = 4
           ;curves, dy = dy, charac_arr = charac_arr, n_arr = n_arr, cha_size = cha_size, x0 = x0, $
           ;  y0 = y0, length = length, colors = colors, line_thick = line_thick, y_bias = y_bias
 
           xyout, dy = dy, charac_arr = charac_arr, n_arr = n_arr, cha_size = cha_size, x0 = x0, $
-              y0 = y0, colors = colors, line_thick = line_thick, y_bias = y_bias 
+              y0 = y0, colors = colors, line_thick = line_thick, y_bias = y_bias
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    
  
@@ -213,7 +216,7 @@
           endif 
 
           IF (i EQ 0) and (j EQ 1) THEN BEGIN  
-              axis,yaxis=0,ytitle=textoidl('Log(\nuF_\nu) '),$
+              axis,yaxis=0,ytitle=textoidl('log(\nuF_\nu) '),$
                         yticks=(yup-ylow),yminor=5, $
                 yrange=[ylow,yup],ystyle=1, charsize=1.1
               axis,yaxis=1,ytickname=replicate(' ',12),yticks=(yup-ylow),yminor=5
@@ -226,27 +229,26 @@
             IF 1 eq 1 THEN BEGIN   
  
               ns = 0
-              i_mu = 1
+              i_mu = 0
               max_I =  max( 10.^2 ) 
               max_I2 =  max( 2. ) 
               i_thi = 3
-             
-              oplot, lg10E, alog10( IQUV_1[0, i_mu, 6, *] / max( IQUV_1[0, i_mu, 6, *] ) ), $
+              oplot, lg10E, alog10( IQUV_1[0, 1, 6, *] / max( IQUV_1[0, 1, 6, *] ) ), $
                         thick=i_thi, color=blue, linestyle=6;,psym=-4  
 
-              oplot, lg10E, alog10( IQUV_1[0, i_mu, 0, *] / max( IQUV_1[0, i_mu, 6, *] ) ), $
+              oplot, lg10E, alog10( IQUV_1[0, 1, 0, *] / max( IQUV_1[0, 1, 6, *] ) ), $
                         thick=i_thi, color=red, linestyle=6;,psym=-4 
 
-              oplot, lg10E, alog10( IQUV_1[0, i_mu, 1, *] / max( IQUV_1[0, i_mu, 6, *] ) ), $
+              oplot, lg10E, alog10( IQUV_1[0, 1, 1, *] / max( IQUV_1[0, 1, 6, *] ) ), $
                         thick=i_thi, color=green, linestyle=1;,psym=-4  
 
-              oplot, lg10E, alog10( IQUV_1[0, i_mu, 2, *] / max( IQUV_1[0, i_mu, 6, *] ) ), $
+              oplot, lg10E, alog10( IQUV_1[0, 1, 2, *] / max( IQUV_1[0, 1, 6, *] ) ), $
                         thick=i_thi, color=cyan, linestyle=2;,psym=-4 
 
-              oplot, lg10E, alog10( IQUV_1[0, i_mu, 3, *] / max( IQUV_1[0, i_mu, 6, *] ) ), $
+              oplot, lg10E, alog10( IQUV_1[0, 1, 3, *] / max( IQUV_1[0, 1, 6, *] ) ), $
                         thick=i_thi, color=248, linestyle=3;,psym=-4 
 
-              oplot, lg10E, alog10( IQUV_1[0, i_mu, 4, *] / max( IQUV_1[0, i_mu, 6, *] ) ), $
+              oplot, lg10E, alog10( IQUV_1[0, 1, 4, *] / max( IQUV_1[0, 1, 6, *] ) ), $
                         thick=i_thi, color=247, linestyle=4;,psym=-4 
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
              n_arr = 1
@@ -265,7 +267,7 @@
              colors = indgen(n_arr)
              ;colors(2) = white
              ;colors(1) = white
-             colors(0) = red
+             colors(0) = white
              ;colors(3) = green
              line_thick = 4
           ;curves, dy = dy, charac_arr = charac_arr, n_arr = n_arr, cha_size = cha_size, x0 = x0, $
@@ -324,9 +326,9 @@
   ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           IF (i EQ 1) and (j EQ 0) THEN BEGIN  
               axis,yaxis=0,ytitle=textoidl(' Polarization Degree \delta '),$
-                        yticks=n_ytick,yminor=5, $
+                        yticks=xtks,yminor=xtksm, $
                 yrange=[ylow,yup],ystyle=1, charsize=1.1
-              axis,yaxis=1,ytickname=replicate(' ',12),yticks=n_ytick,yminor=5
+              axis,yaxis=1,ytickname=replicate(' ',12),yticks=xtks,yminor=xtksm
               axis,xaxis=1,xticks=6,xminor=5,xtickname=replicate(' ',15) 
               ;axis,xaxis=0,xticks=6,xminor=2,xtickname=replicate(' ',15) 
               axis,xaxis=0,xticks=6,xminor=5,xrange=[xlow,xup],xstyle=1,$ 
@@ -336,10 +338,6 @@
               i_thick = 3
               oplot, lg10E, IQUV_1[1, 0, 6, *]  /  IQUV_1[0, 0, 6, *] , $
                         thick=i_thick, color=blue, linestyle=6;,psym=-4  
- 
-              ;i_thick = 3
-              ;oplot, lg10E, IQUV_1[2, 2, 6, *]  /  IQUV_1[0, 2, 6, *] , $
-              ;          thick=i_thick, color=blue, linestyle=6;,psym=-4  
  
 
               ;KED2, lg10E,  IQUV_1[0, 3, *], Y_array_kde, 0.001
@@ -382,10 +380,10 @@
   ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
           IF (i EQ 1) and (j EQ 1) THEN BEGIN  
-              axis,yaxis=0,ytitle=textoidl(' Polarization Degree \delta '),$
-                        yticks=n_ytick,yminor=5, $
+              axis,yaxis=0,ytitle=textoidl('Polarization Degree \delta'),$
+                        yticks=xtks,yminor=xtksm, $
                 yrange=[ylow,yup],ystyle=1, charsize=1.1
-              axis,yaxis=1,ytickname=replicate(' ',12),yticks=n_ytick,yminor=5
+              axis,yaxis=1,ytickname=replicate(' ',12),yticks=xtks,yminor=xtksm
               axis,xaxis=1,xticks=6,xminor=5,xtickname=replicate(' ',15) 
               ;axis,xaxis=0,xticks=6,xminor=2,xtickname=replicate(' ',15) 
               axis,xaxis=0,xticks=6,xminor=5,xrange=[xlow,xup],xstyle=1,$ 
@@ -394,12 +392,6 @@
               i_thick = 3
               oplot, lg10E, IQUV_1[1, 1, 6, *] /  IQUV_1[0, 1, 6, *] , $
                         thick=i_thick, color=blue, linestyle=6;,psym=-4  
-
-              ;hgs = 0.11
-              ;maxkde = max( IQUV_1[1, 1, 6, *] /  IQUV_1[0, 1, 6, *] )
-              ;KED3, lg10E, IQUV_1[1, 1, 6, *] /  IQUV_1[0, 1, 6, *], hgs, Y_array_kde
-              ;oplot, lg10E, Y_array_kde / max(Y_array_kde) * 0.12 , $
-              ;          thick=i_thick, color=red, linestyle=6;,psym=-4  
 
           endif   
         endfor 
@@ -498,10 +490,10 @@ n = FILE_LINES(infile) / num_scatter
              I1_6[2, 1, i, j] = x6
              I1_6[3, 1, i, j] = x7
 
-            ; I1_6[0, 2, i, j] = x8
-            ; I1_6[1, 2, i, j] = x9
-            ; I1_6[2, 2, i, j] = x10
-            ; I1_6[3, 2, i, j] = x11
+           ;  I1_6[0, 2, i, j] = x4
+           ;  I1_6[1, 2, i, j] = x5
+           ;  I1_6[2, 2, i, j] = x6
+           ;  I1_6[3, 2, i, j] = x7
              ;print, 'tss', x6, times
          ;endif
          ;if times EQ 4 then begin
@@ -580,18 +572,17 @@ PRO KED2, X_array, Y_array, Y_array_kde, h_gauss
 END
 
 
-PRO KED3, X_array, Y_array, h_gauss, Y_array_kde
+PRO KED3, X_array, Y_array, h_gauss, n_end = n_end, Y_array_kde
  
       ns = n_elements(Y_array)
       print, ns   
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
       Y_array_kde = fltarr(ns)
       Y_array_kde[*] = 0.
-      for i=0, ns - 1 do begin
-          for j=0, ns - 1 do begin 
+      for i=0, n_end do begin
+          for j=0, n_end do begin 
             ;Dx_ij = abs( X_array(i) - X_array(j) ) 
-            Y_array_kde(i) = Y_array_kde(i) + Y_array(j) * $
-                 exp( - ( X_array(i) - X_array(j) )^2 / 2./h_gauss^2 ) /h_gauss
+            Y_array_kde(i) = Y_array_kde(i) + Y_array(j) * exp( - ( X_array(i) - X_array(j) )^2 / 2./h_gauss ) 
           endfor
       endfor   
 END
@@ -608,6 +599,18 @@ PRO curves, dy = dy, charac_arr = charac_arr, n_arr = n_arr, cha_size = cha_size
 END
 
 
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+PRO xyout, dy = dy, charac_arr = charac_arr, n_arr = n_arr, cha_size = cha_size, x0 = x0, $
+              y0 = y0, colors = colors, line_thick = line_thick, y_bias = y_bias
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+    FOR i = 0, n_arr-1 DO BEGIN  
+      ;oplot, [x0, x0 + length], [y0-dy*i, y0-dy*i], thick=line_thick, color=colors(i), linestyle=6;,psym=-4  
+      xyouts, x0, y0-dy*i-y_bias, charac_arr(i), charsize=cha_size
+    ENDFOR 
+END
+
+
+
 
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 PRO rectangle, xll = xll, yll = yll, x_length = x_length, y_length = y_length
@@ -619,16 +622,5 @@ PRO rectangle, xll = xll, yll = yll, x_length = x_length, y_length = y_length
    
 END
 
-
-
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-PRO xyout, dy = dy, charac_arr = charac_arr, n_arr = n_arr, cha_size = cha_size, x0 = x0, $
-              y0 = y0, colors = colors, line_thick = line_thick, y_bias = y_bias
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    FOR i = 0, n_arr-1 DO BEGIN  
-      ;oplot, [x0, x0 + length], [y0-dy*i, y0-dy*i], thick=line_thick, color=colors(i), linestyle=6;,psym=-4  
-      xyouts, x0, y0-dy*i-y_bias, charac_arr(i), charsize=cha_size
-    ENDFOR 
-END
 
 
