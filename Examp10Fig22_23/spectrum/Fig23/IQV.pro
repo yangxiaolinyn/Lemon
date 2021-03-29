@@ -51,7 +51,7 @@
       l=16 & xxss=l*(ratio) & yyss=l
       ;xoff=(LL-xxss)/2.,yoff=(3*LL/2.-yyss)/2.,
       !p.font = 0
-      device,filename='./fig352_2.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
+      device,filename='./fig352_3.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
       /color,xoff=(2-xxss)/2.0,yoff=(2-yyss)/2.,$
       set_font='Times-Roman';, /tt_font
 

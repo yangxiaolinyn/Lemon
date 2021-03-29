@@ -782,7 +782,7 @@
       !this%Scal_Factor_before = this%Phot4k_In_Elec_CF(1) / this%Phot4k_CtrCF(1)
 
       this%Vector_Stokes4_ECF = this%Vector_Stokes4_CF * ( this%Elec_gama * ( one - &
-                                 this%Elec_V * this%Elec_Phot_mu ) )**3
+                                this%Elec_V * this%Elec_Phot_mu ) )**3
       
       end subroutine Set_Phot4k_In_Elec_CF_Sub
 
@@ -1112,10 +1112,11 @@
       !this%Phot_f4_AxisZ(1) = this%Phot4k_In_Elec_CF(2) / this%Phot4k_In_Elec_CF(1)
       !this%Phot_f4_AxisZ(2) = this%Phot4k_In_Elec_CF(3) / this%Phot4k_In_Elec_CF(1)
       !this%Phot_f4_AxisZ(3) = this%Phot4k_In_Elec_CF(4) / this%Phot4k_In_Elec_CF(1)
-      this%Phot_f4_AxisZ = this%Phot4k_In_Elec_CF(2: 4) / Vector3D_Length( this%Phot4k_In_Elec_CF(2: 4) )
+      this%Phot_f4_AxisZ = this%Phot4k_In_Elec_CF(2: 4) / &
+              Vector3D_Length( this%Phot4k_In_Elec_CF(2: 4) )
 
-      vector1 = this%f4_In_Elec_CF(2: 4) - this%f4_In_Elec_CF(1) / this%Phot4k_In_Elec_CF(1) * &
-                this%Phot4k_In_Elec_CF(2: 4)
+      vector1 = this%f4_In_Elec_CF(2: 4) - this%f4_In_Elec_CF(1) / &
+                this%Phot4k_In_Elec_CF(1) * this%Phot4k_In_Elec_CF(2: 4)
       this%Phot_f4_AxisX = vector1 / Vector3D_Length( vector1 )
       !this%Phot_f4_AxisX(1) = this%f4_In_Elec_CF(2)! / this%f4_In_Elec_CF(1)
       !this%Phot_f4_AxisX(2) = this%f4_In_Elec_CF(3)! / this%f4_In_Elec_CF(1)

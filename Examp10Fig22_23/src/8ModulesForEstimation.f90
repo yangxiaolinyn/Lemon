@@ -912,12 +912,17 @@
 
 
 !************************************************************************************
+      !SUBROUTINE IQUV_Reflection_From_BoundaryPlane_Phi_Sub( this, &
+      !           Phot4k_CtrCF_At_p, f4_CF, Vector_Stokes4_CF, Vector_of_Momentum_ini )
       SUBROUTINE IQUV_Reflection_From_BoundaryPlane_Phi_Sub( this )
 !************************************************************************************
       IMPLICIT NONE
       class(Photon_ForEstimation) :: this 
+      !real(mcp), intent(in) :: Phot4k_CtrCF_At_p(1: 4), f4_CF(1: 4), &
+      !              Vector_Stokes4_CF(1: 4), Vector_of_Momentum_ini(1: 3)
       !TYPE(Photon_Estimation), INTENT(INOUT) :: phot
       !TYPE(ScatPhoton_KN), INTENT(INOUT) :: sphot
+      !type(Photon_FlatSP), intent(inout) :: phot
       REAL(mcp) :: vLv, I_reflec, Q_reflec, U_reflec, V_reflec, f4(1: 3), &
                 fx, fy, Qpsi, Upsi, Axis_x(1: 3), Axis_y(1: 3), Axis_z(1: 3), &
                 Flru(1: 3), reflected_Ilru(1: 3), mu, mu0, phi, phi0, sinmu, &
@@ -934,9 +939,16 @@
       !          mu0 * DABS( this%Phot4k_CtrCF_ini(1) )
       !I_reflec = this%Vector_Stokes4_CF(1) !this%w_ini 
            
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      !this%Phot4k_CtrCF = Phot4k_CtrCF_At_p 
+      !this%Phot4k_CtrCF_ini = Phot4k_CtrCF_At_p 
+      !this%f4_CF    = f4_CF 
+      !this%Vector_Stokes4_CF = Vector_Stokes4_CF 
+      !this%Vector_of_Momentum_ini = Vector_of_Momentum_ini
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       call this%Set_Photon_k_and_disk_normal_n_Tetrad_In_CF( Axis_y_norml )
       this%Phot4k_CtrCF = this%Phot4k_CtrCF_At_p 
-      CALL this%Set_Photon_f3_Tetrad_In_CF( )
+      CALL this%Set_Photon_f3_Tetrad_In_CF( ) 
  
       mu_ya_yb = Vector3D_Inner_Product( Axis_y_norml, this%PhotAxisY )
       mu_signs = Vector3D_Inner_Product( Axis_y_norml, this%PhotAxisX )
@@ -1082,6 +1094,7 @@
       this%Vector_Stokes4_ECF_scat(1) = reflected_Ilru(1) + reflected_Ilru(2)
       this%Vector_Stokes4_ECF_scat(2) = reflected_Ilru(1) - reflected_Ilru(2)
       this%Vector_Stokes4_ECF_scat(3) = reflected_Ilru(3)
+      !write(*, *)'f2 = ', this%Vector_Stokes4_ECF_scat
       !this%Vector_Stokes4_ECF_scat = this%Vector_Stokes4_ECF_scat * twopi
       !this%delta_pd_scat = dsqrt( this%Q_sp_scat**2 + this%U_sp_scat**2 ) / &
       !                        ( reflected_Ilru(1) + reflected_Ilru(2) )
@@ -1169,8 +1182,8 @@
       IMPLICIT NONE
       class(Photon_ForEstimation) :: this 
       !TYPE(Photon_Estimation), INTENT(INOUT) :: phot
-      !TYPE(ScatPhoton_KN), INTENT(INOUT) :: sphot
-      type( Photon_ForEstimation ), INTENT(INOUT) :: sphot
+      TYPE(ScatPhoton_KN), INTENT(INOUT) :: sphot
+      !type( Photon_ForEstimation ), INTENT(INOUT) :: sphot
       REAL(mcp) :: vLv, I_reflec, Q_reflec, U_reflec, V_reflec, f4(1: 3), &
                 fx, fy, Qpsi, Upsi, Axis_x(1: 3), Axis_y(1: 3), Axis_z(1: 3), &
                 Flru(1: 3), reflected_Ilru(1: 3), mu, mu0, phi, phi0, sinmu, &
