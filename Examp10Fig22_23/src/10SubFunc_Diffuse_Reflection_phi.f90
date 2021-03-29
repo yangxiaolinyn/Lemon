@@ -80,7 +80,7 @@
         Scattering_loop: Do
         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
             phot%scatter_times = phot%scatter_times + 1   
-            CALL phot%Set_InI_Conditions_For_Next_Scattering2( )   
+            CALL phot%Set_InI_Conditions_For_Next_Scattering2( sphot )   
             CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p( )  
             if( phot%w_ini / phot%w_ini0 <= Terminate_Tolerence )exit 
             !write(*,fmt=*)'ssff===', phot%w_ini / phot%w_ini0 

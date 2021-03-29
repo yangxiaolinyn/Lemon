@@ -225,19 +225,20 @@
 
 
 !************************************************************************************
-      SUBROUTINE Set_InI_Conditions_For_Next_Scattering2_Sub( this )
+      SUBROUTINE Set_InI_Conditions_For_Next_Scattering2_Sub( this, sphot )
 !************************************************************************************
       IMPLICIT NONE
       class(Photon_FlatSP) :: this   
+      TYPE(ScatPhoton_KN), INTENT(INOUT) :: sphot
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      this%Phot4k_CtrCF_ini = this%Scattered_Phot4k_CF 
+      this%Phot4k_CtrCF_ini = sphot%Scattered_Phot4k_CF 
       this%Vector_of_Momentum_ini(1:3) = this%Phot4k_CtrCF_ini(2:4) / &
                                        dabs( this%Phot4k_CtrCF_ini(1) )
       if( isnan( this%Vector_of_Momentum_ini(3) ) )write(*, *)'mmsf=', this%Phot4k_CtrCF_ini
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      this%Vector_Stokes4_CF = this%Vector_Stokes4_ECF_scat
-      this%f4_CF = this%f4_scat_CF 
+      this%Vector_Stokes4_CF = sphot%Vector_Stokes4_ECF_scat
+      this%f4_CF = sphot%f4_scat_CF 
       !write(*, fmt="(' ', A5, 1ES18.7)")'ss1=', &
       !    Vector3D_Inner_Product( this%Phot4k_CtrCF_ini(2: 4), this%f4_CF(2: 4) ) 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
