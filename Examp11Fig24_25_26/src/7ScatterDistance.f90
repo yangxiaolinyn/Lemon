@@ -263,8 +263,9 @@
       else
           open(unit=19, file = this%CrossSectFileName, status = "replace", &
                                    action = "write", iostat = istat)
-          call Set_xi_wi_all()
-          !T_e = 4.D0 * mec2
+  
+          call gauleg_x_w( -one, one, x1000, w1000, 1000 )
+          call gaulag( x0la362, w0la362, 362, zero ) 
           if (istat == 0) then
               write(unit = *, fmt = *)'************************************************************'  
               write(unit = *, fmt = *)'Now Writting the SigmaArray data to the file.....' 
@@ -273,7 +274,7 @@
                   write(unit = *, fmt = *)'herer'
                   Ephoton = 10**( this%logE_low + this%dindexE * i )
                   this%sigmaaTeE_FST(i) = gama_Integration( this%T_e, Ephoton, &
-                                   x1000, w1000, 1000, x0la1000, w0la1000, 362 ) 
+                                   x1000, w1000, 1000, x0la362, w0la362, 362 ) 
                   if(i == N_sigma)this%sigmaaTeE_400(i) = sigma_a( this%T_e, Ephoton )
                   write(unit = 19, fmt = *)this%sigmaaTeE_FST(i)
                   write(unit = *, fmt = *)i, this%sigmaaTeE_FST(i), this%sigmaaTeE_400(i)

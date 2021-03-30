@@ -315,7 +315,7 @@
       real(mcp) :: vLv, Lv, v_esti, J_esti, Qpsi, Upsi
       real(mcp) :: mu_ep, smu_ep, sin_phi_ep, mu_psi, epsip, epsi, KN_CrossSection, &
                    nup_vs_nu, chi, factor, Cos_Theta, Sin_Theta, SigmaKN, &
-                   KN_CrossSection_ECF, chi1, Sin_Theta_Cos_Phi, E_temp, Sigma_E1
+                   KN_CrossSection_ECF, chi1, Sin_Theta_Cos_Phi, E_temp 
       real(mcp) :: N_temp, Sin_Theta2, x, y, cosphi, sinphi, cos2phi, sin2phi
       real(mcp) :: F0, F11, F1, F22, F33, tp_vales, Q_xi, U_xi, I_xi, V_xi, gam
        
@@ -364,8 +364,7 @@
                                                           this%Vector_Stokes4_ECF(3) * sin2phi )
           U_xi = F22 * (-this%Vector_Stokes4_ECF(2) * sin2phi + this%Vector_Stokes4_ECF(3) * cos2phi)  
           V_xi = F33 * this%Vector_Stokes4_ECF(4)
- 
-
+  
           this%Vector_Stokes4_ECF_scat(1) = I_xi
           this%Vector_Stokes4_ECF_scat(2) = Q_xi
           this%Vector_Stokes4_ECF_scat(3) = U_xi
@@ -375,9 +374,9 @@
           this%Scat_Phot3k_CF = this%Phot3k_CF_esti
           call this%Get_Scattered_Stokes_Vector_And_f_CF( this%Phot3k_ECF1_esti )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          Q_xi = this%Vector_Stokes4_ECF(2) / this%Vector_Stokes4_ECF(1)
-          U_xi = this%Vector_Stokes4_ECF(3) / this%Vector_Stokes4_ECF(1)
-          N_temp = I_xi / this%Vector_Stokes4_ECF(1)
+          !Q_xi = this%Vector_Stokes4_ECF(2) / this%Vector_Stokes4_ECF(1)
+          !U_xi = this%Vector_Stokes4_ECF(3) / this%Vector_Stokes4_ECF(1)
+          !N_temp = I_xi / this%Vector_Stokes4_ECF(1)
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
           !write(*, *)'s1=', KN_CrossSection_ECF 
           epsi = ( two * this%E_ini / mec2 ) * this%Elec_gama * &
@@ -394,50 +393,31 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
           E_temp = dabs( this%Phot4k_In_Elec_CF(1) ) * nup_vs_nu
-          this%E_esti_vs_mu_phi = this%Elec_gama * E_temp * ( one + this%Elec_v * this%Phot3k_ECF_esti(3) )
-          !write(*, fmt="(' ', A8, 5ES20.10)")'ffs = ', this%E_esti_vs_mu_phi, nup_vs_nu, &
-          !              E_temp, this%Elec_v, this%Phot3k_ECF_esti(3)
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          !Sigma_E1 = this%sigma_fn( this%E_esti_vs_mu_phi )! * this%n_e1 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          !if(this%mu_estimates(mu_i) > zero)then
-          !    Lv = this%w_ini * dexp( - this%z_tau * Sigma_E1 / this%mu_estimates(mu_i) ) / &
-          !                this%mu_estimates(mu_i) * KN_CrossSection * Sigma_E1 
-          !else
-          !    Lv = - this%w_ini * dexp( (this%z_max - this%z_tau) * Sigma_E1 / this%mu_estimates(mu_i) ) / &
-          !                this%mu_estimates(mu_i) * KN_CrossSection * Sigma_E1 
-          !endif
-          vLv = KN_CrossSection !* Sigma_E1
+          this%E_esti_vs_mu_phi = this%Elec_gama * E_temp * ( one + &
+                              this%Elec_v * this%Phot3k_ECF_esti(3) )
+ 
+          vLv = KN_CrossSection 
 
           call this%Get_Observed_Energy_Bin_index_i( this%E_esti_vs_mu_phi, i_E )  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-           !write(*, fmt=300)'ffs=', this%w_ini, dexp( - this%z_tau / this%mu_estimates(mu_i) ), &
-          !      one / this%mu_estimates(mu_i),  KN_CrossSection, this%scatter_times
-          !300 FORMAT (' ', A5, 5ES15.6)
-
-          !gam = dsqrt( this%E_esti_vs_mu_phi / (2.5D-11 * mec2) ) / &
-          !      dsqrt( two * ( one - dcos( pi * 85.D0 / 180.D0 ) ) )
-
-          !write(*, *)'ffs= ', gam, this%Elec_gama
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+          !write(*, *)'s1=', dabs( this%Phot4k_In_Elec_CF(1) ), nup_vs_nu, this%Phot3k_ECF_esti(3) 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
           if( i_E > vL_sc_up .or. i_E < 0 )cycle
-          scat_times = this%scatter_times + 1 
-
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+          scat_times = this%scatter_times + 1  
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
           this%PolArrIQUV(1, 6, mu_i, i_E) = this%PolArrIQUV(1, 6, mu_i, i_E) + &
                                               vLv * this%Vector_Stokes4_ECF_scat(1)
-
+ 
           if(scat_times <= 4)then
-              this%PolArrIQUV(1, scat_times, mu_i, i_E) = this%PolArrIQUV(1, scat_times, mu_i, i_E) + &
-                                              vLv * this%Vector_Stokes4_ECF_scat(1)
+              this%PolArrIQUV(1, scat_times, mu_i, i_E) = &
+                         this%PolArrIQUV(1, scat_times, mu_i, i_E) + &
+                         vLv * this%Vector_Stokes4_ECF_scat(1)
           else
               this%PolArrIQUV(1, 5, mu_i, i_E) = this%PolArrIQUV(1, 5, mu_i, i_E) + &
                                               vLv * this%Vector_Stokes4_ECF_scat(1)
           endif   
+ 
 
-          !if( this%delta_pd_scat /= zero )then 
-              !call this%Get_PolaVector_And_IQU_InCF_for_Estimation(Cos_Theta, Sin_Theta, &
-              !                            sinphi, cosphi, Qpsi, Upsi)
               call this%Get_Observed_Stokes_Parameters( ) 
 
               this%PolArrIQUV(2, 6, mu_i, i_E) = this%PolArrIQUV(2, 6, mu_i, i_E) + &
@@ -446,9 +426,7 @@
                                   vLv * this%Vector_Stokes4_ECF_scat(3) 
               this%PolArrIQUV(4, 6, mu_i, i_E) = this%PolArrIQUV(4, 6, mu_i, i_E) + &
                                   vLv * this%Vector_Stokes4_ECF_scat(4) 
-
-!write(*, fmt=*)'ffs=',this%Vector_Stokes4_ECF_scat(2),this%Vector_Stokes4_ECF_scat(3), vLv, this%Vector_Stokes4_ECF_scat(1)
-          !endif  
+ 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
         enddo  
       enddo  

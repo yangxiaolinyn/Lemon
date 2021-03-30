@@ -717,34 +717,21 @@
 
 
 !*******************************************************************************************************
-      subroutine Get_gama_mu_phi_Of_Scatter_Electron_Power_Sub( this, T_e )
+      subroutine Get_gama_mu_phi_Of_Scatter_Electron_Power_Sub( this )
 !*******************************************************************************************************
       implicit none
-      class(ScatPhoton_KN) :: this
-      real(mcp), intent(in) :: T_e 
-      real(mcp) :: p11, p22, p33, p44, S3, K1, K2, K3, Y1
-      real(mcp) :: AcceptProbability, epsi, SigmaKN, t, r1, r2
+      class(ScatPhoton_KN) :: this 
+      real(mcp) :: K1, K2, K3, Y1
+      real(mcp) :: AcceptProbability, epsi, SigmaKN, r1, r2
       integer(kind=8) :: i
       !**********************************************************************
-
-      t = T_e / mec2
-      p11 = sqrtpi * 0.25D0
-      p22 = dsqrt( 0.5D0 * t )*0.5D0
-      p33 = 0.375D0 * sqrtpi * t
-      p44 = t * dsqrt( 0.5D0 * t )
-      S3 = p11 + p22 + p33 + p44
+ 
       i = 0
-      !if( isnan( this%Phot4k_CtrCF(1) ) )then
-      !    write(*, *)'000==', dabs( this%Phot4k_CtrCF(1) ), &
-      !            this%Elec_V, this%Elec_Phot_mu 
-      !    stop
-      !endif
-      this%N_coef = ( this%alp - one ) / ( this%gama1**(one - this%alp) - this%gama2**(one - this%alp) )
+ 
       gamamuphi : do
         i = i + 1    
 
-        r1 = ranmar()
-        !this%Elec_gama = 100.D0 * ( one - ranmar() ) ** ( one/(-two) )
+        r1 = ranmar() 
         this%Elec_gama = ( this%gama1**(one - this%alp) - r1*&
                            (this%alp-one)/this%N_coef )**( one / (one - this%alp) )
         !write(*, *)'sdf=', this%Elec_gama, r1, this%gama1**(one - this%alp), r1*&
@@ -864,7 +851,8 @@
       real(mcp) :: Vector_Length
       !**********************************************************************
 
-      this%Phot_Tetrad1_ECF_axisZ(1:3) = this%Phot4k_In_Elec_CF(2: 4) / dabs( this%Phot4k_In_Elec_CF(1) )
+      this%Phot_Tetrad1_ECF_axisZ(1:3) = this%Phot4k_In_Elec_CF(2: 4) &
+                                 / dabs( this%Phot4k_In_Elec_CF(1) )
   
       e_p(1) = zero
       e_p(2) = zero
@@ -907,8 +895,10 @@
       real(mcp), dimension(2: 3) :: Rot_Vec_Stokes
       !**********************************************************************
 
-      Rot_Vec_Stokes(2) =  dcos(two*angle_phi) * Vec_Stokes(2) + dsin(two*angle_phi) * Vec_Stokes(3)
-      Rot_Vec_Stokes(3) = -dsin(two*angle_phi) * Vec_Stokes(2) + dcos(two*angle_phi) * Vec_Stokes(3)
+      Rot_Vec_Stokes(2) =  dcos(two*angle_phi) * Vec_Stokes(2) + &
+                           dsin(two*angle_phi) * Vec_Stokes(3)
+      Rot_Vec_Stokes(3) = -dsin(two*angle_phi) * Vec_Stokes(2) + &
+                           dcos(two*angle_phi) * Vec_Stokes(3)
       Vec_Stokes(2) = Rot_Vec_Stokes(2)
       Vec_Stokes(3) = Rot_Vec_Stokes(3)
    
@@ -1137,9 +1127,11 @@
       k_p2 = Temp_Matrix_1X3 - mu_signs * this%Scat_Phot3k_CF
       this%f4_scat_CF(2: 4) = k_p2 / Vector3D_Length( k_p2 )
       this%f4_scat_CF(1) = zero
+
       !this%f4_scat_CovCF = this%f4_scat_CF 
       !this%f4_scat_CovCF(1) = - this%f4_scat_CF(1)
-      !write(*, fmt="(' ', A5, 2ES18.7)")'s3=', Vector3D_Inner_Product( this%f4_scat_CF(2:4), this%Scat_Phot3k_CF), Vector3D_Length( this%Scat_Phot3k_CF )
+      !write(*, fmt="(' ', A5, 2ES18.7)")'s3=', Vector3D_Inner_Product( &
+          !this%f4_scat_CF(2:4), this%Scat_Phot3k_CF), Vector3D_Length( this%Scat_Phot3k_CF )
 
       end subroutine Get_Scattered_Stokes_Vector_And_f_CF_Sub
 

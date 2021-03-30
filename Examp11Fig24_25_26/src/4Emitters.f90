@@ -36,27 +36,22 @@
       integer :: i
   
 !~~~ The incident photons are monochromatic, the energy is E_ini, which is a constant.
-      this%Phot4k_CtrCF_ini(1) = this%E_ini
+      this%Phot4k_CtrCF(1) = this%E_ini
 !~~~ Set the inital direction of the photon, which is along the z-axis, i.e., p=(0, 0, 1).
-      cos_theta = one 
-      sin_theta = zero 
-      phi = twopi * ranmar()
-      sin_phi = dsin( phi )
-      cos_phi = dcos( phi )
+      !cos_theta = one 
+      !sin_theta = zero 
+      !phi = twopi * ranmar()
+      !sin_phi = dsin( phi )
+      !cos_phi = dcos( phi )
 
-      this%Vector_of_Momentum_ini(1) = sin_theta * cos_phi
-      this%Vector_of_Momentum_ini(2) = sin_theta * sin_phi
-      this%Vector_of_Momentum_ini(3) = cos_theta 
-      this%Phot4k_CtrCF_ini(2: 4) = this%Phot4k_CtrCF_ini(1) * this%Vector_of_Momentum_ini(1:3)
+      this%Vector_of_Momentum_ini(1) = zero !sin_theta * cos_phi
+      this%Vector_of_Momentum_ini(2) = zero !sin_theta * sin_phi
+      this%Vector_of_Momentum_ini(3) = one !cos_theta 
+      this%Phot4k_CtrCF(2: 4) = this%Phot4k_CtrCF(1) * this%Vector_of_Momentum_ini(1:3)
 
-      !this%Phot4k_CovCF = this%Phot4k_CtrCF 
- 
-
-      this%w_ini_em = one
-      !this%w_ini = this%w_ini_em
-      !this%w_ini0 = this%w_ini_em
-
-      this%z_tau = zero 
+      !this%Phot4k_CtrCF = this%Phot4k_CtrCF_ini
+  
+      this%w_ini_em = one 
   
       end subroutine get_Phot4k_CtrCF_CovCF_BoundReflec_Sub
 

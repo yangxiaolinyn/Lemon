@@ -11,33 +11,27 @@
     integer :: methods_cases, i
     integer(kind = 8) :: Total_Phot_Num 
     character*80 ::  Spentrum_filename, CrossSec_filename, &
-              filename 
+              filename, alps, Te
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     TYPE(BCS_photons) :: BCS_phot
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
         call InitRandom()  
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-        Theta_e = 10.D0  ! Theta_e = T_e / mec2, which is the dimensionless temperature of the
-                         ! electron gas.
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+        Theta_e = 10.D0  ! Theta_e = T_e / mec2, which is the 
+                         ! dimensionless temperature of the electron gas.
 
 !~~~~~~~The cosine of the polar angle of the observer~~~~~~~~~~~~~~~~
         mu_obs = dcos( 85.D0 * dtor )
 
-!~~~~~~~~Set the normalized incident Stokes parameters~~~~~~~~~~~~~~~~~
-        !S_in(1) = one
-        !S_in(2) = one * zero!one / dsqrt(3.D0)
-        !S_in(3) = one * zero!one / dsqrt(3.D0)
-        !S_in(4) = one !* zero!one / dsqrt(3.D0)
-
+!~~~~~~~~Set the normalized incident Stokes parameters~~~~~~~~~~~~~~~~~  
         theta = 30.D0
         phis = 60.D0
         S_in(1) = one
         S_in(2) = dsin(theta*dtor) * dcos(phis*dtor)!one / dsqrt(3.D0)
         S_in(3) = dsin(theta*dtor) * dsin(phis*dtor)!one / dsqrt(3.D0)
         S_in(4) = dcos(theta*dtor) !* zero!one / dsqrt(3.D0)
-        filename = './spectrum/bcs_V_alp=3.txt'
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         alp = 3.D0   ! the power law index of electron gas.
@@ -54,20 +48,31 @@
         BCS_phot%vy1 = vy1
         BCS_phot%vy2 = vy2
         BCS_phot%E_ini = E_ini
-!~~~~~~~ Implement the calculations and the results it saved in file: filename.~~~~~~~~~
-        call BCS_phot%BCS_analytical_formula_Powerlaw( Theta_e, S_in, mu_obs, filename )
+!~~ N_coef is the normalization factor for the power law distributed electron gas.
+        BCS_phot%N_coef = ( BCS_phot%alp - one ) / &
+                   ( BCS_phot%gama1**(one - BCS_phot%alp) - &
+                     BCS_phot%gama2**(one - BCS_phot%alp) )
  
-        T_elec = 50.D0 * mec2   ! In unit of MeV
-        CrossSec_filename = './data/SigmaArrayT_e=100kev.txt' 
-        Spentrum_filename = './spectrum/I_Te=100_V_alp=3.txt'
  
+        write(alps, "(f8.4)")alp
+        Spentrum_filename = trim('./spectrum/dataPowerlaw_alp=')//&
+                            trim(adjustl(alps))//trim('.dat') 
+        filename = trim('./spectrum/BCS_Powerlaw_alp=')//&
+                            trim(adjustl(alps))//trim('.dat')
 
-        Total_Phot_Num = 1.1D10
+!~~~~~~~ Implement the calculations and the results it saved in file: filename.~~~~~~~~~
+        call BCS_phot%BCS_analytical_formula_Powerlaw( S_in, mu_obs, filename )
+
+        !T_elec = 50.D0 * mec2   ! In unit of MeV 
+        !write(Te, "(ES10.3)")T_elec
+        !CrossSec_filename = trim('./data/SigArrTe=')//trim(adjustl(Te))//&
+        !       trim('_alp=')//trim(adjustl(alps))//trim('.dat') !
+  
+        Total_Phot_Num = 1.1D9
         call mimick_of_ph_Slab_BoundReflc( Total_Phot_Num, T_elec, &
                     CrossSec_filename, Spentrum_filename, S_in, alp, & 
-                    gama1, gama2, vy1, vy2, E_ini )
-   
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+                    gama1, gama2, vy1, vy2, E_ini, mu_obs ) 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 
     END PROGRAM main
 

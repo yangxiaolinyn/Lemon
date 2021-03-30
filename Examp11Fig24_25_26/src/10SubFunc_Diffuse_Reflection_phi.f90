@@ -11,15 +11,15 @@
 !**************************************************************************************
     SUBROUTINE mimick_of_ph_Slab_BoundReflc( Total_Phot_Num, T_elec, &
                       CrossSec_filename, Spentrum_filename, S_in, &
-                      alp, gama1, gama2, vy1, vy2, E_ini )
+                      alp, gama1, gama2, vy1, vy2, E_ini, mu_obs )
 !************************************************************************************** 
     implicit none 
-    real(mcp), intent(in) :: T_elec, S_in(1: 4), alp, gama1, gama2, vy1, vy2, E_ini
+    real(mcp), intent(in) :: T_elec, S_in(1: 4), alp, gama1, &
+                             gama2, vy1, vy2, E_ini, mu_obs
     integer(kind = 8), intent(in) :: Total_Phot_Num
     character*80, intent(inout) :: CrossSec_filename, Spentrum_filename
     real(mcp) :: E, E_low, E_up  
-    integer(kind = 8) :: Num_Photons 
-    type(Photon_Emitter) :: Emitter
+    integer(kind = 8) :: Num_Photons  
     type(Photon_FlatSP) :: phot
     type(ScatPhoton_KN) :: sphot
     integer :: send_num, recv_num, send_tag, RECV_SOURCE, &
@@ -51,10 +51,9 @@
  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CALL phot%Set_Initial_Values_For_Photon_Parameters( T_elec, CrossSec_filename, &
-                      S_in, alp, gama1, gama2, vy1, vy2, E_ini )
+                      S_in, alp, gama1, gama2, vy1, vy2, E_ini, mu_obs )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    Num_Photons = 0   
-    sphot%mu_estimat = phot%mu_estimat
+    Num_Photons = 0    
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     Do 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -63,49 +62,20 @@
   
         CALL phot%Generate_A_Photon( )  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
-        CALL phot%FIRST_SCATTERING_OF_PHOT_ELCE( sphot )
+        CALL phot%Implement_Estimations_For_IQUVobs( )
         !CALL phot%Photon_Electron_Scattering( sphot )
         !write(*,fmt=*)'ssff222===', Num_Photons
-
-    if( myid == np-1 ) then
-        If ( mod(Num_Photons, 10)==0 ) then 
-        write(unit = *, fmt = *)'*************************************************************************' 
-        write(unit = *, fmt = "(' ', A14, I10, A40, I10, A40)")'***** The', Num_Photons,&
-              '  th Photons have been scattered', phot%scatter_times, &
-                         '  times and Escapted from the region !!!!!!!'      
-        write(unit = *, fmt = 120)'***** My Duty Photon Number is: ', myid, mydutyphot 
+ 
+        If ( mod(Num_Photons, 500000)==0 .and. myid == np-1 ) then 
+        !write(unit = *, fmt = *)'*************************************************************************' 
+        write(unit = *, fmt=*)'***** The contributions of the ', Num_Photons, &
+                    ' th Photon has been recorded. '  
+        write(unit = *, fmt = *)'***** My Duty Photon Number is: ', myid, mydutyphot 
         write(unit = *, fmt = *)'*************************************************************************'
-        endif
-    endif
-
-        If( Num_Photons > mydutyphot )EXIT
-        cycle
-        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-        Scattering_loop: Do
-        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-            phot%scatter_times = phot%scatter_times + 1   
-            CALL phot%Set_InI_Conditions_For_Next_Scattering( sphot ) 
-            !write(*,fmt=*)'ssff222===', phot%Phot4k_CtrCF_ini(1) 
-            CALL phot%Determine_P_Of_Scatt_Site_And_Quantities_At_p()  
-            if( phot%w_ini / phot%w_ini0 <= 1.D-40)exit
-            !write(*,fmt=*)'ssff222===', T_bb * 1.1D4,  mec2 * 8.D-1  
-            CALL phot%Photon_Electron_Scattering( sphot ) 
-        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-        END DO Scattering_loop
-        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-  
-        If ( mod(Num_Photons, 20000)==0 ) then 
-        write(unit = *, fmt = *)'*************************************************************************' 
-        write(unit = *, fmt = "(' ', A14, I5, A50, I5, A50)")'***** The', Num_Photons,&
-              'th Photons have been scattered', phot%scatter_times, &
-                         'times and Escapted from the region !!!!!!!'      
-        write(unit = *, fmt = 120)'***** My Duty Photon Number is: ', myid, mydutyphot 
-        write(unit = *, fmt = *)'*************************************************************************'
-        endif
-    If( Num_Photons > mydutyphot )EXIT
-    !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Enddo  
-    120 format(' ', A35, 2I10)
+        endif 
+ 
+        If( Num_Photons > mydutyphot )EXIT  
+    Enddo   
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       If ( myid /= np-1 ) then  
           send_num  = ( vL_sc_up + 1 ) * 4 * 7 * Num_mu

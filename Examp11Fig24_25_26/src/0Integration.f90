@@ -17,6 +17,7 @@
       real(mcp) :: x500(0: 499), w500(0: 499), x1000(0: 999), w1000(0: 999)
       real(mcp) :: xall(0: n_all), wall(0: n_all)
       real(mcp) :: x0la1000(0: 361), w0la1000(0: 361)
+      real(mcp) :: x0la362(0: 361), w0la362(0: 361)
       real(mcp) :: x1la100(0: 99), w1la100(0: 99)
       real(mcp) :: x2la100(0: 99), w2la100(0: 99)
       real(mcp) :: x10la100(0: 99), w10la100(0: 99)

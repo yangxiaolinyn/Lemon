@@ -3,7 +3,7 @@
       implicit none 
       integer, parameter :: N_BCS = 100
 
-      type, public, extends(Photon_ForEstimation) :: BCS_photons
+      type, public, extends(Photon_ForEstimation) :: BCS_photons 
       contains 
 !******************************************************************************************************* 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
@@ -31,16 +31,16 @@
  
       contains       
 !*******************************************************************************************************
-      subroutine BCS_analytical_formula_Powerlaw_Sub( this, Theta_e, S_in, mu_obs, filename )
+      subroutine BCS_analytical_formula_Powerlaw_Sub( this, S_in, mu_obs, filename )
 !*******************************************************************************************************
       implicit none
       class(BCS_photons) :: this 
-      real(mcp), intent(in) :: Theta_e, S_in(1: 4), mu_obs
+      real(mcp), intent(in) :: S_in(1: 4), mu_obs
       character*80, intent(inout) :: filename
-      real(mcp) :: tau, T_bb, T_elec, gam, temp_v1, freq_s, J_I, J_Q, J_U, J_V, J_I1, J_I2
+      real(mcp) :: tau, T_bb, T_elec, Emin, temp_v1, freq_s, J_I, J_Q, J_U, J_V, J_I1, J_I2
       real(mcp) :: Intensity(0: N_BCS), log_fs1f(0, N_BCS), IQUV(1: 4), xythe(1: 4), cx, cy, &
                    IQUV1(1: 4), xythe1(1: 4), coef_1(1:2, 1: 3), coef_2(1:2, 1: 3), sigma1, sigma2
-      real(mcp) :: cos_p1ap2, sin_p1ap2, cos_p1mp2, sin_p1mp2, alp, xt, N_coef, x1, x2
+      real(mcp) :: cos_p1ap2, sin_p1ap2, cos_p1mp2, sin_p1mp2, alp, xt, x1, x2
       integer :: i
 
 
@@ -74,62 +74,57 @@
         call this%BCS_Get_c1_c2( IQUV, coef_1, coef_2 )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+        temp_v1 = dsqrt( two * ( one - mu_obs ) )
+        open(unit=13, file = filename, status="replace")  
 
-        call Set_xi_wi_all()
-        !Theta_e = 100.D0
-        temp_v1 = dsqrt( two * ( one - dcos( pi * 85.D0 / 180.D0 ) ) )
-        open(unit=13, file = filename, status="replace") 
-        !open(unit=14, file = './spectrum/bcs2.txt', status="replace") 
-
-        alp = this%alp
-        N_coef = ( this%alp - one ) / ( this%gama1**(one -this%alp) - this%gama2**(one -this%alp) )
+        alp = this%alp 
         do i = 0, N_BCS
             freq_s = 10.D0**( this%vy1 + (this%vy2 - this%vy1) / N_BCS * i )
-            gam = dsqrt( freq_s ) / temp_v1
+            Emin = dsqrt( freq_s ) / temp_v1
 
-            !sigma1 = this%Func_Sigma1( gam, Theta_e, x0la1000, w0la1000, 362 )
-            !sigma2 = this%Func_Sigma2( gam, Theta_e, x0la1000, w0la1000, 362 )
-            !sigma1 = this%Func_Sigma1_power( gam, Theta_e, x1000, w1000, 1000 )
-            !sigma2 = this%Func_Sigma2_power( gam, Theta_e, x1000, w1000, 1000 )
-            !sigma1 = one / gam ** (alp + two) * ( one / (alp + 5.D0) - one /(alp+one) + two/(alp+3.D0) )
-            !sigma2 = one / gam ** (alp + two) * ( one / (alp + 5.D0) + one /(alp+one) - two/(alp+3.D0) )
-            !sigma1 = gam ** (-6.D0)/8.D0 - gam ** (-6.D0) / 4.D0 + gam**()
-            x1 = gam / this%gama2
-            if(this%gama1 <= gam)then
+            !sigma1 = this%Func_Sigma1( Emin, Theta_e, x0la1000, w0la1000, 362 )
+            !sigma2 = this%Func_Sigma2( Emin, Theta_e, x0la1000, w0la1000, 362 )
+            !sigma1 = this%Func_Sigma1_power( Emin, Theta_e, x1000, w1000, 1000 )
+            !sigma2 = this%Func_Sigma2_power( Emin, Theta_e, x1000, w1000, 1000 ) 
+            !sigma1 = Emin ** (-6.D0)/8.D0 - Emin ** (-6.D0) / 4.D0 + Emin**()
+            x1 = Emin / this%gama2
+            if(this%gama1 <= Emin)then
                 x2 = one
             else
-                x2 = gam / this%gama1
+                x2 = Emin / this%gama1
             endif
-            !write(unit=6, fmt=*)'lls=',gam, this%gama1, this%gama2, x1,x2
-            sigma1 = N_coef / gam**(alp + two) * ( ( x2**(alp+5.D0) - x1**(alp+5.D0) ) / (alp + 5.D0) - & 
-                ( x2**(alp+1.D0) - x1**(alp+1.D0) ) /(alp+one) + &
+            !write(unit=6, fmt=*)'lls=',Emin, this%gama1, this%gama2, x1,x2
+!~~~~~ Here the expressions of sigma1 and sigma2 are different from the Equation (144) of our paper,
+!~~~~~ Since in our paper, gama2 is infinity, then x1 = 0.D0, the below expressions of 
+!~~~~~ sigma1 and sigma2 will equal to the Equation (144) of our paper. Here we choose gama2 is a 
+!~~~~~ finite number, we get the following expressions for sigma1 and sigma2.
+            sigma1 = this%N_coef / Emin**(alp + two) * ( ( x2**(alp+5.D0) - x1**(alp+5.D0) ) /& 
+                 (alp + 5.D0) - ( x2**(alp+1.D0) - x1**(alp+1.D0) ) /(alp+one) + &
                 two*( x2**(alp+3.D0) - x1**(alp+3.D0) )/(alp+3.D0) )
 
-            sigma2 = N_coef / gam**(alp + two) * ( ( x2**(alp+5.D0) - x1**(alp+5.D0) ) / (alp + 5.D0) + & 
-                ( x2**(alp+1.D0) - x1**(alp+1.D0) ) /(alp+one) - &
+            sigma2 = this%N_coef / Emin**(alp + two) * ( ( x2**(alp+5.D0) - x1**(alp+5.D0) ) /& 
+                 (alp + 5.D0) + ( x2**(alp+1.D0) - x1**(alp+1.D0) ) /(alp+one) - &
                 two*( x2**(alp+3.D0) - x1**(alp+3.D0) )/(alp+3.D0) )
  
-            J_I = ( sigma1 + 3.D0 * sigma2 ) * gam * freq_s
+            J_I = ( sigma1 + 3.D0 * sigma2 ) * Emin * freq_s
 
             J_Q = ( coef_1(1, 1) * sigma1 + coef_2(1, 1) * sigma2 - &
-                   (coef_1(2, 1) * sigma1 + coef_2(2, 1) * sigma2) ) * gam * freq_s
+                   (coef_1(2, 1) * sigma1 + coef_2(2, 1) * sigma2) ) * Emin * freq_s
   
             J_U = ( coef_1(1, 2) * sigma1 + coef_2(1, 2) * sigma2 - &
-                   (coef_1(2, 2) * sigma1 + coef_2(2, 2) * sigma2) ) * gam * freq_s
+                   (coef_1(2, 2) * sigma1 + coef_2(2, 2) * sigma2) ) * Emin * freq_s
 
             J_V = ( coef_1(1, 3) * sigma1 + coef_2(1, 3) * sigma2 - &
-                   (coef_1(2, 3) * sigma1 + coef_2(2, 3) * sigma2) ) * gam * freq_s
+                   (coef_1(2, 3) * sigma1 + coef_2(2, 3) * sigma2) ) * Emin * freq_s
  
             write(unit=13, fmt=100)J_I , J_Q / J_I, J_U / J_I, J_V / J_I 
             !write(unit=6, fmt=*)'mms= ', coef_1(1, 3), coef_1(2, 3), coef_2(1, 3), coef_2(2, 3)
         enddo
         100 FORMAT(' ', '    ', ES20.10, '   ', ES20.10, '   ', ES20.10, '   ', ES20.10)
         200 FORMAT(' ', '    ', ES20.10) 
-        write(unit=6, fmt=*)'lls=', two * ( one - dcos( pi * 85.D0 / 180.D0 ) ), &
-                              dlog10( two * ( one - dcos( pi * 85.D0 / 180.D0 ) ) )
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-       ! stop
+        write(unit=6, fmt=*)'lls=', two * ( one - mu_obs ), dlog10( two * ( one - mu_obs ) )
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
       end subroutine BCS_analytical_formula_Powerlaw_Sub
 
@@ -183,12 +178,10 @@
 !*******************************************************************************************************
       implicit none
       class(BCS_photons) :: this 
-      real(mcp), intent(in) :: IQUV(1: 4)!, IQUV1(1: 4)
+      real(mcp), intent(in) :: IQUV(1: 4) 
       real(mcp), intent(out) :: c1(1: 2, 1: 3), c2(1: 2, 1: 3)
       real(mcp) :: xythe(1: 4), xythe1(1: 4)
-      real(mcp) :: cos_p1ap2, sin_p1ap2, cos_p1mp2, sin_p1mp2
-      !real(mcp) :: tau, T_bb, T_elec, gam, temp_v1, freq_s, J_I, J_I1, J_I2
-      !real(mcp) :: Intensity(0: N_BCS), log_fs1f(0, N_BCS)
+      real(mcp) :: cos_p1ap2, sin_p1ap2, cos_p1mp2, sin_p1mp2 
       integer :: i
 
         call this%BCS_IQUV2xytheta( IQUV, xythe ) 
