@@ -32,56 +32,38 @@
 
 !*******************************************************************************************************
       subroutine Set_Initial_Values_For_Photon_Parameters_Sub( this, T_elec, &
-                            Emitter, CrossSec_filename, S_in, alp, gama1, gama2, vy1, vy2, E_ini )
+                            CrossSec_filename, S_in, alp, &
+                            gama1, gama2, vy1, vy2, E_ini )
 !*******************************************************************************************************
       implicit none
-      class(Photon_FlatSP) :: this
-      TYPE(Photon_Emitter), intent(inout) :: Emitter 
+      class(Photon_FlatSP) :: this 
       real(mcp), intent(in) :: T_elec, S_in(1: 4), alp, gama1, gama2, vy1, vy2, E_ini
       character*80, intent(inout) :: CrossSec_filename
       integer :: i
       real(mcp) :: dy
 
-!~~~~~~~~~~~~~~~~~~~~Emitte a photon and take its parameters as initial values~~~~~~~~~~~~~~~~~~~~~~~~~~
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-!| Set Initial conditions for the Emitter
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      !CALL Emitter%Set_Emin_Emax()   
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!| Set Initial conditions for the Photon                    
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      Emitter%E_ini = E_ini
+!~~~~~~~Emitte a photon and take its parameters as initial values~~~~~~~~~~~~~~~ 
+      this%E_ini = E_ini
 
       this%alp = alp
       this%gama1 = gama1
-      this%gama2 = gama2
-      this%ln_nu1 = Emitter%ln_nu1
-      this%ln_nu2 = Emitter%ln_nu2
-      this%logE_low = DLOG10(1.D-13)
-      this%logE_up = DLOG10(1.D-7) 
+      this%gama2 = gama2   
       this%T_e = T_elec 
-      this%log10_Tbb = dlog10( E_ini )!( T_bb )
-      !write(*, fmt="(' ', 'mest=', 2ES16.7)")DLOG10(Emitter%E_low1), DLOG10(Emitter%E_up1)
+      this%log10_Tbb = dlog10( E_ini )  
        
       this%n_e1 = 1.D20 
       this%ne_times_SigmaT = this%n_e1 * Sigma_T 
       this%effect_number = 0 
-      this%CrossSectFileName = CrossSec_filename !'./data/SigmaArrayFST11.dat'
-
-      !write(*, fmt="(' ', 'mest=', 2ES16.7)")DLOG10(Emitter%E_low1), DLOG10(Emitter%E_up1)
-      CALL this%Set_Cross_Section_3Te()
-      !CALL Set_psi_phi_chi_zera_array() 
-      
+      this%CrossSectFileName = CrossSec_filename  
+ 
+      CALL this%Set_Cross_Section_3Te()  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       this%y1 = vy1
       this%y2 = vy2
       this%dy = ( this%y2 - this%y1 ) / vL_sc_up 
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      dy = one / Num_mu 
-          this%mu_estimates(1) = dcos(85.D0 * dtor)
-          !this%mu_estimates(2) = 0.5D0
-          !this%mu_estimates(3) = 0.1D0 
-          this%smu_estimates(1) = dsqrt(one - this%mu_estimates(1)**2) 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      this%mu_estimates(1) = dcos(85.D0 * dtor) 
+      this%smu_estimates(1) = dsqrt(one - this%mu_estimates(1)**2) 
 
       dy = twopi / Num_phi
       do i = 0, Num_phi - 1
@@ -90,7 +72,6 @@
           this%cos_phi_esti(i) = zero !dcos(this%phi_estimates(i)) 
       enddo 
       this%P_mu_normal = one / twopi 
-      this%P_nu_normal = one / ( Emitter%ln_nu2 - Emitter%ln_nu1 )
       this%Vector_Stokes4_CF(1) = S_in(1)
       this%Vector_Stokes4_CF(2) = S_in(2)
       this%Vector_Stokes4_CF(3) = S_in(3)
@@ -102,33 +83,14 @@
 
 
 !*******************************************************************************************************
-      subroutine Generate_A_Photon_Sub( this, Emitter )
+      subroutine Generate_A_Photon_Sub( this )
 !*******************************************************************************************************
       implicit none
-      class(Photon_FlatSP) :: this
-      TYPE(Photon_Emitter), intent(inout) :: Emitter  
+      class(Photon_FlatSP) :: this   
       
-      
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      CALL Emitter%get_Phot4k_CtrCF_CovCF_BoundReflec() 
-      !Emitter%Vector_of_Momentum(1:3) = Emitter%Phot4k_CtrCF(2:4) / Emitter%Phot4k_CtrCF(1)
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      !this%z_tau = this%z_max
-      !this%medium_case = Emitter%medium_case
-      this%Vector_of_Momentum_ini = Emitter%Vector_of_Momentum
-      !this%Vector_of_position_ini = Emitter%Vector_of_position
-      this%Phot4k_CtrCF_ini = Emitter%Phot4k_CtrCF  
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      this%E_ini = DABS( Emitter%Phot4k_CtrCF(1) ) 
-      !write(*, *)'f1 = ', this%E_ini
-      this%Sigma_a_E_ini = this%sigma_fn( this%E_ini )! * this%n_e1 
-      !write(*, *)'f2 = ', this%E_ini
-      this%ne_times_Sigma_a = this%Sigma_a_E_ini * this%n_e1 
-      !write(*, *)'f1333 = ', this%Sigma_KN_E_ini, this%E_ini
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      this%w_ini = Emitter%w_ini_em 
-      this%w_ini0 = Emitter%w_ini_em
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      CALL this%get_Phot4k_CtrCF_CovCF_BoundReflec()  
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
       this%Q_sp = zero
       this%U_sp = zero
       this%V_sp = zero
@@ -136,19 +98,14 @@
       this%Psi_I = one
       this%Psi_Q = zero
       this%Psi_U = zero
-      this%Psi_V = zero
-      !this%Vector_Stokes4_CF(1) = one
-      !this%Vector_Stokes4_CF(2) = one / two
-      !this%Vector_Stokes4_CF(3) = one / two
-      !this%Vector_Stokes4_CF(4) = one / dsqrt(two)
+      this%Psi_V = zero 
       
+!~~~ Set the initial polarization vector: f = (1, 0, 0), i.e., along the x-axis.
       this%f4_CF(1) = zero
       this%f4_CF(2) = one
       this%f4_CF(3) = zero
       this%f4_CF(4) = zero
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~       
-      !call this%get_J_emissivity_for_estimation_Phiarr()
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       END SUBROUTINE Generate_A_Photon_Sub
 
 !************************************************************************************

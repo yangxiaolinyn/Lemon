@@ -4,12 +4,7 @@
 
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
       type, public, extends(Photon_With_ScatDistance_FlatSP) :: Photon_ForEstimation
-!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^      
-          !real(mcp) :: nu_low
-          !real(mcp) :: nu_up
-          !real(mcp) :: ln_nu1
-          !real(mcp) :: ln_nu2 
-          !real(mcp) :: T_s   
+!^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^       
           real(mcp) :: PolArrIQUVpmu11(1: 5, 0: vL_sc_up) = zero
           real(mcp) :: PolArrIQUVpmu50(1: 5, 0: vL_sc_up) = zero
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -18,21 +13,9 @@
           real(mcp) :: PolArrIQUV(1: 4, 0: 6, 1: Num_mu, 0: vL_sc_up) = zero   
           !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
       contains 
-!*******************************************************************************************************   
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-          !procedure, public :: FIRST_SCATTERING_OF_PHOT_ELCE   =>    FIRST_SCATTERING_OF_PHOT_ELCE_Sub
-          !procedure, public :: Photon_Electron_Scattering   =>   Photon_Electron_Scattering_Sub
-          !procedure, public :: get_J_emissivity_for_estimation    =>   &
-          !                     get_J_emissivity_for_estimation_Sub
-          !procedure, public :: get_J_emissivity_for_estimation2    =>   &
-          !                     get_J_emissivity_for_estimation2_Sub
-          !procedure, public :: Get_K_P1_P2_Scat_Kernel_for_Estimation   =>   &
-          !                     Get_K_P1_P2_Scat_Kernel_for_Estimation_Sub
-          !procedure, public :: get_J_emissivity_for_estimation_phi   =>  &
-          !                     get_J_emissivity_for_estimation_phi_Sub 
+!******************************************************************************************************* 
           procedure, public :: get_J_emissivity_for_estimation_Phiarr   =>   &
-                               get_J_emissivity_for_estimation_Phiarr_Sub
-    
+                               get_J_emissivity_for_estimation_Phiarr_Sub 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
           procedure, public :: Get_Phot4k_in_ElecFrame_From_Phot4k_in_CF   =>    &
                                Get_Phot4k_in_ElecFrame_From_Phot4k_in_CF_Sub
@@ -41,19 +24,13 @@
           procedure, public :: Get_K_P1_P2_Scat_Kernel_InECF_for_Esti_withpol_medium2  =>   &
                                Get_K_P1_P2_Scat_Kernel_InECF_for_Esti_withpol_medium2_Sub
           procedure, public :: Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation    =>   &
-                               Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation_Sub
-          !procedure, public :: Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation_GivenE   =>   &
-          !                     Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation_GivenE_Sub
+                               Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation_Sub 
           procedure, public :: Get_PolaVector_And_IQU_InCF_for_Estimation    =>   &
-                               Get_PolaVector_And_IQU_InCF_for_Estimation_Sub
-          !procedure, public :: Get_PolaVector_And_IQU_InCF_for_Estimation1    =>   &
-          !                     Get_PolaVector_And_IQU_InCF_for_Estimation1_Sub 
+                               Get_PolaVector_And_IQU_InCF_for_Estimation_Sub 
           procedure, public :: Get_Phot4k_phi_As_Egiven_in_CF   =>    &
                                Get_Phot4k_phi_As_Egiven_in_CF_Sub
           procedure, public :: Set_Phot_f4_Tetrad_In_Phot_CFrame    =>   &
-                               Set_Phot_f4_Tetrad_In_Phot_CFrame_Sub
-          !procedure, public :: Get_K_P1_P2_Scat_Kernel_for_Esti_Electron_Static   =>   &
-          !                     Get_K_P1_P2_Scat_Kernel_for_Esti_Electron_Static_Sub 
+                               Set_Phot_f4_Tetrad_In_Phot_CFrame_Sub 
           procedure, public :: Get_Observed_Stokes_Parameters   =>   &
                                Get_Observed_Stokes_Parameters_Sub
           procedure, public :: Get_Observed_Energy_Bin_index_i  =>  &
@@ -62,26 +39,17 @@
                                Making_An_Estimation_One_MC_Component_1_Sub
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       end type Photon_ForEstimation
-  
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
-      !private :: Calc_Phot_Inform_At_Observer_Diffuse_Reflec_phi_Sub 
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      !private :: get_J_emissivity_for_estimation_Sub
-      !private :: get_J_emissivity_for_estimation2_Sub
-      private :: get_J_emissivity_for_estimation_Phiarr_Sub
-      !private :: Get_K_P1_P2_Scat_Kernel_for_Estimation_Sub
+   
+      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+      private :: get_J_emissivity_for_estimation_Phiarr_Sub 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      private :: Get_Phot4k_in_ElecFrame_From_Phot4k_in_CF_Sub
-      !private :: Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation_GivenE_Sub
+      private :: Get_Phot4k_in_ElecFrame_From_Phot4k_in_CF_Sub 
       private :: Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation_Sub
       private :: Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation_withPol_Sub
       private :: Get_K_P1_P2_Scat_Kernel_InECF_for_Esti_withpol_medium2_Sub
-      private :: Get_PolaVector_And_IQU_InCF_for_Estimation_Sub
-      !private :: Get_PolaVector_And_IQU_InCF_for_Estimation1_Sub
-      !private :: get_J_emissivity_for_estimation_phi_Sub 
+      private :: Get_PolaVector_And_IQU_InCF_for_Estimation_Sub 
       private :: Get_Phot4k_phi_As_Egiven_in_CF_Sub
-      private :: Set_Phot_f4_Tetrad_In_Phot_CFrame_Sub
-      !private :: Get_K_P1_P2_Scat_Kernel_for_Esti_Electron_Static_Sub
+      private :: Set_Phot_f4_Tetrad_In_Phot_CFrame_Sub 
       private :: Get_Observed_Stokes_Parameters_Sub
       private :: Get_Observed_Energy_Bin_index_i_Sub
       private :: Making_An_Estimation_One_MC_Component_1_Sub
@@ -92,10 +60,8 @@
       subroutine Making_An_Estimation_One_MC_Component_1_Sub( this, sphot )
 !*******************************************************************************************************
       implicit none
-      class(Photon_ForEstimation) :: this
-      !real(mcp), intent(in) :: v_esti
-      TYPE(ScatPhoton_KN), INTENT(INOUT) :: sphot
-      !integer, intent(out) :: E_i
+      class(Photon_ForEstimation) :: this 
+      TYPE(ScatPhoton_KN), INTENT(INOUT) :: sphot 
       integer :: i_1
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

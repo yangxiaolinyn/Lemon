@@ -70,7 +70,7 @@ OBJS =  $(OUT_DIR)/ConstantsUnit.o \
         $(OUT_DIR)/0IntialParameters.o \
         $(OUT_DIR)/2SubroutineFunctions.o \
         $(OUT_DIR)/3BasicVariablesAndMethods.o \
-        $(OUT_DIR)/4EmittersBlackBody.o \
+        $(OUT_DIR)/4Emitters.o \
         $(OUT_DIR)/5CrossSection.o \
         $(OUT_DIR)/6SPhotonKNScatter.o \
         $(OUT_DIR)/7ScatterDistance.o \
@@ -92,12 +92,12 @@ $(OUT_DIR)/0Integration2.o: $(OUT_DIR)/ConstantsUnit.o
 $(OUT_DIR)/2SubroutineFunctions.o: $(OUT_DIR)/ConstantsUnit.o $(OUT_DIR)/1RandUtils.o
 $(OUT_DIR)/3BasicVariablesAndMethods.o: $(OUT_DIR)/0Integration.o $(OUT_DIR)/2SubroutineFunctions.o \
              $(OUT_DIR)/0IntialParameters.o 
-$(OUT_DIR)/4EmittersBlackBody.o: $(OUT_DIR)/3BasicVariablesAndMethods.o
+$(OUT_DIR)/4Emitters.o: $(OUT_DIR)/3BasicVariablesAndMethods.o
 $(OUT_DIR)/6SPhotonKNScatter.o: $(OUT_DIR)/3BasicVariablesAndMethods.o
 $(OUT_DIR)/7ScatterDistance.o: $(OUT_DIR)/6SPhotonKNScatter.o
 $(OUT_DIR)/8ModulesForEstimation.o: $(OUT_DIR)/7ScatterDistance.o
-$(OUT_DIR)/9Photons.o: $(OUT_DIR)/8ModulesForEstimation.o $(OUT_DIR)/4EmittersBlackBody.o
-$(OUT_DIR)/BCS.o: $(OUT_DIR)/8ModulesForEstimation.o $(OUT_DIR)/4EmittersBlackBody.o
+$(OUT_DIR)/9Photons.o: $(OUT_DIR)/8ModulesForEstimation.o $(OUT_DIR)/4Emitters.o
+$(OUT_DIR)/BCS.o: $(OUT_DIR)/8ModulesForEstimation.o $(OUT_DIR)/4Emitters.o
 $(OUT_DIR)/10SubFunc_Diffuse_Reflection_phi.o: $(OUT_DIR)/7ScatterDistance.o \
 			 $(OUT_DIR)/9Photons.o
 $(OUT_DIR)/main.o: $(OUT_DIR)/10SubFunc_Diffuse_Reflection_phi.o $(OUT_DIR)/BCS.o
