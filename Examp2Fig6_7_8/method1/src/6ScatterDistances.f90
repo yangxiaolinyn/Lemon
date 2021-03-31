@@ -24,8 +24,7 @@
           real(mcp) :: T_e
           real(mcp) :: time_arrive_observer
           real(mcp) :: time_travel
-          real(mcp) :: t_standard
-          real(mcp) :: r_obs
+          real(mcp) :: t_standard 
           !real(mcp) :: R_in
           !real(mcp) :: R_out
           real(mcp) :: Important_Sampling_Const
@@ -56,10 +55,7 @@
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
           real(mcp) :: Red_Shift_g    ! Red_Shift_g = Phto_E_CF_end / Phto_E_CF_ini
           real(mcp) :: Phot_E_CF_ini  ! Phto_E_CF_ini = P_{\mu} * U^{\mu}(ini)
-          real(mcp) :: Phot_E_CF_end  ! Phto_E_CF_end = P_{\mu} * U^{\mu}(end)
-          real(mcp) :: logE_low
-          real(mcp) :: logE_up
-          real(mcp) :: dindexE 
+          real(mcp) :: Phot_E_CF_end  ! Phto_E_CF_end = P_{\mu} * U^{\mu}(end) 
           real(mcp) :: frequency_v 
           real(mcp) :: Optical_Depth_scatter 
 

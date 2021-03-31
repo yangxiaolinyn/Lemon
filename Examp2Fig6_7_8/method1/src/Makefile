@@ -65,8 +65,6 @@ defaut: compton
 IF90 = ifort
 OBJS =  $(OUT_DIR)/ConstantsUnit.o \
         $(OUT_DIR)/RootsUnit.o \
-        $(OUT_DIR)/ellfunctionsUnit.o \
-        $(OUT_DIR)/BlcoordinateUnit.o \
         $(OUT_DIR)/0Integration.o \
         $(OUT_DIR)/1RandUtils.o \
         $(OUT_DIR)/2SubroutineFunctions.o \
@@ -94,14 +92,12 @@ OBJS =  $(OUT_DIR)/ConstantsUnit.o \
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $(OUT_DIR)/RootsUnit.o: $(OUT_DIR)/ConstantsUnit.o
-$(OUT_DIR)/ellfunctionsUnit.o: $(OUT_DIR)/RootsUnit.o
-$(OUT_DIR)/BlcoordinateUnit.o: $(OUT_DIR)/ellfunctionsUnit.o
 $(OUT_DIR)/0IntialParameters.o: $(OUT_DIR)/ConstantsUnit.o
 $(OUT_DIR)/0Integration.o: $(OUT_DIR)/ConstantsUnit.o
 $(OUT_DIR)/0Integration2.o: $(OUT_DIR)/ConstantsUnit.o
 $(OUT_DIR)/2SubroutineFunctions.o: $(OUT_DIR)/ConstantsUnit.o $(OUT_DIR)/1RandUtils.o
 $(OUT_DIR)/3BasicVariablesAndMethods.o: $(OUT_DIR)/0Integration.o $(OUT_DIR)/2SubroutineFunctions.o \
-             $(OUT_DIR)/BlcoordinateUnit.o $(OUT_DIR)/0IntialParameters.o
+           $(OUT_DIR)/0IntialParameters.o
 $(OUT_DIR)/4Emitters.o: $(OUT_DIR)/3BasicVariablesAndMethods.o
 $(OUT_DIR)/5CrossSection.o: $(OUT_DIR)/ConstantsUnit.o
 $(OUT_DIR)/6ScatterPhotons.o: $(OUT_DIR)/3BasicVariablesAndMethods.o
