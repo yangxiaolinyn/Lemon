@@ -63,8 +63,6 @@ defaut: compton
 IF90 = ifort
 OBJS =  $(OUT_DIR)/ConstantsUnit.o \
         $(OUT_DIR)/RootsUnit.o \
-        $(OUT_DIR)/ellfunctionsUnit.o \
-        $(OUT_DIR)/BlcoordinateUnit.o \
         $(OUT_DIR)/1RandUtils.o \
         $(OUT_DIR)/0Integration.o \
         $(OUT_DIR)/0IntialParameters.o \
@@ -83,14 +81,12 @@ OBJS =  $(OUT_DIR)/ConstantsUnit.o \
 #        ScatterPhoton.o \
 #        Emitter.o \ 
 
-$(OUT_DIR)/RootsUnit.o: $(OUT_DIR)/ConstantsUnit.o
-$(OUT_DIR)/ellfunctionsUnit.o: $(OUT_DIR)/RootsUnit.o
-$(OUT_DIR)/BlcoordinateUnit.o: $(OUT_DIR)/ellfunctionsUnit.o
+$(OUT_DIR)/RootsUnit.o: $(OUT_DIR)/ConstantsUnit.o 
 $(OUT_DIR)/0IntialParameters.o: $(OUT_DIR)/ConstantsUnit.o
 $(OUT_DIR)/0Integration.o: $(OUT_DIR)/ConstantsUnit.o
 $(OUT_DIR)/2SubroutineFunctions.o: $(OUT_DIR)/ConstantsUnit.o $(OUT_DIR)/1RandUtils.o
 $(OUT_DIR)/3BasicVariablesAndMethods.o: $(OUT_DIR)/0Integration.o $(OUT_DIR)/2SubroutineFunctions.o \
-             $(OUT_DIR)/BlcoordinateUnit.o $(OUT_DIR)/0IntialParameters.o    
+            $(OUT_DIR)/0IntialParameters.o    
 #$(OUT_DIR)/photons_FlatSP.o: $(OUT_DIR)/6ScatterDistance_Flat_SpaceTiem.o $(OUT_DIR)/EmittersBlackBody.o
            #$(OUT_DIR)/6ScatterPhotonSequences.o 
 #$(OUT_DIR)/main.o: $(OUT_DIR)/SubFunc_FLST_BoundReflec.o

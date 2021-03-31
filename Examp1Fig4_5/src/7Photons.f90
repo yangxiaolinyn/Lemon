@@ -1,8 +1,6 @@
       module Photons 
-      use PhotonEmitter
-      !use ScatDistance
-      implicit none 
-      integer, parameter :: N_sigma = 1000 
+      use PhotonEmitter 
+      implicit none  
 
       type, public, extends(Photon_Emitter) :: Photon
 !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -24,12 +24,14 @@
           real(mcp) :: Optical_Depth_absorption
           real(mcp), private :: Theta_e
           real(mcp) :: n_obs(1: 3)
-          real(mcp) :: sin_theta_obs
-          real(mcp) :: cos_theta_obs
+          !real(mcp) :: sin_theta_obs
+          !real(mcp) :: cos_theta_obs
           real(mcp) :: sin_phi_obs
           real(mcp) :: cos_phi_obs
-          real(mcp) :: theta_obs
+          real(mcp) :: T_e
           real(mcp) :: phi_obs
+          real(mcp) :: ln_nu1
+          real(mcp) :: ln_nu2
 
       contains 
           procedure, public :: get_Phot4k_CtrCF_CovCF    =>  get_Phot4k_CtrCF_CovCF_Sub
