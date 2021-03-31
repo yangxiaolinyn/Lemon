@@ -38,14 +38,14 @@
 
 !*******************************************************************************************************
       subroutine Set_Initial_Values_For_Photon_Parameters_Sub( this, T_elec, &
-                            CrossSec_filename, S_in, alp, &
+                            S_in, alp, &
                             gama1, gama2, vy1, vy2, E_ini, mu_obs )
 !*******************************************************************************************************
       implicit none
       class(Photon_FlatSP) :: this 
       real(mcp), intent(in) :: T_elec, S_in(1: 4), alp, gama1, &
                                gama2, vy1, vy2, E_ini, mu_obs
-      character*80, intent(inout) :: CrossSec_filename
+      !character*80, intent(inout) :: CrossSec_filename
       integer :: i
       real(mcp) :: dy
 

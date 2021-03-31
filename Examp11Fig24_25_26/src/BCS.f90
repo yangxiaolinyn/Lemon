@@ -133,11 +133,11 @@
 
 
 !*******************************************************************************************************
-      subroutine BCS_analytical_formula_HotElectron_Sub( this, Theta_e, S_in, filename )
+      subroutine BCS_analytical_formula_HotElectron_Sub( this, Theta_e, S_in, mu_obs, filename )
 !*******************************************************************************************************
       implicit none
       class(BCS_photons) :: this 
-      real(mcp), intent(in) :: Theta_e, S_in(1: 4)
+      real(mcp), intent(in) :: Theta_e, S_in(1: 4), mu_obs
       character*80, intent(inout) :: filename
       real(mcp) :: tau, T_bb, T_elec, gam, temp_v1, freq_s, J_I, J_Q, J_U, J_V, J_I1, J_I2
       real(mcp) :: Intensity(0: N_BCS), log_fs1f(0, N_BCS), IQUV(1: 4), xythe(1: 4), cx, cy, &
@@ -176,19 +176,17 @@
         call this%BCS_Get_c1_c2( IQUV, coef_1, coef_2 )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+        call gaulag( x0la362, w0la362, 362, zero ) 
+        temp_v1 = dsqrt( two * ( one - mu_obs ) )
+        open(unit=13, file = filename, status="replace")  
 
-        call Set_xi_wi_all()
-        !Theta_e = 100.D0
-        temp_v1 = dsqrt( two * ( one - dcos( pi * 85.D0 / 180.D0 ) ) )
-        open(unit=13, file = filename, status="replace") 
-        !open(unit=14, file = './spectrum/bcs2.txt', status="replace") 
-
-        do i = 0, N_BCS
-            freq_s = 10.D0**( 1.D0 + (7.D0 - 1.D0) / N_BCS * i )
+        do i = 0, N_BCS 
+            freq_s = 10.D0**( this%vy1 + (this%vy2 - this%vy1) / N_BCS * i )
             gam = dsqrt( freq_s ) / temp_v1
 
-            sigma1 = this%Func_Sigma1( gam, Theta_e, x0la1000, w0la1000, 362 )
-            sigma2 = this%Func_Sigma2( gam, Theta_e, x0la1000, w0la1000, 362 )
+            sigma1 = this%Func_Sigma1( gam, Theta_e, x0la362, w0la362, 362 )
+            sigma2 = this%Func_Sigma2( gam, Theta_e, x0la362, w0la362, 362 )
             !write(unit=6, fmt=*)'lls=',gam, sigma1, sigma2
  
             J_I = ( sigma1 + 3.D0 * sigma2 ) * gam * freq_s
