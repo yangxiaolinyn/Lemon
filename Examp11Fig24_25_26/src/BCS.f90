@@ -15,6 +15,8 @@
           procedure, public :: Func_m_gamma2
           procedure, public :: BCS_analytical_formula_Powerlaw  =>  &
                                BCS_analytical_formula_Powerlaw_Sub
+          procedure, public :: BCS_analytical_formula_HotElectron  =>  &
+                               BCS_analytical_formula_HotElectron_Sub
           procedure, public :: BCS_IQUV2xytheta   =>   BCS_IQUV2xytheta_Sub
           procedure, public :: BCS_xytheta2IQUV   =>   BCS_xytheta2IQUV_Sub
           procedure, public :: BCS_Get_c1_c2   =>   BCS_Get_c1_c2_Sub
@@ -23,7 +25,8 @@
       end type BCS_photons
   
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     
-      private :: BCS_analytical_formula_Powerlaw_Sub
+      private :: BCS_analytical_formula_Powerlaw_Sub 
+      private :: BCS_analytical_formula_HotElectron_Sub
       private :: BCS_IQUV2xytheta_Sub
       private :: BCS_xytheta2IQUV_Sub
       private :: BCS_Get_c1_c2_Sub
@@ -127,6 +130,90 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
       end subroutine BCS_analytical_formula_Powerlaw_Sub
+
+
+!*******************************************************************************************************
+      subroutine BCS_analytical_formula_HotElectron_Sub( this, Theta_e, S_in, filename )
+!*******************************************************************************************************
+      implicit none
+      class(BCS_photons) :: this 
+      real(mcp), intent(in) :: Theta_e, S_in(1: 4)
+      character*80, intent(inout) :: filename
+      real(mcp) :: tau, T_bb, T_elec, gam, temp_v1, freq_s, J_I, J_Q, J_U, J_V, J_I1, J_I2
+      real(mcp) :: Intensity(0: N_BCS), log_fs1f(0, N_BCS), IQUV(1: 4), xythe(1: 4), cx, cy, &
+                   IQUV1(1: 4), xythe1(1: 4), coef_1(1:2, 1: 3), coef_2(1:2, 1: 3), sigma1, sigma2
+      real(mcp) :: cos_p1ap2, sin_p1ap2, cos_p1mp2, sin_p1mp2
+      integer :: i
+
+
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        IQUV(1) = S_in(1)
+        IQUV(2) = S_in(2)
+        IQUV(3) = S_in(3)
+        IQUV(4) = S_in(4)
+        call this%BCS_IQUV2xytheta( IQUV, xythe )
+
+        IQUV1(1) = one
+        IQUV1(2) = zero
+        IQUV1(3) = zero
+        IQUV1(4) = one
+        call this%BCS_IQUV2xytheta( IQUV1, xythe1 )
+
+        cos_p1ap2 = xythe(3) * xythe1(3) - xythe(4) * xythe1(4)
+        sin_p1ap2 = xythe(4) * xythe1(3) + xythe(3) * xythe1(4)
+        cos_p1mp2 = xythe(3) * xythe1(3) + xythe(4) * xythe1(4)
+        sin_p1mp2 = xythe(4) * xythe1(3) - xythe(3) * xythe1(4)
+        
+        coef_1(1, 1) = ( xythe(1)*xythe1(1) - xythe(2)*xythe1(2)*cos_p1mp2 )**2 + &
+                 ( xythe(2)*xythe1(2)*sin_p1mp2 )**2
+
+        coef_2(1, 1) = ( xythe(1)*xythe1(1) - xythe(2)*xythe1(2)*cos_p1ap2 )**2 + &
+                 ( xythe(2)*xythe1(2)*sin_p1ap2 )**2
+
+        write(unit=6, fmt=*)coef_1, coef_2, xythe, xythe1
+ 
+        call this%BCS_Get_c1_c2( IQUV, coef_1, coef_2 )
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        call Set_xi_wi_all()
+        !Theta_e = 100.D0
+        temp_v1 = dsqrt( two * ( one - dcos( pi * 85.D0 / 180.D0 ) ) )
+        open(unit=13, file = filename, status="replace") 
+        !open(unit=14, file = './spectrum/bcs2.txt', status="replace") 
+
+        do i = 0, N_BCS
+            freq_s = 10.D0**( 1.D0 + (7.D0 - 1.D0) / N_BCS * i )
+            gam = dsqrt( freq_s ) / temp_v1
+
+            sigma1 = this%Func_Sigma1( gam, Theta_e, x0la1000, w0la1000, 362 )
+            sigma2 = this%Func_Sigma2( gam, Theta_e, x0la1000, w0la1000, 362 )
+            !write(unit=6, fmt=*)'lls=',gam, sigma1, sigma2
+ 
+            J_I = ( sigma1 + 3.D0 * sigma2 ) * gam * freq_s
+
+            J_Q = ( coef_1(1, 1) * sigma1 + coef_2(1, 1) * sigma2 - &
+                   (coef_1(2, 1) * sigma1 + coef_2(2, 1) * sigma2) ) * gam * freq_s
+  
+            J_U = ( coef_1(1, 2) * sigma1 + coef_2(1, 2) * sigma2 - &
+                   (coef_1(2, 2) * sigma1 + coef_2(2, 2) * sigma2) ) * gam * freq_s
+
+            J_V = ( coef_1(1, 3) * sigma1 + coef_2(1, 3) * sigma2 - &
+                   (coef_1(2, 3) * sigma1 + coef_2(2, 3) * sigma2) ) * gam * freq_s
+ 
+            write(unit=13, fmt=100)J_I, J_Q / J_I, J_U / J_I, J_V / J_I 
+  
+        enddo
+        100 FORMAT(' ', '    ', ES20.10, '   ', ES20.10, '   ', ES20.10, '   ', ES20.10)
+        200 FORMAT(' ', '    ', ES20.10) 
+        write(unit=6, fmt=*)'lls=', two * ( one - dcos( pi * 85.D0 / 180.D0 ) ), &
+                              dlog10( two * ( one - dcos( pi * 85.D0 / 180.D0 ) ) )
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       ! stop
+
+      end subroutine BCS_analytical_formula_HotElectron_Sub
 
 
 !*******************************************************************************************************

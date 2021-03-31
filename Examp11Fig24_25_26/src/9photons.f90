@@ -13,8 +13,10 @@
           procedure, public :: Generate_A_Photon   =>   Generate_A_Photon_Sub
           procedure, public :: Determine_P_Of_Scatt_Site_And_Quantities_At_p    =>   &
                                Determine_P_Of_Scatt_Site_And_Quantities_At_p_sub 
-          procedure, public :: Implement_Estimations_For_IQUVobs   =>   &
-                               Implement_Estimations_For_IQUVobs_Sub
+          procedure, public :: Implement_Estimations_For_IQUVobs_PW   =>   &
+                               Implement_Estimations_For_IQUVobs_PW_Sub
+          procedure, public :: Implement_Estimations_For_IQUVobs_HotE   =>   &
+                               Implement_Estimations_For_IQUVobs_HotE_Sub
           procedure, public :: Implement_Estimations_For_IQUVobs2   =>   &
                                Implement_Estimations_For_IQUVobs2_Sub
           procedure, public :: Photon_Electron_Scattering   =>   &
@@ -25,7 +27,9 @@
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       private :: Set_Initial_Values_For_Photon_Parameters_Sub
       private :: Determine_P_Of_Scatt_Site_And_Quantities_At_p_sub 
-      private :: Implement_Estimations_For_IQUVobs_Sub
+      private :: Implement_Estimations_For_IQUVobs_PW_Sub
+      private :: Implement_Estimations_For_IQUVobs_HotE_Sub
+      private :: Implement_Estimations_For_IQUVobs2_Sub
       private :: Photon_Electron_Scattering_Sub 
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
  
@@ -119,7 +123,7 @@
 
 
 !************************************************************************************
-      SUBROUTINE Implement_Estimations_For_IQUVobs_Sub( this )
+      SUBROUTINE Implement_Estimations_For_IQUVobs_PW_Sub( this )
 !************************************************************************************
       IMPLICIT NONE
       class(Photon_FlatSP) :: this  
@@ -127,7 +131,7 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       CALL this%Set_Photon_f3_Tetrad_In_CF() 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !CALL sphot%Get_gama_mu_phi_Of_Scatter_Electron_HXM( this%T_e ) 
+      !CALL this%Get_gama_mu_phi_Of_Scatter_Electron_HXM( this%T_e ) 
       CALL this%Get_gama_mu_phi_Of_Scatter_Electron_Power( )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       CALL this%Set_Elec_Tetrad_In_CF()
@@ -145,10 +149,42 @@
       CALL this%Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation_withpol()  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 
-      END SUBROUTINE Implement_Estimations_For_IQUVobs_Sub
+      END SUBROUTINE Implement_Estimations_For_IQUVobs_PW_Sub
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
 
+
+!************************************************************************************
+      SUBROUTINE Implement_Estimations_For_IQUVobs_HotE_Sub( this )
+!************************************************************************************
+      IMPLICIT NONE
+      class(Photon_FlatSP) :: this  
+  
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      CALL this%Set_Photon_f3_Tetrad_In_CF() 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      !CALL this%Get_gama_mu_phi_Of_Scatter_Electron_HXM( this%T_e ) 
+      !CALL this%Get_gama_mu_phi_Of_Scatter_Electron_Power( )
+      CALL this%Get_gama_mu_phi_Of_Scatter_Electron( this%T_e )
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      CALL this%Set_Elec_Tetrad_In_CF()
+      this%Vector_Stokes4_CF_esti = this%Vector_Stokes4_CF
+      CALL this%StokesPara_Rotation_Matrix( this%Elec_Phot_phi, &
+                                            this%Vector_Stokes4_CF_esti )
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      CALL this%Set_Phot4k_In_Elec_CF() 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+      CALL this%Set_Phot_Tetrad1_In_Elec_CF() 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
+      this%Vector_Stokes4_ECF = this%Vector_Stokes4_CF_esti
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      CALL this%Get_K_P1_P2_Scat_Kernel_InECF_for_Estimation_withpol()  
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+
+      END SUBROUTINE Implement_Estimations_For_IQUVobs_HotE_Sub
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
 
 
 !************************************************************************************

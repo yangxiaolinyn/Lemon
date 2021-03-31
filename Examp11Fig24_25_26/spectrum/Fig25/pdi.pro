@@ -1,4 +1,4 @@
-      pro pdq
+      pro pdi
 
       oldn=!D.name & set_plot,'ps'
  
@@ -14,13 +14,13 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
       ;rfiles, infile = './IQUV_1.txt',I0, I1, I2, I3, ns
       ;rdfile1, infile = './bcs1.txt', mu = 3, times = 4, IQUV_1, ns 
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
       ;rdfile, infile = './I_Te=100.txt', mu = 1, times = 4, IQUV_1, ns 
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-      ;rdfile, infile = './I_Te=100_Q.txt', mu = 1, times = 4, IQUV_Q, ns 
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-      rdfile, infile = './dataPowerlaw_alp=3.0000_fig26.dat', mu = 1, times = 4, IQUV_Q2, ns 
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+      rdfile, infile = './dataPowerlaw_alp=3.0000_fig25_1.dat', mu = 1, times = 4, IQUV_2, ns 
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      rdfile, infile = './dataPowerlaw_alp=3.0000_fig25_3.dat', mu = 1, times = 4, IQUV_U, ns 
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
       lg10E1 = fltarr(ns)
       nu_2 = 7.
@@ -29,10 +29,9 @@
           lg10E1(i) = ( nu_2 - nu_1 ) / (ns-1) * i + nu_1
       endfor
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-      rdfil, infile = './BCS_Powerlaw_alp=3.0000_fig26.dat', I0, Q0, U0, V0, ns
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-      ;rdfiln, infile = './bcs2.txt', Q1, ns
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+
+      rdfil, infile = './BCS_Powerlaw_alp=3.0000_fig25_1.dat', I0, Q0, U0, V0, ns
+      rdfil, infile = './BCS_Powerlaw_alp=3.0000_fig25_3.dat', Iu0, Qu0, Uu0, Vu0, ns
       ;print, I0(*)
       ;I0(0, 200:*) = 0.
       ;I0(1, 200:*) = 0.
@@ -47,7 +46,7 @@
       pi1=3.141592653589793 / 2.
       lg10E = fltarr(ns)
       nu_2 = 7.
-      ;nu_1 =  1.
+      nu_1 =  1.
       for i=0, ns-1 do begin
           lg10E(i) = ( nu_2 - nu_1 ) / (ns-1) * i + nu_1
       endfor
@@ -63,14 +62,14 @@
       l=16 & xxss=l*(ratio) & yyss=l
       ;xoff=(LL-xxss)/2.,yoff=(3*LL/2.-yyss)/2.,
       !p.font = 0
-      device,filename='./figquv_1.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
+      device,filename='./figI_2.ps',xsize=xxss,ysize=yyss,bits_per_pixel=8,$
       /color,xoff=(2-xxss)/2.0,yoff=(2-yyss)/2.,$
       set_font='Times-Roman';, /tt_font
 
       loadct,30
-      RRR=bytscl(findgen(256))
       GGG=bytscl(findgen(256))
       BBB=bytscl(findgen(256))
+      RRR=bytscl(findgen(256))
       RRR[243:255]=[0,255,0  ,0  ,0  ,255,255,200,0  ,0  ,200,200,0  ]
       GGG[243:255]=[0,0  ,255,0  ,255,0  ,255,0  ,200,0  ,200,0  ,200]
       BBB[243:255]=[0,0  ,0  ,255,255,255,0  ,0  ,0  ,200,0  ,200,200]
@@ -101,7 +100,7 @@
       ygap = 0.01
       ylen = (1. - ygap_up - ygap_d ) / 1
 
-      xlow = nu_1
+      xlow = 1
       xup = 5
       ylow = .5
       yup =    1.2
@@ -121,9 +120,7 @@
       ygs(2) = 0.005
       n_x = 1
       n_y = 1
-
-      csize = 2. 
-
+      csize = 2.0
       ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       panel_set, m_x = n_x, m_y = n_y, xgaps = xgs, ygaps = ygs, $
                    xl_arr, xr_arr, yu_arr, yd_arr
@@ -135,8 +132,8 @@
           ;x1 = xgap1
           ;x2 = x1 + xlen  
           IF (i EQ 0) and (j EQ 0) THEN BEGIN    
-              ylow = -1
-              yup  = 1
+              ylow = -3
+              yup  = 0.5
           endif   
           IF (i EQ 0) and (j EQ 1) THEN BEGIN    
               ylow = 0
@@ -156,11 +153,12 @@
           IF (i EQ 0) and (j EQ 0) THEN BEGIN 
               ;ylow = -5
               ;yup  = 1
-              axis,yaxis=0,ytitle=textoidl('fractional polarization'),$
-                        yticks=10,yminor=2, $
+              axis,yaxis=0,ytitle=textoidl('Log( Intensity I )'),$
+                        yticks=7,yminor=5, $
                 yrange=[ylow,yup],ystyle=1, charsize=csize
-              axis,yaxis=1,ytickname=replicate(' ',12),yticks=10 ,yminor=2, charsize=csize
+              axis,yaxis=1,ytickname=replicate(' ',12),yticks=7,yminor=5, charsize=csize
               axis,xaxis=1,xticks=4,xminor=5,xtickname=replicate(' ',15), charsize=csize
+              ;axis,xaxis=0,xticks=6,xminor=2,xtickname=replicate(' ',15) 
               axis,xaxis=0,xticks=4,xminor=5,xrange=[xlow,xup],xstyle=1,$ 
               charsize=csize,xtitle=textoidl('Log(\varepsilon\prime/\varepsilon)')
               ;,xthick=tickth,color=colorsfont=-1,$;,xtickname=replicate(' ',6),$;,
@@ -170,56 +168,81 @@
               i_mu = 0
               max_I =  max( 10.^2 ) 
               max_I2 =  max( 2. ) 
-              oplot, lg10E, Q0, thick=4, color=black, linestyle=6;,psym=-4  
-              oplot, lg10E, U0, thick=4, color=black, linestyle=6;,psym=-4    
-              oplot, lg10E, V0, thick=4, color=black, linestyle=6;,psym=-4 
-
-              ;oplot, lg10E, Q1, thick=4, color=green, linestyle=6;,psym=-4    
-
-              ;print, lg10E
-              ;oplot, lg10E1, IQUV_1[0, 1, *] / IQUV_1[0, 0, *], thick=4, color=red, linestyle=6;,psym=-4   
-              ;oplot, lg10E1, IQUV_1[0, 2, *] / IQUV_1[0, 0, *], thick=4, color=green, linestyle=6;,psym=-4  
-              ;oplot, lg10E1, IQUV_1[0, 3, *] / IQUV_1[0, 0, *], thick=4, color=green, linestyle=6;,psym=-4  
-              ;oplot, lg10E1, IQUV_Q[0, 1, *] / IQUV_Q[0, 0, *], thick=4, color=green, linestyle=6;,psym=-4  
-              ;oplot, lg10E1, -IQUV_Q[0, 1, *] / IQUV_Q[0, 0, *], thick=4, color=green, linestyle=6;,psym=-4  
-
-              histgram, x_arr = lg10E1, y_arr = IQUV_Q2[0, 1, *] / IQUV_Q2[0, 0, *], x, y
-              oplot, x, y, thick=4, color=blue, linestyle=6;,psym=-4  
-
-              histgram, x_arr = lg10E1, y_arr = IQUV_Q2[0, 2, *] / IQUV_Q2[0, 0, *], x, y
-              oplot, x, y, thick=4, color=red, linestyle=6;,psym=-4  
-
-              histgram, x_arr = lg10E1, y_arr = IQUV_Q2[0, 3, *] / IQUV_Q2[0, 0, *], x, y
-              oplot, x, y, thick=4, color=green, linestyle=6;,psym=-4 
-
+              oplot, lg10E, alog10( I0 / max(I0) ), thick=4, color=black, linestyle=6;,psym=-4  
+              ;oplot, lg10E, alog10( Iu0 / max(Iu0) ), thick=3, color=red, linestyle=6;,psym=-4  
  
-             n_arr = 3
-             charac_arr = sindgen(n_arr);" S(1,1,0,0), S(1,0,1,0), S(1,0,0,1) "
-             charac_arr(0) = textoidl(' Q / I ')
-             charac_arr(1) = textoidl(' U / I ')
-             charac_arr(2) = textoidl(' V / I ')
+              ;oplot, lg10E1, alog10( IQUV_1[0, 0, *]/ max(IQUV_1[0, 0, *]) ), $
+               ;         thick=4, color=red, linestyle=6;,psym=-4    
+
+
+              histgram, x_arr = lg10E1, y_arr = alog10( IQUV_2[0, 0, *]/ max(abs(IQUV_2[0, 0, *])) ), x, y
+              oplot, x, y, thick=4, color=blue, linestyle=6;,psym=-4   
+
+              histgram, x_arr = lg10E1, y_arr = alog10( IQUV_U[0, 0, *]/ max(abs(IQUV_U[0, 0, *])) ), x, y
+              ;oplot, x, y, thick=2, color=red, linestyle=6;,psym=-4   
+
+           ; xyouts, 1.5, 0.4,  textoidl('S_{in} = (1, 1 / 3^{1/2}, 1 / 3^{1/2}, 1 / 3^{1/2})'), charsize=1.3
+
+
+             n_arr = 2
+             charac_arr = sindgen(n_arr);" S(1,1,0,0), S(1,0,1,0), S(1,0,0,1) " 
+             charac_arr(0) = textoidl('numerical')
+             charac_arr(1) = textoidl('BCS70 semi-analytic') 
              ;charac_arr(3) = textoidl('S_{in}=(1,1/2,1/2,1/\sqrt{2})')
-             dy = 0.1 
+             dy = 0.3
              cha_size = 1.6
-             x0 = 1.5 
-             y0 = -0.3
-             length = 0.60
+             x0 = 1.2
+             y0 =  -0.0
+             length = 0.6
              colors = indgen(n_arr)
              colors(0) = blue
-             colors(1) = red
-             colors(2) = green
+             colors(1) = black
              line_thick = 4
           curves, dy = dy, charac_arr = charac_arr, n_arr = n_arr, cha_size = cha_size, x0 = x0, $
             y0 = y0, length = length, colors = colors, line_thick = line_thick
 
-            xyouts, 1.4, y0-5*dy,  textoidl('S_{in} = (1, 0.25, 0.433, 0.866)'),$
-                  charsize=1.6
 
-            xll = 1.4
-            yll = -0.6
-            x_length = 1.03
-            y_length = 0.4
+            xll = 1.1 
+            yll = -0.46
+            x_length = 1.9
+            y_length = 0.6
             rectangle, xll = xll, yll = yll, x_length = x_length, y_length = y_length  
+
+              ;print, alog10( IQUV_1[0, 0, *] ), max(IQUV_1[0, 0, *])
+              ;max3 = max( I3(i_mu, *) / max_I )
+              ;KED2,  lg10E, I3(i_mu, *) , Y_array_kde, 0.05
+              ;oplot, lg10E, alog10( Y_array_kde / max(Y_array_kde) *max3 ),thick=4,$
+              ;              color=red,linestyle=6;,psym=-4  
+
+
+             ; max2 = max( I2(i_mu, *) / max_I )
+              ;KED2,  lg10E, I2(i_mu, *) , Y_array_kde, 0.05
+              ;oplot, lg10E, alog10( Y_array_kde / max(Y_array_kde) *max2 ),thick=4,$
+              ;              color=red,linestyle=6;,psym=-4  
+ 
+              ;max1 = max( I1(i_mu, *) / max_I )
+             ; KED2,  lg10E, I1(i_mu, *) , Y_array_kde, 0.05
+              ;oplot, lg10E, alog10( Y_array_kde / max(Y_array_kde) *max1 ),thick=4,$
+              ;              color=blue,linestyle=6;,psym=-4  
+
+           ;   KED2, lg10E,   I6 , Y_array_kde, 0.009
+            ;  max2 = max(Y_array_kde)
+             ; oplot, lg10E(ns:nt), alog10(Y_array_kde(ns:nt)/max2 )-0.,thick=2,$
+             ;               color=blue,linestyle=6;,psym=-4 
+            IF 1 eq 0 THEN BEGIN 
+              dy = 0.3
+              xyouts, 2.08, 0.4, textoidl('\mu = 1.0'), charsize=1.3
+              oplot, [1.2, 2.], [0.45, 0.45], thick=4, color=252, linestyle=6;,psym=-4  
+              xyouts, 2.08, 0.4 - dy, textoidl('\mu = 0.5'), charsize=1.3
+              oplot, [1.2, 2.], [0.45 - dy*1, 0.45 - dy*1], thick=4, color=244, linestyle=2;,psym=-4  
+              xyouts, 2.08, 0.4 - dy*2., textoidl('\mu = 0.1'), charsize=1.3
+              oplot, [1.2, 2.], [0.45 - dy*2, 0.45 - dy*2], thick=4, color=254, linestyle=3;,psym=-4  
+              xyouts, 2.08, 0.4 - dy*3., textoidl('\mu = - 0.5'), charsize=1.3
+              oplot, [1.2, 2.], [0.45 - dy*3., 0.45 - dy*3.], thick=4, color=255, linestyle=4;,psym=-4 
+
+              xyouts, -0.5, 0.4, textoidl('\Theta = 0.5'), charsize=1.3 
+              xyouts, -0.5, 0.4 - dy, textoidl('\tau = 0.1'), charsize=1.3 
+             endif
    
           endif 
 
@@ -315,7 +338,9 @@
 
       end
 
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 PRO rfiles, infile = infile, I0, I1, I2, I3, n
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;Demonstrate reading from a file 
 ;infile = !Bowman + ’data/table.txt’ ;Input file name
 n = FILE_LINES(infile) 
@@ -344,7 +369,9 @@ FREE_LUN, iunit ;Close input file
 END
 
  
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 PRO rfile3, infile = infile, I0, I1, I2, n
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;Demonstrate reading from a file 
 ;infile = !Bowman + ’data/table.txt’ ;Input file name
 n = FILE_LINES(infile) 
@@ -371,7 +398,9 @@ FREE_LUN, iunit ;Close input file
 END  
 
 
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 PRO rdfile, infile = infile, mu = mu, times = times, I1_6, n
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;Demonstrate reading from a file 
 ;infile = !Bowman + ’data/table.txt’ ;Input file name
 n = FILE_LINES(infile) / mu
@@ -446,7 +475,9 @@ END
 
 
 
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 PRO KED2, X_array, Y_array, Y_array_kde, h_gauss
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
       ;h_gauss = 0.02
@@ -469,7 +500,9 @@ END
 
 
 
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 PRO rdfil, infile = infile, I0, Q0, U0, V0, n
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;Demonstrate reading from a file 
 ;infile = !Bowman + ’data/table.txt’ ;Input file name
 n = FILE_LINES(infile) 
@@ -499,35 +532,9 @@ END
 
 
 
-PRO rdfiln, infile = infile, Q0, n
-;Demonstrate reading from a file 
-;infile = !Bowman + ’data/table.txt’ ;Input file name
-n = FILE_LINES(infile) 
-      ;I0=fltarr(n) 
-      Q0=fltarr(n) 
-      ;V0=fltarr(n) 
-;x = FLTARR(n)  
- print, ' data number= ', n  
- 
- OPENR, iunit, infile, /GET_LUN ;Open input file
- Point_lun, iunit, 0
-   
-      FOR i = 0, n-1 DO BEGIN
-         ;ReadF,lunAo10, x1, x2, x3, x4;, FORMAT = "(4F22.17)"
-         READF, iunit, x1 ;0, x1, x2;, FORMAT = "(4F22.17)"
-         ;I0[i] = x0 
-         Q0[i] = x1 
-         ;V0[i] = x2
-         ;print, x3, x4, x5, x6
-      ENDFOR 
-FREE_LUN, iunit ;Close input file
-;FOR i = 0, n−1 DO PRINT, x[i], logx[i], $ ;Print values to terminal
-;    FORMAT = "(2F12.5)"
-END
 
 
-
-
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 PRO histgram, x_arr = x_arr, y_arr = y_arr, x, y
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     hist = y_arr
@@ -547,7 +554,6 @@ PRO histgram, x_arr = x_arr, y_arr = y_arr, x, y
 
 END
 
- 
 
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 PRO curves, dy = dy, charac_arr = charac_arr, n_arr = n_arr, cha_size = cha_size, x0 = x0, $
@@ -555,10 +561,9 @@ PRO curves, dy = dy, charac_arr = charac_arr, n_arr = n_arr, cha_size = cha_size
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     FOR i = 0, n_arr-1 DO BEGIN  
         oplot, [x0, x0 + length], [y0-dy*i, y0-dy*i], thick=line_thick, color=colors(i), linestyle=6;,psym=-4  
-        xyouts, x0 + length*1.01, y0-dy*i-0.023, charac_arr(i), charsize=cha_size
+        xyouts, x0 + length*1.01, y0-dy*i-0.04, charac_arr(i), charsize=cha_size
     ENDFOR 
 END
-
 
 
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

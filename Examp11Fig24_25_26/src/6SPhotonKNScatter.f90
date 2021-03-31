@@ -71,7 +71,7 @@
       procedure, public :: Set_Photon_f3_Tetrad_In_CF   => Set_Photon_f3_Tetrad_In_CF_Sub
       procedure, public :: Set_Elec_Tetrad_In_CF        => Set_Elec_Tetrad_In_CF_Sub
       procedure, public :: Vector_Cross_Product         => Vector_Cross_Product_Sub
-      procedure, public :: Get_gama_mu_phi_Of_Scat_Elec => &
+      procedure, public :: Get_gama_mu_phi_Of_Scatter_Electron => &
                            Get_gama_mu_phi_Of_Scatter_Electron_Sub
       procedure, public :: Get_gama_mu_phi_Of_Scatter_Electron_Power    =>  &
                            Get_gama_mu_phi_Of_Scatter_Electron_Power_Sub
@@ -328,7 +328,7 @@
 
       else 
 
-          call this%Get_gama_mu_phi_Of_Scat_Elec( T_e ) 
+          call this%Get_gama_mu_phi_Of_Scatter_Electron( T_e ) 
 
       endif
 
@@ -647,11 +647,7 @@
       p44 = t * dsqrt( 0.5D0 * t )
       S3 = p11 + p22 + p33 + p44
       i = 0
-      !if( isnan( this%Phot4k_CtrCF(1) ) )then
-      !    write(*, *)'000==', dabs( this%Phot4k_CtrCF(1) ), &
-      !            this%Elec_V, this%Elec_Phot_mu 
-      !    stop
-      !endif
+ 
       gamamuphi : do
         i = i + 1
         do 

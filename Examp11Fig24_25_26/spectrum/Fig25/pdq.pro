@@ -18,9 +18,15 @@
       ;rdfile, infile = './I_Te=100.txt', mu = 1, times = 4, IQUV_1, ns 
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       ;rdfile, infile = './I_Te=100_Q.txt', mu = 1, times = 4, IQUV_Q, ns 
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-      rdfile, infile = './dataPowerlaw_alp=3.0000_fig26.dat', mu = 1, times = 4, IQUV_Q2, ns 
-;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+      rdfile, infile = './dataPowerlaw_alp=3.0000_fig25_1.dat', mu = 1, times = 4, IQUV_Q2, ns 
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      rdfile, infile = './dataPowerlaw_alp=3.0000_fig25_2.dat', mu = 1, times = 4, mIQUV_Q2, ns 
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      rdfile, infile = './dataPowerlaw_alp=3.0000_fig25_3.dat', mu = 1, times = 4, IQUV_U, ns 
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      rdfile, infile = './dataPowerlaw_alp=3.0000_fig25_4.dat', mu = 1, times = 4, IQUV_V, ns 
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
       lg10E1 = fltarr(ns)
       nu_2 = 7.
@@ -29,7 +35,14 @@
           lg10E1(i) = ( nu_2 - nu_1 ) / (ns-1) * i + nu_1
       endfor
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-      rdfil, infile = './BCS_Powerlaw_alp=3.0000_fig26.dat', I0, Q0, U0, V0, ns
+      rdfil, infile = './BCS_Powerlaw_alp=3.0000_fig25_1.dat', I0, Q0, U0, V0, ns
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      rdfil, infile = './BCS_Powerlaw_alp=3.0000_fig25_2.dat', mI0, mQ0, mU0, mV0, ns
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+      rdfil, infile = './BCS_Powerlaw_alp=3.0000_fig25_3.dat', Iu0, Qu0, Uu0, Vu0, ns 
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+      rdfil, infile = './BCS_Powerlaw_alp=3.0000_fig25_4.dat', Iv0, Qv0, Uv0, Vv0, ns 
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
       ;rdfiln, infile = './bcs2.txt', Q1, ns
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
@@ -121,9 +134,7 @@
       ygs(2) = 0.005
       n_x = 1
       n_y = 1
-
-      csize = 2. 
-
+      csize = 2.0
       ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       panel_set, m_x = n_x, m_y = n_y, xgaps = xgs, ygaps = ygs, $
                    xl_arr, xr_arr, yu_arr, yd_arr
@@ -160,19 +171,24 @@
                         yticks=10,yminor=2, $
                 yrange=[ylow,yup],ystyle=1, charsize=csize
               axis,yaxis=1,ytickname=replicate(' ',12),yticks=10 ,yminor=2, charsize=csize
-              axis,xaxis=1,xticks=4,xminor=5,xtickname=replicate(' ',15), charsize=csize
+              ;axis,xaxis=1,xticks=4,xminor=5,xtickname=replicate(' ',15), charsize=csize
+              ;axis,xaxis=0,xticks=6,xminor=2,xtickname=replicate(' ',15) 
               axis,xaxis=0,xticks=4,xminor=5,xrange=[xlow,xup],xstyle=1,$ 
               charsize=csize,xtitle=textoidl('Log(\varepsilon\prime/\varepsilon)')
               ;,xthick=tickth,color=colorsfont=-1,$;,xtickname=replicate(' ',6),$;,
 
               ;nt = 1000 * 5.9 / 6
+              tk = 4
               ns = 0
               i_mu = 0
               max_I =  max( 10.^2 ) 
               max_I2 =  max( 2. ) 
-              oplot, lg10E, Q0, thick=4, color=black, linestyle=6;,psym=-4  
-              oplot, lg10E, U0, thick=4, color=black, linestyle=6;,psym=-4    
-              oplot, lg10E, V0, thick=4, color=black, linestyle=6;,psym=-4 
+              oplot, lg10E, Q0, thick=tk, color=black, linestyle=6;,psym=-4 
+              oplot, lg10E, mQ0, thick=tk, color=black, linestyle=6;,psym=-4 
+              oplot, lg10E, Uu0, thick=tk, color=black, linestyle=6;,psym=-4  
+              oplot, lg10E, Vv0, thick=tk, color=black, linestyle=6;,psym=-4  
+              ;oplot, lg10E, U0, thick=2, color=black, linestyle=6;,psym=-4    
+              ;oplot, lg10E, V0, thick=2, color=black, linestyle=6;,psym=-4 
 
               ;oplot, lg10E, Q1, thick=4, color=green, linestyle=6;,psym=-4    
 
@@ -184,41 +200,47 @@
               ;oplot, lg10E1, -IQUV_Q[0, 1, *] / IQUV_Q[0, 0, *], thick=4, color=green, linestyle=6;,psym=-4  
 
               histgram, x_arr = lg10E1, y_arr = IQUV_Q2[0, 1, *] / IQUV_Q2[0, 0, *], x, y
-              oplot, x, y, thick=4, color=blue, linestyle=6;,psym=-4  
+              oplot, x, y, thick=tk, color=blue, linestyle=6;,psym=-4  
+              histgram, x_arr = lg10E1, y_arr = mIQUV_Q2[0, 1, *] / mIQUV_Q2[0, 0, *], x, y
+              oplot, x, y, thick=tk, color=247, linestyle=6;,psym=-4  
 
-              histgram, x_arr = lg10E1, y_arr = IQUV_Q2[0, 2, *] / IQUV_Q2[0, 0, *], x, y
-              oplot, x, y, thick=4, color=red, linestyle=6;,psym=-4  
+              histgram, x_arr = lg10E1, y_arr = IQUV_U[0, 2, *] / IQUV_U[0, 0, *], x, y
+              oplot, x, y, thick=tk, color=red, linestyle=6;,psym=-4  
 
-              histgram, x_arr = lg10E1, y_arr = IQUV_Q2[0, 3, *] / IQUV_Q2[0, 0, *], x, y
-              oplot, x, y, thick=4, color=green, linestyle=6;,psym=-4 
+              histgram, x_arr = lg10E1, y_arr = IQUV_V[0, 3, *] / IQUV_V[0, 0, *], x, y
+              oplot, x, y, thick=tk, color=green, linestyle=6;,psym=-4 
 
  
-             n_arr = 3
+              axis,xaxis=1,xticks=4,xminor=5,xtickname=replicate(' ',15), charsize=csize
+
+             n_arr = 4
              charac_arr = sindgen(n_arr);" S(1,1,0,0), S(1,0,1,0), S(1,0,0,1) "
-             charac_arr(0) = textoidl(' Q / I ')
-             charac_arr(1) = textoidl(' U / I ')
-             charac_arr(2) = textoidl(' V / I ')
+             charac_arr(0) = textoidl(' S_{in}=(1, 1, 0, 0) ')
+             charac_arr(1) = textoidl(' S_{in}=(1, -1, 0, 0) ')
+             charac_arr(2) = textoidl(' S_{in}=(1, 0, 1, 0) ')
+             charac_arr(3) = textoidl(' S_{in}=(1, 0, 0, 1) ')
              ;charac_arr(3) = textoidl('S_{in}=(1,1/2,1/2,1/\sqrt{2})')
              dy = 0.1 
              cha_size = 1.6
              x0 = 1.5 
              y0 = -0.3
-             length = 0.60
+             length = 0.6
              colors = indgen(n_arr)
              colors(0) = blue
-             colors(1) = red
-             colors(2) = green
+             colors(1) = 247
+             colors(2) = red
+             colors(3) = green
              line_thick = 4
           curves, dy = dy, charac_arr = charac_arr, n_arr = n_arr, cha_size = cha_size, x0 = x0, $
             y0 = y0, length = length, colors = colors, line_thick = line_thick
 
-            xyouts, 1.4, y0-5*dy,  textoidl('S_{in} = (1, 0.25, 0.433, 0.866)'),$
-                  charsize=1.6
+            ;xyouts, 1.4, y0-5*dy,  textoidl('S_{in} = (1, 1 / 3^{1/2}, 1 / 3^{1/2}, 1 / 3^{1/2})'),$
+            ;      charsize=1.3
 
             xll = 1.4
-            yll = -0.6
-            x_length = 1.03
-            y_length = 0.4
+            yll = -0.7
+            x_length = 1.6
+            y_length = 0.5
             rectangle, xll = xll, yll = yll, x_length = x_length, y_length = y_length  
    
           endif 
@@ -555,7 +577,7 @@ PRO curves, dy = dy, charac_arr = charac_arr, n_arr = n_arr, cha_size = cha_size
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     FOR i = 0, n_arr-1 DO BEGIN  
         oplot, [x0, x0 + length], [y0-dy*i, y0-dy*i], thick=line_thick, color=colors(i), linestyle=6;,psym=-4  
-        xyouts, x0 + length*1.01, y0-dy*i-0.023, charac_arr(i), charsize=cha_size
+        xyouts, x0 + length*1.01, y0-dy*i-0.02, charac_arr(i), charsize=cha_size
     ENDFOR 
 END
 

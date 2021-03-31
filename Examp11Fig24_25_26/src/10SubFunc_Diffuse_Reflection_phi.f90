@@ -11,12 +11,13 @@
 !**************************************************************************************
     SUBROUTINE mimick_of_ph_Slab_BoundReflc( Total_Phot_Num, T_elec, &
                       CrossSec_filename, Spentrum_filename, S_in, &
-                      alp, gama1, gama2, vy1, vy2, E_ini, mu_obs )
+                      alp, gama1, gama2, vy1, vy2, E_ini, mu_obs, case_powerlaw )
 !************************************************************************************** 
     implicit none 
     real(mcp), intent(in) :: T_elec, S_in(1: 4), alp, gama1, &
                              gama2, vy1, vy2, E_ini, mu_obs
     integer(kind = 8), intent(in) :: Total_Phot_Num
+    logical, intent(in) :: case_powerlaw
     character*80, intent(inout) :: CrossSec_filename, Spentrum_filename
     real(mcp) :: E, E_low, E_up  
     integer(kind = 8) :: Num_Photons  
@@ -55,27 +56,46 @@
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     Num_Photons = 0    
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    Do 
+
+
+    if( case_powerlaw )then
+      Do 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
         Num_Photons = Num_Photons + 1 
         phot%scatter_times = 0  
   
         CALL phot%Generate_A_Photon( )  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   
-        CALL phot%Implement_Estimations_For_IQUVobs( )
-        !CALL phot%Photon_Electron_Scattering( sphot )
-        !write(*,fmt=*)'ssff222===', Num_Photons
+        CALL phot%Implement_Estimations_For_IQUVobs_PW( ) 
  
-        If ( mod(Num_Photons, 500000)==0 .and. myid == np-1 ) then 
-        !write(unit = *, fmt = *)'*************************************************************************' 
-        write(unit = *, fmt=*)'***** The contributions of the ', Num_Photons, &
+        If ( mod(Num_Photons, 500000)==0 .and. myid == np-1 ) then  
+            write(unit = *, fmt=*)'***** The contributions of the ', Num_Photons, &
                     ' th Photon has been recorded. '  
-        write(unit = *, fmt = *)'***** My Duty Photon Number is: ', myid, mydutyphot 
-        write(unit = *, fmt = *)'*************************************************************************'
+            write(unit = *, fmt = *)'***my Id is: ',  myid, 'and my Duty Photon Number is: ', mydutyphot 
+            write(unit = *, fmt = *)'******************************************************************'
         endif 
  
         If( Num_Photons > mydutyphot )EXIT  
-    Enddo   
+      Enddo
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+    else
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+      Do 
+        Num_Photons = Num_Photons + 1 
+        phot%scatter_times = 0  
+  
+        CALL phot%Generate_A_Photon( )      
+        CALL phot%Implement_Estimations_For_IQUVobs_HotE( ) 
+ 
+        If ( mod(Num_Photons, 500000)==0 .and. myid == np-1 ) then  
+            write(unit = *, fmt=*)'***** The contributions of the ', Num_Photons, &
+                    ' th Photon has been recorded. '  
+            write(unit = *, fmt = *)'***my Id is: ',  myid, 'and my Duty Photon Number is: ', mydutyphot 
+            write(unit = *, fmt = *)'******************************************************************'
+        endif  
+        If( Num_Photons > mydutyphot )EXIT  
+      Enddo
+    endif
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
       If ( myid /= np-1 ) then  
           send_num  = ( vL_sc_up + 1 ) * 4 * 7 * Num_mu
