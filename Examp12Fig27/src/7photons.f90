@@ -87,68 +87,43 @@
 
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      SUBROUTINE Set_initial_parameter_values( this, tau, case1 )
+      SUBROUTINE Set_initial_parameter_values( this, tau, &
+              jIQUV, alpIQUV, rhoQUV, IQUV0, alpha )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       IMPLICIT NONE  
       class(Photon_FlatSP) :: this  
-      REAL(mcp), INTENT(INOUT) :: tau
-      LOGICAL, INTENT(IN) :: case1
+      REAL(mcp), INTENT(IN) :: tau, jIQUV(1: 4), alpIQUV(1: 4), &
+                               rhoQUV(1: 3), IQUV0(1: 4), alpha 
       REAL(mcp) :: E_low, E_up
  
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !| Set Initial conditions for the Photon                     !
-!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      !alpI = 2.D0
-      !alpQ = 1.4D0
-      !jI = 3.21D0
-      !jQ = 2.D0
-      this%effect_number = 0
-      if( case1 )then 
-          this%j_I = 2.1D0
-          this%j_Q = 1.2D0 
-          this%j_U = 0.D0 
-          this%j_V = 0.D0 
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+          this%effect_number = 0 
+          this%j_I = jIQUV(1)
+          this%j_Q = jIQUV(2)
+          this%j_U = jIQUV(3)
+          this%j_V = jIQUV(4)
 
-          this%alpI = 2.D0
-          this%alpQ = 1.5D0
-          this%alpU = 0.D0
-          this%alpV = 0.D0
+          this%alpI = alpIQUV(1)
+          this%alpQ = alpIQUV(2)
+          this%alpU = alpIQUV(3)
+          this%alpV = alpIQUV(4)
 
-          this%rhoQ = 0.D0
-          this%rhoU = 0.D0
-          this%rhoV = 0.D0
+          this%rhoQ = rhoQUV(1)
+          this%rhoU = rhoQUV(2)
+          this%rhoV = rhoQUV(3)
 
-          this%I0 = zero
-          this%Q0 = zero
-          this%U0 = zero
-          this%V0 = zero
+          this%I0 = IQUV0(1)
+          this%Q0 = IQUV0(2)
+          this%U0 = IQUV0(3)
+          this%V0 = IQUV0(4)
   
-          this%alp = 3.D0
-      else
-          this%j_I = zero
-          this%j_Q = 9.02D0 
-          this%j_U = 9.033D0 
-          this%j_V = 9.0587D0 
-          this%alpI = zero
-          this%alpQ = zero
-          this%alpU = zero
-          this%alpV = zero
-
-          this%rhoQ = 7.5D0
-          this%rhoU = 3.4D0
-          this%rhoV = 7.2D0
-
-          this%I0 = zero
-          this%Q0 = zero
-          this%U0 = zero
-          this%V0 = zero
-  
-          this%alp = 60.D0
+          this%alp = alpha 
+ 
           this%rho  = dsqrt(this%rhoQ**2 + this%rhoU**2 + this%rhoV**2)
-
-          this%j_Q = ( -this%rho**2 / this%rhoQ * 0.95D0 - this%j_V * this%rhoV ) / this%rhoQ
-          !write(*, *)'sss = ', this%j_Q = -10.71710 
-      endif 
+ 
+          !write(*, *)'sss = ', this%j_Q = -10.71710  
       !this%alpI = zero
       !this%rho  = dsqrt(this%rhoQ**2 + this%rhoU**2 + this%rhoV**2)
 

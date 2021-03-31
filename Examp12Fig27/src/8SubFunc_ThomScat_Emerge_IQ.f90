@@ -11,11 +11,13 @@
       CONTAINS 
 !**************************************************************************************
     SUBROUTINE mimick_of_ph_finity_zone_Emerge_IQ( Total_Phot_Num, tau, &
+           jIQUV, alpIQUV, rhoQUV, IQUV0, alpha, &
            AnalyticResult_Fig27_left, AnalyticResult_Fig27_right, &
            MCResultsFile, Fig27_left_panel )
 !************************************************************************************** 
     implicit none
-    real(mcp), intent(inout) :: tau
+    real(mcp), intent(inout) :: tau, jIQUV(1: 4), alpIQUV(1: 4), &
+                              rhoQUV(1: 3), IQUV0(1: 4), alpha
     character*80, intent(in) :: AnalyticResult_Fig27_left, &
                  AnalyticResult_Fig27_right, MCResultsFile
     logical, intent(in) :: Fig27_left_panel
@@ -52,15 +54,16 @@
     endif 
 
   
+!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    CALL phot%Set_initial_parameter_values( tau, jIQUV, alpIQUV, &
+                          rhoQUV, IQUV0, alpha )
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     if( Fig27_left_panel )then 
-        CALL phot%Set_initial_parameter_values( tau, Fig27_left_panel )
         if( myid == np-1 ) then 
             call phot%Get_Analytical_Solutions_Of_RTE_IQ( tau, 1000, &
                                            AnalyticResult_Fig27_left )
         endif
-    else
-        CALL phot%Set_initial_parameter_values( tau, Fig27_left_panel )
+    else 
         if( myid == np-1 ) then  
             call phot%Get_Analytical_Solutions_Of_RTE_QUV( tau, 1000, &
                                            AnalyticResult_Fig27_right )
