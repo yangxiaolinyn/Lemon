@@ -94,6 +94,11 @@ $(OUT_DIR)/3BasicVariablesAndMethods.o: $(OUT_DIR)/0Integration.o $(OUT_DIR)/2Su
 # include the dependencies $(LIB_DIR)/libynogk.a
 #include makefile.dep
 
+
+$(shell if [ ! -e $(OUT_DIR) ];then mkdir -p $(OUT_DIR); fi)
+$(shell if [ ! -e $(MOD_DIR) ];then mkdir -p $(MOD_DIR); fi)
+
+
 directories:
 	mkdir -p $(OUT_DIR)
 $(bin): $(OBJS)
