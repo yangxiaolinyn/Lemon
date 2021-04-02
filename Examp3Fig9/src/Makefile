@@ -101,7 +101,12 @@ $(OUT_DIR)/8SubFunc_ThomScat_Emerge_IQ.o: $(OUT_DIR)/6ScatterDistance.o \
 $(OUT_DIR)/main.o: $(OUT_DIR)/8SubFunc_ThomScat_Emerge_IQ.o
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- 
+
+
+
+$(shell if [ ! -e $(OUT_DIR) ];then mkdir -p $(OUT_DIR); fi)
+$(shell if [ ! -e $(MOD_DIR) ];then mkdir -p $(MOD_DIR); fi) 
+
 $(bin): $(OBJS)
 	$(FC) $^ -o ../$@ $(LDFLAGS) $(LDLIBS) 
  
