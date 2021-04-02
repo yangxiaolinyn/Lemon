@@ -104,6 +104,9 @@ $(OUT_DIR)/main.o: $(OUT_DIR)/10SubFunc_Diffuse_Reflection_phi.o $(OUT_DIR)/BCS.
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
+$(shell if [ ! -e $(OUT_DIR) ];then mkdir -p $(OUT_DIR); fi)
+$(shell if [ ! -e $(MOD_DIR) ];then mkdir -p $(MOD_DIR); fi) 
+
 $(bin): $(OBJS)
 	$(FC) $^ -o ../$@ $(LDFLAGS) $(LDLIBS) 
  
