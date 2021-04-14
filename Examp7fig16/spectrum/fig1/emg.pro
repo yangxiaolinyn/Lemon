@@ -92,7 +92,7 @@
           endif  
           IF i EQ 2 THEN BEGIN 
               ylow = -1
-              yup  = 4
+              yup  = 5
           endif  
           IF i EQ 3 THEN BEGIN 
               ylow = -1
@@ -196,6 +196,7 @@
           IF i EQ 2 THEN BEGIN
               ;Total_Num = 2.*10.^3 ;max(  mu1(2, *) )
               mi = 2
+              y00 = 0.5
               ;labels=[-90, -60, -30, 0, 30, 60, '  ']
               axis,yaxis=0,ytitle=textoidl('U'),yticks=(yup-ylow)/pdel,yminor=2,$
                             yrange=[ylow,yup],ystyle=1
@@ -231,6 +232,7 @@
               ;Total_Num = 4.*10.^5
               ;Total_Num = max(mu1(2, *))
               mi = 3
+              y00 = 0.4
               axis,yaxis=0,ytitle=textoidl('V'),yticks=(yup-ylow)/pdel,yminor=2,$
                             yrange=[ylow,yup],ystyle=1
               ;axis,yaxis=0,ytickname=replicate(' ',30),yticks=(yup-ylow)/pdel,yminor=2
