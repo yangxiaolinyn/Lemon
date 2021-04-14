@@ -2,7 +2,7 @@
 
       oldn=!D.name & set_plot,'ps'
   
-      infile = './dataFF_xx.txt'
+      infile = './dataFF_xx.dat'
       Openr, lunAo10, infile, /Get_Lun
       nn = FILE_LINES(infile) 
       Point_lun,lunAo10,0

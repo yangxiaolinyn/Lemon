@@ -184,7 +184,7 @@ int main( )
 
          //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          ofstream myFile;
-         myFile.open("./fig/dataFF_xx.txt", ios_base::out); 
+         myFile.open("./fig/dataFF_xx.dat", ios_base::out); 
          if (myFile.is_open())
          { 
              cout << "File open successful" << endl;  
